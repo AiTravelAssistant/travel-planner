@@ -90,9 +90,17 @@
     }
 
     function exportPDF() {
-      const element = document.getElementById("output");
-      html2pdf().from(element).save("旅行行程计划.pdf");
-    }
+  const element = document.getElementById("pdf-content");
+  const opt = {
+    margin: 0.5,
+    filename: "旅行行程计划.pdf",
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+    jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+  };
+  html2pdf().set(opt).from(element).save();
+}
   </script>
 </body>
 </html>
