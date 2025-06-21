@@ -214,6 +214,28 @@ textarea:focus {
   margin: 20px auto 0 auto;
   text-align: center;
 }
+  
+
+/* 生成中提示加载动画 */
+.loading-text {
+  display: inline-block;
+  font-weight: bold;
+  animation: pulse 1.2s infinite;
+  color: #555;
+}
+
+@keyframes pulse {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* 支付后 PDF 按钮也保持居中 */
+#pdfButton {
+  display: none;
+  margin: 20px auto 0 auto;
+  text-align: center;
+}
   </style>
  </head>
  <body>
