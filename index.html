@@ -153,10 +153,8 @@ textarea:focus {
 }
 
 /* ③ 输出区域淡入过渡 */
-.output {
-  opacity: 0;
-  animation: fadeIn 0.8s ease-in-out forwards;
-}
+.output { opacity: 1; transition: opacity 0.6s ease-in-out; }
+@media screen { .output { opacity: 0; animation: fadeIn 0.8s ease-in-out forwards; } }
 @keyframes fadeIn {
   to {
     opacity: 1;
@@ -193,6 +191,28 @@ textarea:focus {
   .footer {
     color: #888;
   }
+}
+  
+
+/* PDF 优化专用样式 */
+@media print {
+  .output {
+    font-size: 16px;
+    line-height: 1.75;
+    color: #000;
+    background-color: white;
+    padding: 20px;
+  }
+  table {
+    font-size: 15px;
+  }
+}
+
+/* 修复下载 PDF 按钮未居中 */
+#pdfButton {
+  display: none;
+  margin: 20px auto 0 auto;
+  text-align: center;
 }
   </style>
  </head>
