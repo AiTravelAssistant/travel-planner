@@ -12,70 +12,79 @@
   <style>
    body {
   font-family: "Microsoft YaHei", sans-serif;
-  padding: 16px;
-  margin: auto;
+  margin: 0;
+  padding: 0;
+  background-color: #f1f3f5;
+}
+
+.container {
   max-width: 800px;
-  background-color: #f8f8f8;
+  margin: 0 auto;
+  padding: 20px 16px;
 }
 
 h2 {
   text-align: center;
-  font-size: 26px;
-  margin: 20px 0 10px;
+  font-size: 24px;
+  margin-bottom: 20px;
   font-weight: bold;
-  color: #333;
+  color: #222;
 }
 
 textarea {
   width: 100%;
-  font-size: 18px;
+  font-size: 17px;
   padding: 16px;
-  border-radius: 10px;
-  box-sizing: border-box;
+  border-radius: 12px;
   border: 1px solid #ccc;
+  box-sizing: border-box;
   height: 30vh;
-  margin-bottom: 20px;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 button {
   display: block;
-  width: 90%;
-  margin: 0 auto 20px;
+  width: 100%;
   font-size: 18px;
   padding: 14px;
+  margin-top: 20px;
   background-color: #4CAF50;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #45a049;
 }
 
 #pdfButton {
-  display: none;
   background-color: #2196F3;
+  display: none;
 }
 
 .output {
-  white-space: pre-wrap;
-  background: #ffffff;
-  padding: 20px;
-  margin-top: 20px;
+  background-color: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-top: 24px;
   font-size: 16px;
   line-height: 1.6;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
+  margin-top: 12px;
   font-size: 15px;
-  page-break-inside: avoid;
 }
 th, td {
-  border: 1px solid #aaa;
-  padding: 6px 8px;
+  border: 1px solid #ddd;
+  padding: 8px;
   text-align: left;
 }
 
@@ -84,80 +93,123 @@ th, td {
   border: 1px solid #ccc;
   padding: 15px;
   background-color: #fffbe8;
-  border-radius: 8px;
+  border-radius: 10px;
   margin-top: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 .paywall img {
-  max-width: 220px;
+  max-width: 200px;
   margin: 10px auto;
   display: block;
 }
 .paywall button {
   background-color: #e0e0e0;
-  border: 1px solid #999;
   font-size: 16px;
   padding: 10px 20px;
   border-radius: 6px;
-  cursor: pointer;
+  margin-top: 10px;
 }
 
+/* 手机端额外调整 */
 @media (max-width: 768px) {
   h2 {
     font-size: 22px;
   }
   textarea {
     font-size: 18px;
-    padding: 16px;
+    padding: 18px;
     height: 34vh;
   }
   button {
-    font-size: 20px;
+    font-size: 19px;
     padding: 16px;
-    width: 95%;
   }
   .output {
-    font-size: 16.5px;
+    font-size: 17px;
     padding: 22px;
   }
+}
+  
+
+/* 顶部标题栏 */
+.header {
+  background: linear-gradient(to right, #4CAF50, #2e7d32);
+  color: white;
+  padding: 14px 20px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* logo + app 名称 */
+.logo-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.logo-title img {
+  height: 28px;
+}
+
+/* 美化底部输出区域 */
+.footer {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 13px;
+  color: #999;
+  padding-bottom: 20px;
 }
   </style>
  </head>
  <body>
-  <h2 style="margin-top: 10px;">
-   ✈️ AI旅行助手（优化版）
-  </h2>
-  <textarea id="inputText" placeholder="请输入您的旅行需求，例如：东京到大阪6天自由行，3人，8月中旬，人均预算10000元" rows="7"></textarea>
-  <button id="generateBtn" onclick="generate()">
-   🗺️ AI生成旅游行程
-  </button>
-  <div class="output" id="pdf-content">
-   <div id="output">
-    <p>
-     <strong>
-      这里将显示生成的行程内容...
-     </strong>
-    </p>
+  <div class="header">
+   <div class="logo-title">
+    <img alt="logo" src="IMG_9582.png"/>
+    <span>
+     AI旅行助手
+    </span>
    </div>
   </div>
-  <div class="paywall" id="paywall" style="display:none;">
-   <p>
-    <strong>
-     🔒 如需下载行程PDF，请扫码支付 &yen;10 后，点击下方按钮：
-    </strong>
-   </p>
-   <img alt="微信支付二维码" src="./wechat_qr.png"/>
-   <button id="unlockButton" onclick="unlockPDF()">
-    <span>
-     ☐
-    </span>
-    我已支付，下载行程PDF
+  <div class="container">
+   <h2 style="margin-top: 10px;">
+    ✈️ AI旅行助手（优化版）
+   </h2>
+   <textarea id="inputText" placeholder="请输入您的旅行需求，例如：东京到大阪6天自由行，3人，8月中旬，人均预算10000元" rows="7"></textarea>
+   <button id="generateBtn" onclick="generate()">
+    🗺️ AI生成旅游行程
    </button>
-  </div>
-  <button id="pdfButton" onclick="exportPDF()" style="display: none;">
-   📄 下载行程PDF文件
-  </button>
-  <script>
-   async function generate() {
+   <div class="output" id="pdf-content">
+    <div id="output">
+     <p>
+      <strong>
+       这里将显示生成的行程内容...
+      </strong>
+     </p>
+    </div>
+   </div>
+   <div class="paywall" id="paywall" style="display:none;">
+    <p>
+     <strong>
+      🔒 如需下载行程PDF，请扫码支付 &yen;10 后，点击下方按钮：
+     </strong>
+    </p>
+    <img alt="微信支付二维码" src="./wechat_qr.png"/>
+    <button id="unlockButton" onclick="unlockPDF()">
+     <span>
+      ☐
+     </span>
+     我已支付，下载行程PDF
+    </button>
+   </div>
+   <button id="pdfButton" onclick="exportPDF()" style="display: none;">
+    📄 下载行程PDF文件
+   </button>
+   <script>
+    async function generate() {
       const userInput = document.getElementById('inputText').value.trim();
       if (!userInput) {
         alert("⚠️ 请输入您的旅行需求！");
@@ -273,6 +325,10 @@ th, td {
       };
       html2pdf().set(opt).from(element).save();
     }
-  </script>
+   </script>
+   <div class="footer">
+    &copy; 2025 AI Travel Planner. All rights reserved.
+   </div>
+  </div>
  </body>
 </html>
