@@ -1,12 +1,38 @@
-
 <!DOCTYPE html>
 <html lang="zh">
-<head>
-  <meta charset="UTF-8" />
-  <title>AI旅行助手（优化版）</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+ <head>
+  <meta charset="utf-8"/>
+  <title>
+   AI旅行助手（优化版）
+  </title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
+  </script>
   <style>
+   @media screen and (max-width: 768px) {
+  textarea {
+    font-size: 18px !important;
+    height: 33vh !important;  /* 占手机屏幕高度约三分之一 */
+    padding: 16px !important;
+  }
+  button {
+    font-size: 18px !important;
+    padding: 14px 20px !important;
+  }
+  h2 {
+    font-size: 26px !important;
+  }
+  .output {
+    font-size: 16.5px !important;
+    line-height: 1.65 !important;
+  }
+  table {
+    font-size: 16px !important;
+  }
+}
+
+
 
 @media screen and (max-width: 768px) {
   textarea, button {
@@ -116,27 +142,43 @@
       }
     }
   </style>
-</head>
-<body>
-  <h2 style="margin-top: 10px;">✈️ AI旅行助手（优化版）</h2>
-
-  <textarea id="inputText" rows="7" placeholder="请输入您的旅行需求，例如：东京到大阪6天自由行，3人，8月中旬，人均预算10000元"></textarea>
-  <button id="generateBtn" onclick="generate()">🗺️ AI生成旅游行程</button>
-
+ </head>
+ <body>
+  <h2 style="margin-top: 10px;">
+   ✈️ AI旅行助手（优化版）
+  </h2>
+  <textarea id="inputText" placeholder="请输入您的旅行需求，例如：东京到大阪6天自由行，3人，8月中旬，人均预算10000元" rows="7"></textarea>
+  <button id="generateBtn" onclick="generate()">
+   🗺️ AI生成旅游行程
+  </button>
   <div class="output" id="pdf-content">
-    <div id="output"><p><strong>这里将显示生成的行程内容...</strong></p></div>
+   <div id="output">
+    <p>
+     <strong>
+      这里将显示生成的行程内容...
+     </strong>
+    </p>
+   </div>
   </div>
-
   <div class="paywall" id="paywall" style="display:none;">
-    <p><strong>🔒 如需下载行程PDF，请扫码支付 ¥10 后，点击下方按钮：</strong></p>
-    <img src="./wechat_qr.png" alt="微信支付二维码" />
-    <button id="unlockButton" onclick="unlockPDF()"><span>☐</span> 我已支付，下载行程PDF</button>
+   <p>
+    <strong>
+     🔒 如需下载行程PDF，请扫码支付 &yen;10 后，点击下方按钮：
+    </strong>
+   </p>
+   <img alt="微信支付二维码" src="./wechat_qr.png"/>
+   <button id="unlockButton" onclick="unlockPDF()">
+    <span>
+     ☐
+    </span>
+    我已支付，下载行程PDF
+   </button>
   </div>
-
-  <button id="pdfButton" onclick="exportPDF()">📄 下载行程PDF文件</button>
-
+  <button id="pdfButton" onclick="exportPDF()">
+   📄 下载行程PDF文件
+  </button>
   <script>
-    async function generate() {
+   async function generate() {
       const userInput = document.getElementById('inputText').value.trim();
       if (!userInput) {
         alert("⚠️ 请输入您的旅行需求！");
@@ -253,5 +295,5 @@
       html2pdf().set(opt).from(element).save();
     }
   </script>
-</body>
+ </body>
 </html>
