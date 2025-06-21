@@ -9,23 +9,36 @@
   <style>
     body {
       font-family: "Microsoft YaHei", sans-serif;
-      padding: 10px 20px;
-      max-width: 800px;
+      padding: 10px;
       margin: auto;
+      max-width: 800px;
       background-color: #f8f8f8;
     }
     h2 {
       text-align: center;
-      font-size: 30px;
-      margin: 10px 0 4px;
+      font-size: 24px;
+      margin: 10px 0;
       font-weight: bold;
       color: #333;
     }
-    textarea, button {
+    textarea {
       width: 100%;
-      margin-top: 10px;
       font-size: 16px;
-      padding: 10px;
+      padding: 12px;
+      box-sizing: border-box;
+      margin-top: 10px;
+    }
+
+    button {
+      display: block;
+      width: 80%;
+      margin: 15px auto;
+      font-size: 18px;
+      padding: 14px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
     }
     .output {
       white-space: pre-wrap;
@@ -50,12 +63,12 @@
       text-align: left;
     }
     .paywall {
-      margin-top: 20px;
       text-align: center;
       border: 1px solid #ccc;
       padding: 15px;
       background-color: #fffbe8;
       border-radius: 8px;
+      margin-top: 20px;
     }
     .paywall img {
       max-width: 220px;
@@ -64,7 +77,7 @@
     }
     .paywall button {
       display: inline-block;
-      padding: 10px 20px;
+      padding: 10px auto;
       margin-top: 10px;
       background-color: #e0e0e0;
       border: 1px solid #999;
@@ -80,12 +93,14 @@
     }
     #pdfButton {
       display: none;
-      margin-top: 20px;
-      background-color: #4CAF50;
+      margin: 15px auto;
+      font-size: 18px;
+      padding: 12px;
+      background-color: #2196F3;
       color: white;
       border: none;
-      border-radius: 5px;
-      padding: 12px 24px;
+      border-radius: 8px;
+      width: 80%;
     }
     @media print {
       h1, h2, h3, h4, table, tr, td, th {
@@ -93,42 +108,7 @@
         page-break-after: avoid !important;
       }
     }
-  
-@media (max-width: 768px) {
-  h2 {
-    font-size: 22px;
-  }
-  textarea {
-    font-size: 18px;
-    padding: 14px;
-    height: 180px;
-  }
-  button {
-    font-size: 18px;
-    padding: 14px 20px;
-  }
-  .output {
-    font-size: 17px;
-    padding: 18px;
-    line-height: 1.7;
-  }
-  table, th, td {
-    font-size: 16px;
-    padding: 10px;
-  }
-  .paywall p {
-    font-size: 16px;
-  }
-  .paywall button {
-    font-size: 18px;
-    padding: 14px;
-  }
-  #pdfButton {
-    font-size: 18px;
-    padding: 14px 20px;
-  }
-}
-</style>
+  </style>
 </head>
 <body>
   <h2 style="margin-top: 10px;">✈️ AI旅行助手（优化版）</h2>
