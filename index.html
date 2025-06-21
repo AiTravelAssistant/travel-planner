@@ -42,20 +42,7 @@
       color: white;
       border: none;
       border-radius: 8px;
-    
-  display: block;
-  margin: 15px auto;
-  width: 80%;
-  max-width: 400px;
-
-  display: block !important;
-  visibility: visible !important;
-  margin: 15px auto;
-  width: 80%;
-  max-width: 400px;
-  box-sizing: border-box;
-  overflow-wrap: break-word;
-}
+    }
 
     .output {
       white-space: pre-wrap;
@@ -84,17 +71,17 @@
     }
 
     #pdfButton {
-  display: none !important;
-  margin: 20px auto;
-  text-align: center;
-  width: fit-content;
-  padding: 12px 24px;
-  background-color: #2196F3;
-  color: white;
-  font-size: 18px;
-  border: none;
-  border-radius: 8px;
-}
+      display: none;
+      margin: 15px auto;
+      font-size: 18px;
+      text-align: center;
+      padding: 12px;
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      width: 80%;
+    }
 
     @media (max-width: 600px) {
       textarea {
@@ -103,17 +90,11 @@
       }
 
       button, #pdfButton {
-  display: none !important;
-  margin: 20px auto;
-  text-align: center;
-  width: fit-content;
-  padding: 12px 24px;
-  background-color: #2196F3;
-  color: white;
-  font-size: 18px;
-  border: none;
-  border-radius: 8px;
-}
+        font-size: 20px;
+        text-align: center;
+        padding: 16px;
+        width: 90%;
+      }
 
       .output {
         font-size: 16px;
@@ -123,18 +104,8 @@
   
 @media print {
   table, th, td {
-  border: 1px solid #333 !important;
-  border-collapse: collapse !important;
-}
-}
-
-@media (max-width: 768px) {
-  button {
-    display: block !important;
-    visibility: visible !important;
-    width: 90%;
-    font-size: 18px;
-    padding: 14px;
+    border: 1px solid #333 !important;
+    border-collapse: collapse !important;
   }
 }
 </style>
