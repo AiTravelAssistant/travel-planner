@@ -80,7 +80,11 @@
       border: none;
       border-radius: 8px;
       width: 80%;
-    }
+    
+  display: block;
+  margin: 20px auto;
+  text-align: center;
+}
 
     @media (max-width: 600px) {
       textarea {
@@ -92,14 +96,25 @@
         font-size: 20px;
         padding: 16px;
         width: 90%;
-      }
+      
+  display: block;
+  margin: 20px auto;
+  text-align: center;
+}
 
       .output {
         font-size: 16px;
         padding: 20px;
       }
     }
-  </style>
+  
+@media print {
+  table, th, td {
+    border: 1px solid #333 !important;
+    border-collapse: collapse !important;
+  }
+}
+</style>
 </head>
 <body>
 <h2 style="margin-top: 10px;">✈️ AI旅行助手（优化版）</h2>
