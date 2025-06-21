@@ -1,154 +1,120 @@
 
 <!DOCTYPE html>
+
 <html lang="zh">
 <head>
-  <meta charset="UTF-8" />
-  <title>AI旅行助手（优化版）</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <style>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta charset="utf-8"/>
+<title>AI旅行助手（移动优化版）</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
     body {
       font-family: "Microsoft YaHei", sans-serif;
-      padding: 10px 20px;
-      max-width: 800px;
+      padding: 10px;
       margin: auto;
+      max-width: 800px;
       background-color: #f8f8f8;
     }
+
     h2 {
       text-align: center;
-      font-size: 30px;
-      margin: 10px 0 4px;
+      font-size: 24px;
+      margin: 10px 0;
       font-weight: bold;
       color: #333;
     }
-    textarea, button {
+
+    textarea {
       width: 100%;
-      margin-top: 10px;
       font-size: 16px;
-      padding: 10px;
+      padding: 12px;
+      box-sizing: border-box;
+      margin-top: 10px;
     }
+
+    button {
+      display: block;
+      width: 80%;
+      margin: 15px auto;
+      font-size: 18px;
+      padding: 14px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+    }
+
     .output {
       white-space: pre-wrap;
       background: #ffffff;
-      padding: 20px;
+      padding: 16px;
       margin-top: 20px;
       border-radius: 12px;
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
       font-size: 15.5px;
       line-height: 1.55;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      font-size: 15px;
-      page-break-inside: avoid;
-    }
-    th, td {
-      border: 1px solid #aaa;
-      padding: 6px 8px;
-      text-align: left;
-    }
+
     .paywall {
-      margin-top: 20px;
       text-align: center;
       border: 1px solid #ccc;
       padding: 15px;
       background-color: #fffbe8;
       border-radius: 8px;
+      margin-top: 20px;
     }
+
     .paywall img {
-      max-width: 220px;
+      max-width: 200px;
       margin: 10px auto;
       display: block;
     }
-    .paywall button {
-      display: inline-block;
-      padding: 10px 20px;
-      margin-top: 10px;
-      background-color: #e0e0e0;
-      border: 1px solid #999;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      max-width: 300px;
-    }
-    .paywall button span {
-      display: inline-block;
-      width: 20px;
-      text-align: center;
-    }
+
     #pdfButton {
       display: none;
-      margin-top: 20px;
-      background-color: #4CAF50;
+      margin: 15px auto;
+      font-size: 18px;
+      padding: 12px;
+      background-color: #2196F3;
       color: white;
       border: none;
-      border-radius: 5px;
-      padding: 12px 24px;
+      border-radius: 8px;
+      width: 80%;
     }
-    @media print {
-      h1, h2, h3, h4, table, tr, td, th {
-        page-break-inside: avoid !important;
-        page-break-after: avoid !important;
+
+    @media (max-width: 600px) {
+      textarea {
+        font-size: 18px;
+        padding: 14px;
+      }
+
+      button, #pdfButton {
+        font-size: 20px;
+        padding: 16px;
+        width: 90%;
+      }
+
+      .output {
+        font-size: 16px;
+        padding: 20px;
       }
     }
-  
-@media (max-width: 768px) {
-  h2 {
-    font-size: 24px;
-  }
-  textarea {
-    font-size: 18px;
-    padding: 14px;
-    height: 160px;
-  }
-  button {
-    font-size: 18px;
-    padding: 14px 20px;
-  }
-  .output {
-    font-size: 16px;
-    padding: 18px;
-    line-height: 1.7;
-  }
-  table, th, td {
-    font-size: 15px;
-    padding: 10px;
-  }
-  .paywall p {
-    font-size: 16px;
-  }
-  .paywall button {
-    font-size: 18px;
-    padding: 14px;
-  }
-  #pdfButton {
-    font-size: 18px;
-    padding: 14px 20px;
-  }
-}
-</style>
+  </style>
 </head>
 <body>
-  <h2 style="margin-top: 10px;">✈️ AI旅行助手（优化版）</h2>
-
-  <textarea id="inputText" rows="7" placeholder="请输入您的旅行需求，例如：东京到大阪6天自由行，3人，8月中旬，人均预算10000元"></textarea>
-  <button id="generateBtn" onclick="generate()">🗺️ AI生成旅游行程</button>
-
-  <div class="output" id="pdf-content">
-    <div id="output"><p><strong>这里将显示生成的行程内容...</strong></p></div>
-  </div>
-
-  <div class="paywall" id="paywall" style="display:none;">
-    <p><strong>🔒 如需下载行程PDF，请扫码支付 ¥10 后，点击下方按钮：</strong></p>
-    <img src="./wechat_qr.png" alt="微信支付二维码" />
-    <button id="unlockButton" onclick="unlockPDF()"><span>☐</span> 我已支付，下载行程PDF</button>
-  </div>
-
-  <button id="pdfButton" onclick="exportPDF()">📄 下载行程PDF文件</button>
-
-  <script>
+<h2 style="margin-top: 10px;">✈️ AI旅行助手（优化版）</h2>
+<textarea id="inputText" placeholder="请输入您的旅行需求，例如：东京到大阪6天自由行，3人，8月中旬，人均预算10000元" rows="7"></textarea>
+<button id="generateBtn" onclick="generate()">🗺️ AI生成旅游行程</button>
+<div class="output" id="pdf-content">
+<div id="output"><p><strong>这里将显示生成的行程内容...</strong></p></div>
+</div>
+<div class="paywall" id="paywall" style="display:none;">
+<p><strong>🔒 如需下载行程PDF，请扫码支付 ¥10 后，点击下方按钮：</strong></p>
+<img alt="微信支付二维码" src="./wechat_qr.png"/>
+<button id="unlockButton" onclick="unlockPDF()"><span>☐</span> 我已支付，下载行程PDF</button>
+</div>
+<button id="pdfButton" onclick="exportPDF()">📄 下载行程PDF文件</button>
+<script>
     async function generate() {
       const userInput = document.getElementById('inputText').value.trim();
       if (!userInput) {
