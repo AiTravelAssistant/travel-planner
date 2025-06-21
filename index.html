@@ -128,6 +128,72 @@ th, td {
     padding: 26px;
   }
 }
+  
+.footer {
+  text-align: center;
+  font-size: 13px;
+  color: #999;
+  margin-top: 40px;
+  padding-bottom: 20px;
+}
+  
+
+/* ① 动态按钮点击动画 */
+button:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset;
+}
+
+/* ② 输入框聚焦高亮 */
+textarea:focus {
+  outline: none;
+  border: 2px solid #4CAF50;
+  box-shadow: 0 0 6px rgba(76, 175, 80, 0.4);
+  background-color: #ffffff;
+}
+
+/* ③ 输出区域淡入过渡 */
+.output {
+  opacity: 0;
+  animation: fadeIn 0.8s ease-in-out forwards;
+}
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* ⑤ 夜间模式支持 */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+  }
+  textarea {
+    background-color: #2a2a2a;
+    color: #fff;
+    border: 1px solid #666;
+  }
+  button {
+    background: linear-gradient(to right, #66bb6a, #388e3c);
+    color: #fff;
+  }
+  .output {
+    background-color: #2e2e2e;
+    color: #f0f0f0;
+  }
+  .paywall {
+    background-color: #333;
+    color: #ddd;
+  }
+  .paywall button {
+    background-color: #444;
+    color: #fff;
+  }
+  .footer {
+    color: #888;
+  }
+}
   </style>
  </head>
  <body>
