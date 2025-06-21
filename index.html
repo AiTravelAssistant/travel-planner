@@ -1,0 +1,270 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI旅行助手（优化版）</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    body {
+      font-family: "Microsoft YaHei", sans-serif;
+      padding: 10px 20px;
+      max-width: 800px;
+      margin: auto;
+      background-color: #f8f8f8;
+    }
+    h2 {
+      text-align: center;
+      font-size: 30px;
+      margin: 10px 0 4px;
+      font-weight: bold;
+      color: #333;
+    }
+    textarea, button {
+      width: 100%;
+      margin-top: 10px;
+      font-size: 16px;
+      padding: 10px;
+    }
+    .output {
+      white-space: pre-wrap;
+      background: #ffffff;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+      font-size: 15.5px;
+      line-height: 1.55;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 15px;
+      page-break-inside: avoid;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 6px 8px;
+      text-align: left;
+    }
+    .paywall {
+      margin-top: 20px;
+      text-align: center;
+      border: 1px solid #ccc;
+      padding: 15px;
+      background-color: #fffbe8;
+      border-radius: 8px;
+    }
+    .paywall img {
+      max-width: 220px;
+      margin: 10px auto;
+      display: block;
+    }
+    .paywall button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-top: 10px;
+      background-color: #e0e0e0;
+      border: 1px solid #999;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      max-width: 300px;
+    }
+    .paywall button span {
+      display: inline-block;
+      width: 20px;
+      text-align: center;
+    }
+    #pdfButton {
+      display: none;
+      margin-top: 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 12px 24px;
+    }
+    @media print {
+      h1, h2, h3, h4, table, tr, td, th {
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
+      }
+    }
+  
+@media (max-width: 768px) {
+  h2 {
+    font-size: 22px;
+  }
+  textarea {
+    font-size: 18px;
+    padding: 14px;
+    height: 180px;
+  }
+  button {
+    font-size: 18px;
+    padding: 14px 20px;
+  }
+  .output {
+    font-size: 17px;
+    padding: 18px;
+    line-height: 1.7;
+  }
+  table, th, td {
+    font-size: 16px;
+    padding: 10px;
+  }
+  .paywall p {
+    font-size: 16px;
+  }
+  .paywall button {
+    font-size: 18px;
+    padding: 14px;
+  }
+  #pdfButton {
+    font-size: 18px;
+    padding: 14px 20px;
+  }
+}
+</style>
+</head>
+<body>
+  <h2 style="margin-top: 10px;">✈️ AI旅行助手（优化版）</h2>
+
+  <textarea id="inputText" rows="7" placeholder="请输入您的旅行需求，例如：东京到大阪6天自由行，3人，8月中旬，人均预算10000元"></textarea>
+  <button id="generateBtn" onclick="generate()">🗺️ AI生成旅游行程</button>
+
+  <div class="output" id="pdf-content">
+    <div id="output"><p><strong>这里将显示生成的行程内容...</strong></p></div>
+  </div>
+
+  <div class="paywall" id="paywall" style="display:none;">
+    <p><strong>🔒 如需下载行程PDF，请扫码支付 ¥10 后，点击下方按钮：</strong></p>
+    <img src="./wechat_qr.png" alt="微信支付二维码" />
+    <button id="unlockButton" onclick="unlockPDF()"><span>☐</span> 我已支付，下载行程PDF</button>
+  </div>
+
+  <button id="pdfButton" onclick="exportPDF()">📄 下载行程PDF文件</button>
+
+  <script>
+    async function generate() {
+      const userInput = document.getElementById('inputText').value.trim();
+      if (!userInput) {
+        alert("⚠️ 请输入您的旅行需求！");
+        return;
+      }
+
+      const output = document.getElementById('output');
+      const paywall = document.getElementById('paywall');
+      const pdfButton = document.getElementById('pdfButton');
+      const generateBtn = document.getElementById('generateBtn');
+
+      output.innerHTML = '<p><strong>⏳ AI正在生成行程，请稍等大概30秒...</strong></p>';
+      paywall.style.display = 'none';
+      pdfButton.style.display = 'none';
+      generateBtn.disabled = true;
+      generateBtn.innerText = "🗺️ AI生成旅游行程";
+
+      const prompt = `你是一位专业的中文旅行规划师，请根据以下旅行者的需求，制定详细的日本自由行计划。旅行需求：${userInput}。
+      
+请为这次日本自由行提供以下内容：
+
+---
+
+### 1. 每日详细行程（按 Day1 ~ DayX 划分）：
+
+- 城市/地区名称  
+- 推荐景点（人文、自然、文化类）  
+- 推荐交通方式（比如电车，新干线，出租车，也可以推荐包车自由行）
+- 餐饮推荐（特色美食或区域料理）  
+- 推荐住宿区域（交通便利，适合家庭）  
+- 节奏合理，适合中年人及青少年，不宜过于紧张
+
+---
+
+### 2. 每日预算估算（简要列出每人/家庭单位估算）：
+
+- 交通费用  
+- 餐饮费用  
+- 门票费用  
+- 住宿费用  
+- 其他小费/自由活动支出
+
+---
+
+### 3. 输出格式请使用以下 **Markdown 表格** 的每日行程，方便用户查看与导出为PDF，并注意分页排版美观：
+
+#### Day1 - 抵达东京，初探都市风情
+
+| 时间 | 行程内容 | 备注 |
+|------|----------|------|
+| 上午 | 抵达东京成田或羽田机场，中文司机接机 | 根据实际航班安排 |
+| 中午 | 入住酒店后简单用餐 | 推荐浅草或银座周边日式餐厅 |
+| 下午 | 浅草寺参拜、雷门、晴空塔拍照打卡 | 结合历史文化与城市景观 |
+| 晚上 | 日本居酒屋或拉面馆 | 可选择家庭套餐，体验日本风味 |
+| 住宿 | 东京市中心酒店（推荐上野、浅草区域） | 交通便利，适合家庭 |
+
+---
+
+请根据以上要求，制定完整的 Day1 ~ DayX 行程计划与预算。
+
+不需要任何AI自我提示或免责声明，直接输出内容即可。
+`;
+
+      try {
+        const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer sk-f364b488cdff4e87951aa571f6208526"
+          },
+          body: JSON.stringify({
+            model: "deepseek-chat",
+            messages: [
+              { role: "system", content: "你是一位专业中文旅行规划师" },
+              { role: "user", content: prompt }
+            ],
+            temperature: 0.7
+          })
+        });
+
+        const data = await response.json();
+        if (data && data.choices && data.choices.length > 0) {
+          output.innerHTML = marked.parse(data.choices[0].message.content.trim());
+          paywall.style.display = 'block';
+          document.getElementById("pdf-content").scrollIntoView({ behavior: "smooth" });
+        } else {
+          output.innerText = "⚠️ AI未返回有效内容，请稍后再试。";
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        output.innerText = "❌ AI请求出错，请检查网络连接。";
+      } finally {
+        generateBtn.disabled = false;
+        generateBtn.innerText = "🗺️ AI生成旅游行程";
+      }
+    }
+
+    function unlockPDF() {
+      const btn = document.getElementById('unlockButton');
+      btn.innerHTML = '<span>✅</span> 已支付，下载行程PDF';
+      document.getElementById('pdfButton').style.display = 'inline-block';
+      document.getElementById('pdfButton').scrollIntoView({ behavior: "smooth" });
+    }
+
+    function exportPDF() {
+      const element = document.getElementById("pdf-content");
+      const opt = {
+        margin: 0.5,
+        filename: "旅行行程计划.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+        jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+  </script>
+</body>
+</html>
