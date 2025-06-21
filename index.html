@@ -47,6 +47,14 @@
   margin: 15px auto;
   width: 80%;
   max-width: 400px;
+
+  display: block !important;
+  visibility: visible !important;
+  margin: 15px auto;
+  width: 80%;
+  max-width: 400px;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
 }
 
     .output {
@@ -122,6 +130,16 @@
   border: 1px solid #333 !important;
   border-collapse: collapse !important;
 }
+}
+
+@media (max-width: 768px) {
+  button {
+    display: block !important;
+    visibility: visible !important;
+    width: 90%;
+    font-size: 18px;
+    padding: 14px;
+  }
 }
 </style>
 </head>
