@@ -197,6 +197,24 @@ button:active {
   transform: scale(0.97);
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
+  
+
+/* 页脚版权信息居中显示在页面底部 */
+footer {
+  text-align: center;
+  font-size: 14px;
+  color: #888;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+/* 修复 PDF 按钮居中失败的问题 */
+#pdfButton {
+  display: none;
+  margin: 24px auto;
+  text-align: center;
+  width: fit-content;
+}
   </style>
  </head>
  <body>
@@ -231,9 +249,11 @@ button:active {
      我已支付，下载行程PDF
     </button>
    </div>
-   <button id="pdfButton" onclick="exportPDF()" style="display: none;">
-    📄 下载行程PDF文件
-   </button>
+   <div style="text-align: center;">
+    <button id="pdfButton" onclick="exportPDF()" style="display: none;">
+     📄 下载行程PDF文件
+    </button>
+   </div>
    <script>
     async function generate() {
       const userInput = document.getElementById('inputText').value.trim();
@@ -356,5 +376,8 @@ button:active {
     &copy; 2025 MYG. All rights reserved.
    </div>
   </div>
+  <footer>
+   &copy; 2025 MYG. All rights reserved.
+  </footer>
  </body>
 </html>
