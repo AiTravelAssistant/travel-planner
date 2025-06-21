@@ -10,95 +10,113 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
   </script>
   <style>
-   body {
+   @media screen and (max-width: 768px) {
+  textarea {
+    font-size: 18px !important;
+    padding: 16px !important;
+    height: 33vh !important; /* 输入框占屏幕约1/3 */
+  }
+  button {
+    font-size: 18px !important;
+    padding: 14px !important;
+  }
+  h2 {
+    font-size: 26px !important;
+  }
+  .output {
+    font-size: 16.5px !important;
+    line-height: 1.65 !important;
+  }
+  table {
+    font-size: 16px !important;
+  }
+}
+
+
+    body {
       font-family: "Microsoft YaHei", sans-serif;
-      padding: 10px;
-      margin: auto;
+      padding: 10px 20px;
       max-width: 800px;
+      margin: auto;
       background-color: #f8f8f8;
     }
-
     h2 {
       text-align: center;
-      font-size: 24px;
-      margin: 10px 0;
+      font-size: 30px;
+      margin: 10px 0 4px;
       font-weight: bold;
       color: #333;
     }
-
-    textarea {
+    textarea, button {
       width: 100%;
-      font-size: 16px;
-      padding: 12px;
-      box-sizing: border-box;
       margin-top: 10px;
+      font-size: 16px;
+      padding: 10px;
     }
-
-    button {
-      display: block;
-      width: 80%;
-      margin: 15px auto;
-      font-size: 18px;
-      padding: 14px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 8px;
-    }
-
     .output {
       white-space: pre-wrap;
       background: #ffffff;
-      padding: 16px;
+      padding: 20px;
       margin-top: 20px;
       border-radius: 12px;
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
       font-size: 15.5px;
       line-height: 1.55;
     }
-
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 15px;
+      page-break-inside: avoid;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 6px 8px;
+      text-align: left;
+    }
     .paywall {
+      margin-top: 20px;
       text-align: center;
       border: 1px solid #ccc;
       padding: 15px;
       background-color: #fffbe8;
       border-radius: 8px;
-      margin-top: 20px;
     }
-
     .paywall img {
-      max-width: 200px;
+      max-width: 220px;
       margin: 10px auto;
       display: block;
     }
-
+    .paywall button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-top: 10px;
+      background-color: #e0e0e0;
+      border: 1px solid #999;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      max-width: 300px;
+    }
+    .paywall button span {
+      display: inline-block;
+      width: 20px;
+      text-align: center;
+    }
     #pdfButton {
       display: none;
-      margin: 15px auto;
-      font-size: 18px;
-      padding: 12px;
-      background-color: #2196F3;
+      margin-top: 20px;
+      background-color: #4CAF50;
       color: white;
       border: none;
-      border-radius: 8px;
-      width: 80%;
+      border-radius: 5px;
+      padding: 12px 24px;
     }
-
-    @media (max-width: 600px) {
-      textarea {
-        font-size: 18px;
-        padding: 14px;
-      }
-
-      button, #pdfButton {
-        font-size: 20px;
-        padding: 16px;
-        width: 90%;
-      }
-
-      .output {
-        font-size: 16px;
-        padding: 20px;
+    @media print {
+      h1, h2, h3, h4, table, tr, td, th {
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
       }
     }
   </style>
