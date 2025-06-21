@@ -272,6 +272,30 @@ footer {
   margin-top: 40px;
   margin-bottom: 20px;
 }
+  
+
+/* PDF 打印优化：每个 Day 的表格尽量单独分页 */
+@media print {
+  .day-plan {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  table {
+    font-size: 13px;
+    line-height: 1.5;
+    page-break-inside: avoid;
+  }
+
+  th, td {
+    padding: 8px 10px;
+    word-break: break-word;
+  }
+
+  .day-plan h3 {
+    page-break-before: always;
+  }
+}
   </style>
  </head>
  <body>
@@ -429,9 +453,6 @@ footer {
       html2pdf().set(opt).from(element).save();
     }
    </script>
-   <div class="footer">
-    &copy; 2025 MYG. All rights reserved.
-   </div>
   </div>
   <footer class="page-footer">
    &copy; 2025 MYG. All rights reserved.
