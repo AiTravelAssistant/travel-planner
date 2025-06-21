@@ -10,10 +10,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
   </script>
   <style>
-   /* 基础布局 */
-body {
+   body {
   font-family: "Microsoft YaHei", sans-serif;
-  padding: 10px;
+  padding: 16px;
   margin: auto;
   max-width: 800px;
   background-color: #f8f8f8;
@@ -21,44 +20,41 @@ body {
 
 h2 {
   text-align: center;
-  font-size: 24px;
-  margin: 12px 0;
+  font-size: 26px;
+  margin: 20px 0 10px;
   font-weight: bold;
   color: #333;
 }
 
-/* 输入框样式 */
 textarea {
   width: 100%;
-  font-size: 17px;
+  font-size: 18px;
   padding: 16px;
+  border-radius: 10px;
   box-sizing: border-box;
-  margin-top: 12px;
-  border-radius: 8px;
   border: 1px solid #ccc;
-  height: 32vh;
-  resize: vertical;
+  height: 30vh;
+  margin-bottom: 20px;
 }
 
-/* 按钮样式 */
 button {
   display: block;
   width: 90%;
-  margin: 15px auto;
-  font-size: 1.2rem;
+  margin: 0 auto 20px;
+  font-size: 18px;
   padding: 14px;
   background-color: #4CAF50;
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
 }
 
-button#pdfButton {
+#pdfButton {
+  display: none;
   background-color: #2196F3;
 }
 
-/* 输出结果样式 */
 .output {
   white-space: pre-wrap;
   background: #ffffff;
@@ -66,11 +62,10 @@ button#pdfButton {
   margin-top: 20px;
   border-radius: 12px;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-  font-size: 15.5px;
-  line-height: 1.55;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
-/* 表格样式 */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -84,50 +79,44 @@ th, td {
   text-align: left;
 }
 
-/* 支付模块 */
 .paywall {
-  margin-top: 20px;
   text-align: center;
   border: 1px solid #ccc;
   padding: 15px;
   background-color: #fffbe8;
   border-radius: 8px;
+  margin-top: 20px;
 }
 .paywall img {
-  max-width: 200px;
+  max-width: 220px;
   margin: 10px auto;
   display: block;
 }
 .paywall button {
   background-color: #e0e0e0;
-  color: black;
+  border: 1px solid #999;
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
-/* 打印适配 */
-@media print {
-  h1, h2, h3, h4, table, tr, td, th {
-    page-break-inside: avoid !important;
-    page-break-after: avoid !important;
-  }
-}
-
-/* 手机屏幕适配 */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   h2 {
     font-size: 22px;
   }
   textarea {
-    font-size: 1.2rem;
-    padding: 14px;
-    height: 35vh;
+    font-size: 18px;
+    padding: 16px;
+    height: 34vh;
   }
   button {
-    font-size: 1.4rem;
+    font-size: 20px;
     padding: 16px;
     width: 95%;
   }
   .output {
-    font-size: 16px;
+    font-size: 16.5px;
     padding: 22px;
   }
 }
