@@ -10,14 +10,14 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
   </script>
   <style>
-
-    body {
+   body {
       font-family: "Microsoft YaHei", sans-serif;
       padding: 10px;
       margin: auto;
       max-width: 800px;
       background-color: #f8f8f8;
     }
+
     h2 {
       text-align: center;
       font-size: 24px;
@@ -25,6 +25,7 @@
       font-weight: bold;
       color: #333;
     }
+
     textarea {
       width: 100%;
       font-size: 16px;
@@ -44,29 +45,18 @@
       border: none;
       border-radius: 8px;
     }
-    
+
     .output {
       white-space: pre-wrap;
       background: #ffffff;
-      padding: 20px;
+      padding: 16px;
       margin-top: 20px;
       border-radius: 12px;
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
       font-size: 15.5px;
       line-height: 1.55;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      font-size: 15px;
-      page-break-inside: avoid;
-    }
-    th, td {
-      border: 1px solid #aaa;
-      padding: 6px 8px;
-      text-align: left;
-    }
+
     .paywall {
       text-align: center;
       border: 1px solid #ccc;
@@ -93,11 +83,22 @@
       border-radius: 8px;
       width: 80%;
     }
-    
-    @media print {
-      h1, h2, h3, h4, table, tr, td, th {
-        page-break-inside: avoid !important;
-        page-break-after: avoid !important;
+
+    @media (max-width: 600px) {
+      textarea {
+        font-size: 18px;
+        padding: 14px;
+      }
+
+      button, #pdfButton {
+        font-size: 20px;
+        padding: 16px;
+        width: 90%;
+      }
+
+      .output {
+        font-size: 16px;
+        padding: 20px;
       }
     }
   </style>
