@@ -14,27 +14,25 @@
   font-family: "Microsoft YaHei", sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f1f3f5;
+  background-color: #f5f6f7;
 }
-
 .container {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px 16px;
 }
-
 h2 {
   text-align: center;
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 30px;
+  margin-bottom: 24px;
   font-weight: bold;
-  color: #222;
+  color: #2a2a2a;
+  letter-spacing: 1px;
 }
-
 textarea {
   width: 100%;
-  font-size: 17px;
-  padding: 16px;
+  font-size: 20px;
+  padding: 18px;
   border-radius: 12px;
   border: 1px solid #ccc;
   box-sizing: border-box;
@@ -45,42 +43,42 @@ textarea {
 
 button {
   display: block;
-  width: 100%;
-  font-size: 18px;
-  padding: 14px;
-  margin-top: 20px;
-  background-color: #4CAF50;
+  width: 60%;
+  font-size: 22px;
+  padding: 16px;
+  margin: 20px auto;
+  background: linear-gradient(to right, #4CAF50, #2e7d32);
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
 }
-
 button:hover {
-  background-color: #45a049;
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.12);
 }
-
 #pdfButton {
-  background-color: #2196F3;
   display: none;
+  background-color: #2196F3;
 }
 
 .output {
   background-color: #ffffff;
-  border-radius: 12px;
-  padding: 20px;
-  margin-top: 24px;
-  font-size: 16px;
-  line-height: 1.6;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 30px;
+  font-size: 18px;
+  line-height: 1.7;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.06);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 12px;
-  font-size: 15px;
+  margin-top: 14px;
+  font-size: 16px;
 }
 th, td {
   border: 1px solid #ddd;
@@ -110,70 +108,28 @@ th, td {
   margin-top: 10px;
 }
 
-/* 手机端额外调整 */
+/* 手机端优化 */
 @media (max-width: 768px) {
   h2 {
-    font-size: 22px;
+    font-size: 28px;
   }
   textarea {
-    font-size: 18px;
-    padding: 18px;
-    height: 34vh;
+    font-size: 20px;
+    height: 32vh;
   }
   button {
-    font-size: 19px;
+    font-size: 24px;
+    width: 85%;
     padding: 16px;
   }
   .output {
-    font-size: 17px;
-    padding: 22px;
+    font-size: 18.5px;
+    padding: 26px;
   }
-}
-  
-
-/* 顶部标题栏 */
-.header {
-  background: linear-gradient(to right, #4CAF50, #2e7d32);
-  color: white;
-  padding: 14px 20px;
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  border-bottom: 1px solid #ccc;
-  letter-spacing: 1px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-/* logo + app 名称 */
-.logo-title {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-.logo-title img {
-  height: 28px;
-}
-
-/* 美化底部输出区域 */
-.footer {
-  margin-top: 40px;
-  text-align: center;
-  font-size: 13px;
-  color: #999;
-  padding-bottom: 20px;
 }
   </style>
  </head>
  <body>
-  <div class="header">
-   <div class="logo-title">
-    <img alt="logo" src="IMG_9582.png"/>
-    <span>
-     AI旅行助手
-    </span>
-   </div>
-  </div>
   <div class="container">
    <h2 style="margin-top: 10px;">
     ✈️ AI旅行助手（优化版）
@@ -327,7 +283,7 @@ th, td {
     }
    </script>
    <div class="footer">
-    &copy; 2025 AI Travel Planner. All rights reserved.
+    &copy; 2025 MYG. All rights reserved.
    </div>
   </div>
  </body>
