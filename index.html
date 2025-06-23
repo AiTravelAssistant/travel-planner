@@ -253,7 +253,81 @@ footer {
     page-break-before: always;
   }
 }
-  </style>
+  
+
+/* 极简美化：整体页面背景和字体 */
+body {
+  background-color: #f7f9fc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
+  color: #2e2e2e;
+}
+
+/* 容器精致圆角卡片化 */
+.container {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  margin-top: 32px;
+}
+
+/* 标题美化 */
+h2 {
+  background: linear-gradient(to right, #4CAF50, #81C784);
+  color: white;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 24px;
+  margin-bottom: 24px;
+}
+
+/* 输入框优化 */
+textarea {
+  font-size: 18px;
+  padding: 16px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+/* 按钮统一风格：大圆角、渐变、轻阴影 */
+button {
+  font-size: 18px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(to right, #43cea2, #185a9d);
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+/* PDF按钮特别高亮 */
+#pdfButton {
+  background: linear-gradient(to right, #00b09b, #96c93d);
+  font-size: 19px;
+  margin-top: 20px;
+}
+
+/* 支付区卡片风格 */
+.paywall {
+  background-color: #fff9db;
+  border: 1px solid #f0e3a3;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* 备注信息样式 */
+#orderCode {
+  font-weight: 600;
+  font-size: 17px;
+  margin-bottom: 12px;
+}
+</style>
 </head>
 <body>
 <div class="container">
