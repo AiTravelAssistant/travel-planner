@@ -4,9 +4,7 @@
 <head>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <meta charset="utf-8"/>
-<title>
-   AI旅行助手（优化版）
-  </title>
+<title>AI旅行助手</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js">
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
@@ -254,86 +252,26 @@ footer {
   }
 }
   
-
-/* 极简美化：整体页面背景和字体 */
-body {
-  background-color: #f7f9fc;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
-  color: #2e2e2e;
+.dot-typing {
+  display: inline-block;
+  width: 1em;
+  text-align: left;
 }
-
-/* 容器精致圆角卡片化 */
-.container {
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-  margin-top: 32px;
+.dot-typing::after {
+  content: '...';
+  animation: blink 1s steps(3, jump-none) infinite;
 }
-
-/* 标题美化 */
-h2 {
-  background: linear-gradient(to right, #4CAF50, #81C784);
-  color: white;
-  padding: 16px;
-  border-radius: 12px;
-  font-size: 24px;
-  margin-bottom: 24px;
-}
-
-/* 输入框优化 */
-textarea {
-  font-size: 18px;
-  padding: 16px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-}
-
-/* 按钮统一风格：大圆角、渐变、轻阴影 */
-button {
-  font-size: 18px;
-  padding: 12px 20px;
-  border-radius: 8px;
-  border: none;
-  background: linear-gradient(to right, #43cea2, #185a9d);
-  color: white;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  transition: all 0.2s ease;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-/* PDF按钮特别高亮 */
-#pdfButton {
-  background: linear-gradient(to right, #00b09b, #96c93d);
-  font-size: 19px;
-  margin-top: 20px;
-}
-
-/* 支付区卡片风格 */
-.paywall {
-  background-color: #fff9db;
-  border: 1px solid #f0e3a3;
-  border-radius: 12px;
-  padding: 20px;
-}
-
-/* 备注信息样式 */
-#orderCode {
-  font-weight: 600;
-  font-size: 17px;
-  margin-bottom: 12px;
+@keyframes blink {
+  0% { content: ''; }
+  33% { content: '.'; }
+  66% { content: '..'; }
+  100% { content: '...'; }
 }
 </style>
 </head>
 <body>
 <div class="container">
-<h2 style="margin-top: 10px;">
-    ✈️ AI旅行助手（优化版）
-   </h2>
+<h2 style="margin-top: 10px;">✈️ AI旅行助手</h2>
 <textarea id="inputText" placeholder="请输入您的旅行需求，例如：东京到大阪6天自由行，3人，8月中旬，人均预算10000元" rows="7"></textarea>
 <button id="generateBtn" onclick="generate()">
     🗺️ AI生成旅游行程
@@ -353,7 +291,7 @@ button:hover {
 </div><div class="paywall" id="paywall" style="display:none;">
 <p>
 <strong>
-      🔒 如需下载行程PDF，请扫码支付 ¥10 后，点击下方按钮：
+      🔒请扫码支付二维码，填写下方的备注信息！
      </strong>
 </p><p id="orderCode">
 备注信息：<strong id="orderIdText">20250623-1807</strong>
@@ -390,7 +328,7 @@ async function generate() {
   const payHint = document.getElementById("payHint");
   const orderCode = document.getElementById("orderIdText");
 
-  output.innerHTML = '<p><strong>⏳ AI正在生成行程，请稍等大概30秒...</strong></p>';
+  output.innerHTML = '<p style="font-weight:bold;font-size:16px;">⏳ <span class="dot-typing"></span> 正在生成行程，请稍等...</p>';
   paywall.style.display = 'none';
   pdfButton.style.display = 'none';
   payHint.style.display = 'none';
