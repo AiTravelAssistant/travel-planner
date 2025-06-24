@@ -7,6 +7,9 @@
 <title>AI旅行助手(MVP)</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js">
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
 </script>
 <style>
@@ -213,9 +216,6 @@ footer {
   }
 }
 
-/* 修复转圈加载动画位置及兼容性 */
-}
-  
 
 }
 
@@ -232,6 +232,9 @@ footer {
 /* PDF 打印优化：每个 Day 的表格尽量单独分页 */
 @media print {
   .day-plan {
+  page-break-before: always !important;
+  page-break-inside: avoid !important;
+  break-before: page !important;
     page-break-before: always;
     break-before: page;
   }
@@ -267,6 +270,44 @@ footer {
   66% { content: '..'; }
   100% { content: '...'; }
 }
+
+@media print {
+  table {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  .day-plan {
+    page-break-inside: avoid !important;
+  }
+}
+
+
+table th:nth-child(1), table td:nth-child(1) {
+  width: 10%;
+  min-width: 60px;
+}
+
+table th:nth-child(2), table td:nth-child(2) {
+  width: 28%;
+  min-width: 160px;
+}
+
+table th:nth-child(3), table td:nth-child(3) {
+  width: 18%;
+  min-width: 100px;
+}
+
+table th:nth-child(4), table td:nth-child(4) {
+  width: 14%;
+  min-width: 60px;
+}
+
+table th:nth-child(5), table td:nth-child(5) {
+  width: 30%;
+  min-width: 160px;
+  word-break: break-word;
+}
+
 </style>
 </head>
 <body>
@@ -287,11 +328,11 @@ footer {
 </div>
 <div class="pay-hint" id="payHint" style="display:none; text-align:center; margin-top:20px;">
 <p><strong>如需下载 PDF 文件，请点击下方按钮，支付 ¥10 解锁：</strong></p>
-<button onclick="showPayment()" style="background-color:#ffa726;">💰 下载PDF（¥10）</button>
+<button onclick="showPayment()" style="background-color:#ffa726;">微信支付（¥10）</button>
 </div><div class="paywall" id="paywall" style="display:none;">
 <p>
 <strong>
-      🔒请扫码支付二维码，填写下方的备注信息！
+      🔒请扫码支付二维码，添加下面的备注信息。
      </strong>
 </p><p id="orderCode">
 备注信息：<strong id="orderIdText">20250623-1807</strong>
@@ -317,7 +358,7 @@ footer {
 async function generate() {
   const userInput = document.getElementById('inputText').value.trim();
   if (!userInput) {
-    alert("⚠️ 请输入您的旅行需求！");
+    alert("⚠️ 请输入您的旅行需求");
     return;
   }
 
@@ -341,15 +382,23 @@ async function generate() {
   const orderId = `${yyyyMMdd}-${hhmm}`;
   orderCode.innerText = orderId;
 
-  const prompt = `你是一位专业的中文旅行规划师，请根据以下旅行者的需求，制定详细的日本自由行计划。旅行需求：${userInput}。
-请为这次日本自由行提供每日行程安排、预算估算，并以 Markdown 表格输出。`;
+  
+  const prompt = `
+你是一位专业的中文旅行规划师，请根据下方旅行需求，制定详细的日本自由行行程：
+${userInput}
+
+请提供每天的活动安排、交通方式、推荐住宿、预计花费，并以 Markdown 表格输出。
+要求内容结构清晰、语言自然，加入适量 emoji 图标增强可读性。
+
+每天行程的住宿安排必须推荐具体真实存在、可搜索到的酒店或旅馆名称，不得使用模糊词如“附近商务酒店”、“温泉旅馆”、“民宿”等笼统表达。
+`;
 
   try {
     const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer sk-f364b488cdff4e87951aa571f6208526"
+        "Authorization": "Bearer sk-a6c3998dd0274ecf8398d8391619bad1"
       },
       body: JSON.stringify({
         model: "deepseek-chat",
@@ -363,7 +412,33 @@ async function generate() {
 
     const data = await response.json();
     if (data && data.choices && data.choices.length > 0) {
-      output.innerHTML = marked.parse(data.choices[0].message.content.trim());
+      
+      const parsedHtml = marked.parse(data.choices[0].message.content.trim());
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = parsedHtml;
+
+            const children = Array.from(tempDiv.children);
+      let outputHTML = '';
+      let currentBlock = [];
+
+      children.forEach(child => {
+        if (/^day\s*\d+/i.test(child.textContent.trim().toLowerCase()) || /第\s*\d+\s*天/.test(child.textContent.trim())) {
+          if (currentBlock.length > 0) {
+            outputHTML += '<div class="day-plan">' + currentBlock.map(el => el.outerHTML).join('') + '</div>';
+            currentBlock = [];
+          }
+        }
+        currentBlock.push(child);
+      });
+
+      if (currentBlock.length > 0) {
+        outputHTML += '<div class="day-plan">' + currentBlock.map(el => el.outerHTML).join('') + '</div>';
+      }
+
+      output.innerHTML = outputHTML;
+      payHint.style.display = "block";
+      document.getElementById("pdf-content").scrollIntoView({ behavior: "smooth" });
+
       payHint.style.display = "block";
       document.getElementById("pdf-content").scrollIntoView({ behavior: "smooth" });
     } else {
