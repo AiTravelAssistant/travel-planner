@@ -341,6 +341,42 @@ th, td {
     word-break: break-word;
   }
 }
+
+/* PC端表格结构优化 */
+@media (min-width: 769px) {
+  table {
+    table-layout: auto;
+  }
+  th, td {
+    padding: 10px;
+    font-size: 16px;
+  }
+}
+
+/* 移动端表格自然缩放 + 显示完整边框 */
+@media (max-width: 768px) {
+  .output {
+    overflow-x: hidden;
+  }
+  table {
+    width: 100% !important;
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+    table-layout: fixed;
+  }
+  th, td {
+    word-break: break-word;
+    white-space: normal;
+    font-size: 15px;
+    padding: 8px 6px;
+    border: 1px solid #ccc;
+  }
+  th:nth-child(1), td:nth-child(1) { width: 18%; }
+  th:nth-child(2), td:nth-child(2) { width: 25%; }
+  th:nth-child(3), td:nth-child(3) { width: 20%; }
+  th:nth-child(4), td:nth-child(4) { width: 15%; }
+  th:nth-child(5), td:nth-child(5) { width: 22%; }
+}
 </style>
 </head>
 <body>
