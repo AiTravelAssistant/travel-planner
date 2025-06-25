@@ -309,12 +309,26 @@ table th:nth-child(5), table td:nth-child(5) {
 }
 
 
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+  word-break: break-word;
+}
+th, td {
+  word-break: break-word;
+  white-space: normal;
+}
 @media (max-width: 768px) {
   .output {
-    overflow-x: auto;
+    padding: 20px;
   }
   table {
-    min-width: 600px;
+    font-size: 15px;
+  }
+  th, td {
+    font-size: 15px;
+    padding: 6px;
   }
 }
 </style>
