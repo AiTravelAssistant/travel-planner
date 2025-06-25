@@ -9,7 +9,7 @@
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-</script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
 </script>
 <style>
@@ -308,6 +308,44 @@ table th:nth-child(5), table td:nth-child(5) {
   word-break: break-word;
 }
 
+
+@media (max-width: 768px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+    width: 100%;
+  }
+  table {
+    border: none;
+  }
+  thead {
+    display: none;
+  }
+  tr {
+    margin-bottom: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #fff;
+  }
+  td {
+    border: none;
+    border-bottom: 1px solid #eee;
+    padding: 6px 0;
+    position: relative;
+    padding-left: 40%;
+    box-sizing: border-box;
+  }
+  td::before {
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    width: 35%;
+    white-space: nowrap;
+    font-weight: bold;
+    color: #555;
+    content: attr(data-label);
+  }
+}
 </style>
 </head>
 <body>
@@ -387,10 +425,10 @@ async function generate() {
 你是一位专业的中文旅行规划师，请根据下方旅行需求，制定详细的日本自由行行程：
 ${userInput}
 
-请提供每天的活动安排、交通方式、推荐住宿、预计总览，并以 Markdown 表格输出。
+请提供每天的活动安排、交通方式、推荐住宿、预计花费，并以 Markdown 表格输出。
 要求内容结构清晰、语言自然，加入适量 emoji 图标增强可读性。
 
-每天行程的推荐住宿必须是具体真实存在、可搜索到的酒店或旅馆名称。
+每天行程的住宿安排必须推荐具体真实存在、可搜索到的酒店或旅馆名称，不得使用模糊词如“附近商务酒店”、“温泉旅馆”、“民宿”等笼统表达。
 `;
 
   try {
