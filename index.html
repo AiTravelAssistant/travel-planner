@@ -310,40 +310,11 @@ table th:nth-child(5), table td:nth-child(5) {
 
 
 @media (max-width: 768px) {
-  table, thead, tbody, th, td, tr {
-    display: block;
-    width: 100%;
+  .output {
+    overflow-x: auto;
   }
   table {
-    border: none;
-  }
-  thead {
-    display: none;
-  }
-  tr {
-    margin-bottom: 16px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 10px;
-    background-color: #fff;
-  }
-  td {
-    border: none;
-    border-bottom: 1px solid #eee;
-    padding: 6px 0;
-    position: relative;
-    padding-left: 40%;
-    box-sizing: border-box;
-  }
-  td::before {
-    position: absolute;
-    top: 6px;
-    left: 8px;
-    width: 35%;
-    white-space: nowrap;
-    font-weight: bold;
-    color: #555;
-    content: attr(data-label);
+    min-width: 600px;
   }
 }
 </style>
