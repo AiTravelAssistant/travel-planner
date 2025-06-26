@@ -406,13 +406,13 @@ th, td {
 </p><p id="orderCode">
 备注信息：<strong id="orderIdText">20250623-1807</strong>
 </p>
-<img alt="微信支付二维码" src="./wechat_qr.png"/>
+<a href="./wechat_qr.png" download="微信支付二维码.png">
+  <img alt="微信支付二维码" src="./wechat_qr.png" style="max-width: 220px; margin: 12px auto; display: block; border: 1px solid #ccc; border-radius: 8px;" />
+</a>
 <button id="unlockButton" onclick="unlockPDF()">
-<span>
-      ☐
-     </span>
-     我已支付，下载行程PDF
-    </button>
+  <span>☐</span>
+  我已支付，下载行程PDF
+</button>
 </div>
 <div style="text-align: center;">
 <button id="pdfButton" onclick="exportPDF()" style="display: none;">
@@ -539,23 +539,42 @@ function showPayment() {
 }
 </script><script>
 function unlockPDF() {
-  const btn = document.getElementById('unlockButton');
-  btn.innerHTML = '<span>✅</span> 已支付，下载行程PDF';
-  const downloadBtn = document.getElementById('pdfButton');
-  downloadBtn.style.display = 'inline-block';
-  downloadBtn.scrollIntoView({ behavior: "smooth" });
+  const confirmed = confirm("您是否已支付？");
+  if (confirmed) {
+    const btn = document.getElementById('unlockButton');
+    btn.innerHTML = '<span>✅</span> 已支付，下载行程PDF';
+    const downloadBtn = document.getElementById('pdfButton');
+    downloadBtn.style.display = 'inline-block';
+    downloadBtn.scrollIntoView({ behavior: "smooth" });
+  } else {
+    const paywall = document.getElementById('paywall');
+    paywall.scrollIntoView({ behavior: "smooth" });
+  }
 }
+
 </script><script>
 function exportPDF() {
   const element = document.getElementById("pdf-content");
+  const userInput = document.getElementById("inputText").value.trim();
+  const now = new Date();
+  const yyyyMMdd = now.toISOString().slice(0,10).replace(/-/g, '');
+  const hhmm = now.getHours().toString().padStart(2,'0') + now.getMinutes().toString().padStart(2,'0');
+
+  let baseName = "旅行行程";
+  if (userInput) {
+    const cleaned = userInput.replace(/[^\u4e00-\u9fa5\w]+/g, "_").slice(0, 20);
+    baseName = cleaned || baseName;
+  }
+
+  const filename = `${baseName}_${yyyyMMdd}_${hhmm}.pdf`;
+
   const opt = {
     margin: 0.5,
-    filename: "旅行行程计划.pdf",
+    filename: filename,
     image: { type: "jpeg", quality: 0.98 },
     html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
     jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
   };
   html2pdf().set(opt).from(element).save();
-}
-</script></body>
+}</script></body>
 </html>
