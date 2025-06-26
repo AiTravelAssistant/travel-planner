@@ -406,9 +406,7 @@ th, td {
 </p><p id="orderCode">
 备注信息：<strong id="orderIdText">20250623-1807</strong>
 </p>
-<a href="./wechat_qr.png" download="微信支付二维码.png">
-  <img alt="微信支付二维码" src="./wechat_qr.png" style="max-width: 220px; margin: 12px auto; display: block; border: 1px solid #ccc; border-radius: 8px;" />
-</a>
+<img alt="微信支付二维码" src="./wechat_qr.png" style="max-width: 220px; margin: 12px auto; display: block; border: 1px solid #ccc; border-radius: 8px;" />
 <button id="unlockButton" onclick="unlockPDF()">
   <span>☐</span>
   我已支付，下载行程PDF
@@ -556,17 +554,14 @@ function unlockPDF() {
 function exportPDF() {
   const element = document.getElementById("pdf-content");
   const userInput = document.getElementById("inputText").value.trim();
-  const now = new Date();
-  const yyyyMMdd = now.toISOString().slice(0,10).replace(/-/g, '');
-  const hhmm = now.getHours().toString().padStart(2,'0') + now.getMinutes().toString().padStart(2,'0');
 
-  let baseName = "旅行行程";
+  let filename = "旅行行程.pdf";
   if (userInput) {
     const cleaned = userInput.replace(/[^\u4e00-\u9fa5\w]+/g, "_").slice(0, 20);
-    baseName = cleaned || baseName;
+    if (cleaned) {
+      filename = `${cleaned}.pdf`;
+    }
   }
-
-  const filename = `${baseName}_${yyyyMMdd}_${hhmm}.pdf`;
 
   const opt = {
     margin: 0.5,
