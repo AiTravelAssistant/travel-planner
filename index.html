@@ -378,6 +378,31 @@ th, td {
   th:nth-child(5), td:nth-child(5) { width: 22%; }
 }
 </style>
+
+
+
+
+<script>
+function submitFeedbackTrack(event) {
+  event.preventDefault(); // 阻止立即跳转
+
+  // 提交数据
+  fetch("https://docs.google.com/forms/d/e/1FAIpQLScArA3vlIk7S-Wz5oxHgAT4W4s2xDuC12Qznfq1QlWdE16Oqw/formResponse", {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: "entry.999999999=" + encodeURIComponent("用户点击了反馈按钮")
+  });
+
+  // 延迟跳转
+  setTimeout(() => {
+    window.open("https://docs.google.com/forms/d/e/1FAIpQLScArA3vlIk7S-Wz5oxHgAT4W4s2xDuC12Qznfq1QlWdE16Oqw/viewform", "_blank");
+  }, 300);
+}
+</script>
+
 </head>
 <body>
 <div class="container">
@@ -428,13 +453,90 @@ th, td {
   </div>
 </div>
 
+
+<!-- 注册弹窗 -->
+<div id="registerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); z-index:10000; justify-content:center; align-items:center;">
+  <div style="background:white; padding:24px 20px; border-radius:12px; text-align:center; width:90%; max-width:360px; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+    <p style="font-size:18px; font-weight:bold; margin-bottom:12px;">📝 注册后可使用3次</p>
+    <input id="nickname" placeholder="请输入昵称" style="width:90%; padding:10px; margin:8px 0; font-size:16px;" /><br/>
+    <input id="email" placeholder="请输入邮箱" style="width:90%; padding:10px; margin:8px 0; font-size:16px;" /><br/>
+    <button onclick="submitRegistration()" style="background:#4CAF50; color:white; font-size:16px; padding:10px 24px; border:none; border-radius:8px; margin-top:10px;">注册</button>
+  </div>
+</div>
+
 </div>
 </div>
 <footer class="page-footer">
    © 2025 MYG. All rights reserved.
-  </footer>
+  
+<div style="text-align:center; margin-top:30px;">
+  <onclick="submitFeedbackTrack(event)" href="https://forms.gle/your-google-form-link" target="_blank" style="font-size:15px; color:#2196F3;">📝 提交反馈建议</a>
+</div>
+
+</footer>
+
+<script>
+// 注册检查和本地存储
+function checkRegistration() {
+  const user = JSON.parse(localStorage.getItem("userInfo"));
+  if (!user || !user.nickname || !user.email) {
+    document.getElementById("registerModal").style.display = "flex";
+    return false;
+  }
+  if (user.paidPlan) return true;
+
+  if (user.usageCount >= 3) {
+    alert("您的免费试用次数已用完，请付费解锁更多功能。");
+    return false;
+  }
+  return true;
+}
+
+function submitRegistration() {
+  const nickname = document.getElementById("nickname").value.trim();
+  const email = document.getElementById("email").value.trim();
+  if (!nickname || !email) {
+    alert("请输入昵称和邮箱");
+    return;
+  }
+  const userInfo = {
+    nickname,
+    email,
+    usageCount: 0,
+    paidPlan: null,
+    startDate: new Date().toISOString()
+  };
+  localStorage.setItem("userInfo", JSON.stringify(userInfo));
+// 同步提交注册信息到 Google Form（含使用次数/时间/设备信息）
+  const usage = 0;
+  const timestamp = new Date().toLocaleString();
+  const device = navigator.userAgent;
+
+  fetch("https://docs.google.com/forms/d/e/1FAIpQLScArA3vlIk7S-Wz5oxHgAT4W4s2xDuC12Qznfq1QlWdE16Oqw/formResponse", {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: `entry.537580952=${encodeURIComponent(nickname)}&entry.709455992=${encodeURIComponent(email)}&entry.800000001=${usage}&entry.800000002=${encodeURIComponent(timestamp)}&entry.800000003=${encodeURIComponent(device)}`
+  });
+// 同步提交注册信息到 Google Form
+  fetch("https://docs.google.com/forms/d/e/1FAIpQLScArA3vlIk7S-Wz5oxHgAT4W4s2xDuC12Qznfq1QlWdE16Oqw/formResponse", {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: `entry.537580952=${encodeURIComponent(nickname)}&entry.709455992=${encodeURIComponent(email)}`
+  });
+  document.getElementById("registerModal").style.display = "none";
+  alert("注册成功！您现在可以使用生成功能了！");
+}
+</script>
+
 <script>
 async function generate() {
+  if (!checkRegistration()) return;
   const userInput = document.getElementById('inputText').value.trim();
   if (!userInput) {
     alert("⚠️ 请输入您的旅行需求");
@@ -516,6 +618,11 @@ ${userInput}
       }
 
       output.innerHTML = outputHTML;
+      const user = JSON.parse(localStorage.getItem('userInfo'));
+      if (user && !user.paidPlan) {
+        user.usageCount = (user.usageCount || 0) + 1;
+        localStorage.setItem('userInfo', JSON.stringify(user));
+      }
       payHint.style.display = "block";
       document.getElementById("pdf-content").scrollIntoView({ behavior: "smooth" });
 
