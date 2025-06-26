@@ -393,7 +393,7 @@ function submitFeedbackTrack(event) {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded"
     },
-    body: "entry.999999999=" + encodeURIComponent("用户点击了反馈按钮")
+    body: "entry.1513543868=" + encodeURIComponent("用户点击了反馈按钮")
   });
 
   // 延迟跳转
@@ -518,7 +518,7 @@ function submitRegistration() {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded"
     },
-    body: `entry.537580952=${encodeURIComponent(nickname)}&entry.709455992=${encodeURIComponent(email)}&entry.800000001=${usage}&entry.800000002=${encodeURIComponent(timestamp)}&entry.800000003=${encodeURIComponent(device)}`
+    body: `entry.537580952=${encodeURIComponent(nickname)}&entry.709455992=${encodeURIComponent(email)}&entry.1504950828=${usage}&entry.1488547560=${encodeURIComponent(timestamp)}&entry.895875942=${encodeURIComponent(device)}`
   });
 // 同步提交注册信息到 Google Form
   fetch("https://docs.google.com/forms/d/e/1FAIpQLScArA3vlIk7S-Wz5oxHgAT4W4s2xDuC12Qznfq1QlWdE16Oqw/formResponse", {
