@@ -416,6 +416,18 @@ th, td {
 <button id="pdfButton" onclick="exportPDF()" style="display: none;">
      📄 下载行程PDF文件
     </button>
+
+<!-- 自定义支付确认弹窗 -->
+<div id="confirmModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:white; padding:24px 20px; border-radius:12px; text-align:center; width:90%; max-width:380px; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+    <p style="font-size:18px; font-weight:bold; margin-bottom:20px;">💰 您是否已支付？</p>
+    <div style="display: flex; justify-content:space-around;">
+      <button onclick="onConfirmPay(true)" style="flex:1; background:#4CAF50; color:white; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">✅ 已支付</button>
+      <button onclick="onConfirmPay(false)" style="flex:1; background:#e0e0e0; color:black; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">❌ 未支付</button>
+    </div>
+  </div>
+</div>
+
 </div>
 </div>
 <footer class="page-footer">
@@ -525,6 +537,7 @@ function showPayment() {
   const paywall = document.getElementById('paywall');
   const payHint = document.getElementById('payHint');
   const orderCode = document.getElementById('orderIdText');
+  const unlockBtn = document.getElementById('unlockButton');
 
   const now = new Date();
   const yyyyMMdd = now.toISOString().slice(0,10).replace(/-/g, '');
@@ -534,11 +547,19 @@ function showPayment() {
   orderCode.innerText = orderId;
   payHint.style.display = "none";
   paywall.style.display = "block";
+  unlockBtn.style.display = "none";
+  setTimeout(() => {
+    unlockBtn.style.display = "block";
+  }, 10000);
 }
 </script><script>
 function unlockPDF() {
-  const confirmed = confirm("您是否已支付？");
-  if (confirmed) {
+  document.getElementById("confirmModal").style.display = "flex";
+}
+
+function onConfirmPay(paid) {
+  document.getElementById("confirmModal").style.display = "none";
+  if (paid) {
     const btn = document.getElementById('unlockButton');
     btn.innerHTML = '<span>✅</span> 已支付，下载行程PDF';
     const downloadBtn = document.getElementById('pdfButton');
