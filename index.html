@@ -221,7 +221,7 @@ footer {
 /* 页脚版权统一居中 */
 .page-footer {
   text-align: center;
-  font-size: 14px;
+  font-size: 20px;
   color: #888;
   margin-top: 40px;
   margin-bottom: 20px;
@@ -381,25 +381,28 @@ th, td {
 
 
 
-
 <script>
-function submitFeedbackTrack(event) {
-  event.preventDefault(); // 阻止立即跳转
+let downloadCount = 0;
 
-  // 提交数据
+function trackPDFDownload() {
+  downloadCount++;
+  const user = JSON.parse(localStorage.getItem("userInfo"));
+  if (!user) return;
+
+  const timestamp = new Date().toLocaleString();
+  const formData = new FormData();
+  formData.append("entry.537580952", user.nickname || "");
+  formData.append("entry.709455992", user.email || "");
+  formData.append("entry.1504950828", user.usageCount || 0);
+  formData.append("entry.1488547560", timestamp);  // 使用当前时间更合理
+  formData.append("entry.895875942", navigator.userAgent || "");
+  formData.append("entry.1513543868", downloadCount);
+
   fetch("https://docs.google.com/forms/d/e/1FAIpQLScArA3vlIk7S-Wz5oxHgAT4W4s2xDuC12Qznfq1QlWdE16Oqw/formResponse", {
     method: "POST",
     mode: "no-cors",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: "entry.1513543868=" + encodeURIComponent("用户点击了反馈按钮")
+    body: formData
   });
-
-  // 延迟跳转
-  setTimeout(() => {
-    window.open("https://docs.google.com/forms/d/e/1FAIpQLScArA3vlIk7S-Wz5oxHgAT4W4s2xDuC12Qznfq1QlWdE16Oqw/viewform", "_blank");
-  }, 300);
 }
 </script>
 
@@ -407,7 +410,7 @@ function submitFeedbackTrack(event) {
 <body>
 <div class="container">
 <h2 style="margin-top: 10px;">✈️ AI旅行助手(MVP)</h2>
-<textarea id="inputText" placeholder="请输入您的旅行需求，例如：东京到大阪6天自由行，3人，8月中旬，人均预算10000元" rows="7"></textarea>
+<textarea id="inputText" placeholder="请输入您的旅行需求，例如：东京到大阪6天自由行，2人，8月中旬，想去东京迪士尼乐园，大阪影视城，京都金阁寺，轻松一点的行程" rows="7"></textarea>
 <button id="generateBtn" onclick="generate()">
     🗺️ AI生成旅游行程
    </button>
@@ -426,7 +429,7 @@ function submitFeedbackTrack(event) {
 </div><div class="paywall" id="paywall" style="display:none;">
 <p>
 <strong>
-      🔒请扫码支付二维码，添加下面的备注信息。
+      🔒请保持支付二维码，用微信扫码支付，添加下面的备注信息。
      </strong>
 </p><p id="orderCode">
 备注信息：<strong id="orderIdText">20250623-1807</strong>
@@ -457,7 +460,7 @@ function submitFeedbackTrack(event) {
 <!-- 注册弹窗 -->
 <div id="registerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); z-index:10000; justify-content:center; align-items:center;">
   <div style="background:white; padding:24px 20px; border-radius:12px; text-align:center; width:90%; max-width:360px; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
-    <p style="font-size:18px; font-weight:bold; margin-bottom:12px;">📝 注册后可使用3次</p>
+    <p style="font-size:18px; font-weight:bold; margin-bottom:12px;">📝 请注册可免费试用AI生成行程。</p>
     <input id="nickname" placeholder="请输入昵称" style="width:90%; padding:10px; margin:8px 0; font-size:16px;" /><br/>
     <input id="email" placeholder="请输入邮箱" style="width:90%; padding:10px; margin:8px 0; font-size:16px;" /><br/>
     <button onclick="submitRegistration()" style="background:#4CAF50; color:white; font-size:16px; padding:10px 24px; border:none; border-radius:8px; margin-top:10px;">注册</button>
@@ -468,11 +471,6 @@ function submitFeedbackTrack(event) {
 </div>
 <footer class="page-footer">
    © 2025 MYG. All rights reserved.
-  
-<div style="text-align:center; margin-top:30px;">
-  <onclick="submitFeedbackTrack(event)" href="https://forms.gle/your-google-form-link" target="_blank" style="font-size:15px; color:#2196F3;">📝 提交反馈建议</a>
-</div>
-
 </footer>
 
 <script>
@@ -483,10 +481,9 @@ function checkRegistration() {
     document.getElementById("registerModal").style.display = "flex";
     return false;
   }
-  if (user.paidPlan) return true;
 
-  if (user.usageCount >= 3) {
-    alert("您的免费试用次数已用完，请付费解锁更多功能。");
+  if (user.usageCount >= 10) {
+    alert("您的免费试用次数已用完。");
     return false;
   }
   return true;
@@ -497,18 +494,20 @@ function submitRegistration() {
   const email = document.getElementById("email").value.trim();
   if (!nickname || !email) {
     alert("请输入昵称和邮箱");
-    return;
+
   }
   const userInfo = {
     nickname,
     email,
     usageCount: 0,
-    paidPlan: null,
     startDate: new Date().toISOString()
   };
   localStorage.setItem("userInfo", JSON.stringify(userInfo));
+  
 // 同步提交注册信息到 Google Form（含使用次数/时间/设备信息）
-  const usage = 0;
+  user = JSON.parse(localStorage.getItem('userInfo'));
+
+  const usage = user.usageCount;
   const timestamp = new Date().toLocaleString();
   const device = navigator.userAgent;
 
@@ -520,19 +519,10 @@ function submitRegistration() {
     },
     body: `entry.537580952=${encodeURIComponent(nickname)}&entry.709455992=${encodeURIComponent(email)}&entry.1504950828=${usage}&entry.1488547560=${encodeURIComponent(timestamp)}&entry.895875942=${encodeURIComponent(device)}`
   });
-// 同步提交注册信息到 Google Form
-  fetch("https://docs.google.com/forms/d/e/1FAIpQLScArA3vlIk7S-Wz5oxHgAT4W4s2xDuC12Qznfq1QlWdE16Oqw/formResponse", {
-    method: "POST",
-    mode: "no-cors",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: `entry.537580952=${encodeURIComponent(nickname)}&entry.709455992=${encodeURIComponent(email)}`
-  });
   document.getElementById("registerModal").style.display = "none";
-  alert("注册成功！您现在可以使用生成功能了！");
 }
 </script>
+
 
 <script>
 async function generate() {
@@ -571,7 +561,7 @@ ${userInput}
 请提供每天的活动安排，并以 Markdown 表格输出。
 要求内容结构清晰、语言自然，加入适量 emoji 图标增强可读性。
 
-每天行程的住宿安排必须推荐具体真实存在的酒店或旅馆名称，不得使用模糊词如“附近商务酒店”、“温泉旅馆”、“民宿”等笼统表达。
+每天行程的住宿安排推荐具体的真实存在的酒店或旅馆名称。
 请列出预算汇总和预约清单。
 `;
 
@@ -580,7 +570,7 @@ ${userInput}
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer sk-a6c3998dd0274ecf8398d8391619bad1"
+        "Authorization": "Bearer sk-eacdffe271a94f409b9c8e8d8fa5b01a"
       },
       body: JSON.stringify({
         model: "deepseek-chat",
@@ -591,6 +581,32 @@ ${userInput}
         temperature: 0.7
       })
     });
+
+
+	user = JSON.parse(localStorage.getItem('userInfo'));
+	if (user) {
+	user.usageCount = (user.usageCount || 0) + 1;
+	localStorage.setItem('userInfo', JSON.stringify(user));
+	}
+
+	// 同步提交到 Google Form（含使用次数/时间/设备信息）
+	user = JSON.parse(localStorage.getItem('userInfo'));
+
+	const nickname = user.nickname;
+	const email = user.email;
+	const usage = user.usageCount;
+	const timestamp = new Date().toLocaleString();
+	const device = navigator.userAgent;
+
+	fetch("https://docs.google.com/forms/d/e/1FAIpQLScArA3vlIk7S-Wz5oxHgAT4W4s2xDuC12Qznfq1QlWdE16Oqw/formResponse", {
+	method: "POST",
+	mode: "no-cors",
+	headers: {
+	  "Content-Type": "application/x-www-form-urlencoded"
+	},
+	body: `entry.537580952=${encodeURIComponent(nickname)}&entry.709455992=${encodeURIComponent(email)}&entry.1504950828=${usage}&entry.1488547560=${encodeURIComponent(timestamp)}&entry.895875942=${encodeURIComponent(device)}`
+	});
+
 
     const data = await response.json();
     if (data && data.choices && data.choices.length > 0) {
@@ -618,16 +634,11 @@ ${userInput}
       }
 
       output.innerHTML = outputHTML;
-      const user = JSON.parse(localStorage.getItem('userInfo'));
-      if (user && !user.paidPlan) {
-        user.usageCount = (user.usageCount || 0) + 1;
-        localStorage.setItem('userInfo', JSON.stringify(user));
-      }
+
+      
       payHint.style.display = "block";
       document.getElementById("pdf-content").scrollIntoView({ behavior: "smooth" });
 
-      payHint.style.display = "block";
-      document.getElementById("pdf-content").scrollIntoView({ behavior: "smooth" });
     } else {
       output.innerText = "⚠️ AI未返回有效内容，请稍后再试。";
     }
@@ -657,7 +668,7 @@ function showPayment() {
   unlockBtn.style.display = "none";
   setTimeout(() => {
     unlockBtn.style.display = "block";
-  }, 10000);
+  }, 20000);
 }
 </script><script>
 function unlockPDF() {
@@ -680,6 +691,7 @@ function onConfirmPay(paid) {
 
 </script><script>
 function exportPDF() {
+  trackPDFDownload();
   const element = document.getElementById("pdf-content");
   const userInput = document.getElementById("inputText").value.trim();
 
