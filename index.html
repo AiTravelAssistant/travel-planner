@@ -61,10 +61,7 @@ button:hover {
   transform: translateY(1px);
   box-shadow: 0 2px 4px rgba(0,0,0,0.12);
 }
-#pdfButton {
-  display: none;
-  background-color: #2196F3;
-}
+
 
 .output {
   background-color: #ffffff;
@@ -156,9 +153,6 @@ th, td {
 }
   
 
-/* 转圈加载动画 */
-}
-
 /* 按钮美化 */
 button {
   background-color: #4CAF50;
@@ -197,6 +191,7 @@ footer {
   margin: 24px auto;
   text-align: center;
   width: fit-content;
+  background-color: #2196F3;
 }
   
 
@@ -215,8 +210,6 @@ footer {
   }
 }
 
-
-}
 
 /* 页脚版权统一居中 */
 .page-footer {
@@ -253,7 +246,8 @@ footer {
     page-break-before: always;
   }
 }
-  
+
+
 .dot-typing {
   display: inline-block;
   width: 1em;
@@ -263,6 +257,7 @@ footer {
   content: '...';
   animation: blink 1s steps(3, jump-none) infinite;
 }
+
 @keyframes blink {
   0% { content: ''; }
   33% { content: '.'; }
@@ -410,7 +405,7 @@ function trackPDFDownload() {
 <body>
 <div class="container">
 <h2 style="margin-top: 10px;">✈️ AI旅行助手(MVP)</h2>
-<textarea id="inputText" placeholder="请输入您的旅行需求，例如：东京到大阪6天自由行，2人，8月中旬，想去东京迪士尼乐园，大阪影视城，京都金阁寺，轻松一点的行程" rows="7"></textarea>
+<textarea id="inputText" placeholder="请输入您的旅行需求，例如：东京到大阪6天自由行，2人，蜜月旅行" rows="7"></textarea>
 <button id="generateBtn" onclick="generate()">
     🗺️ AI生成旅游行程
    </button>
@@ -429,7 +424,7 @@ function trackPDFDownload() {
 </div><div class="paywall" id="paywall" style="display:none;">
 <p>
 <strong>
-      🔒请保持支付二维码，用微信扫码支付，添加下面的备注信息。
+      🔒请保存二维码，用微信扫码支付，并添加下面的备注信息。
      </strong>
 </p><p id="orderCode">
 备注信息：<strong id="orderIdText">20250623-1807</strong>
@@ -453,6 +448,10 @@ function trackPDFDownload() {
       <button onclick="onConfirmPay(true)" style="flex:1; background:#4CAF50; color:white; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">✅ 已支付</button>
       <button onclick="onConfirmPay(false)" style="flex:1; background:#e0e0e0; color:black; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">❌ 未支付</button>
     </div>
+    <input id="orderNumberInput" placeholder="请复制微信支付的转账单号（32位数字）" maxlength="32"
+           style="width:90%; padding:10px; font-size:16px; margin-top:12px;" />
+    <p id="orderError" style="color:red; font-size:14px; display:none;">转账单号不正确，请确实支付。</p>
+
   </div>
 </div>
 
@@ -675,18 +674,56 @@ function unlockPDF() {
   document.getElementById("confirmModal").style.display = "flex";
 }
 
+
+
+
 function onConfirmPay(paid) {
-  document.getElementById("confirmModal").style.display = "none";
-  if (paid) {
-    const btn = document.getElementById('unlockButton');
-    btn.innerHTML = '<span>✅</span> 已支付，下载行程PDF';
-    const downloadBtn = document.getElementById('pdfButton');
-    downloadBtn.style.display = 'inline-block';
-    downloadBtn.scrollIntoView({ behavior: "smooth" });
-  } else {
-    const paywall = document.getElementById('paywall');
-    paywall.scrollIntoView({ behavior: "smooth" });
+  document.getElementById("orderError").style.display = "none";
+
+  if (!paid) {
+    document.getElementById("confirmModal").style.display = "none";
+    document.getElementById("paywall").style.display = "block";
+    document.getElementById("paywall").scrollIntoView({ behavior: "smooth" });
+    return;
   }
+
+  // 验证订单号格式
+  const orderNumber = document.getElementById("orderNumberInput").value.trim();
+  const regex = /^1000107301\d{8}\d{14}$/;
+  if (!regex.test(orderNumber)) {
+    document.getElementById("orderError").style.display = "block";
+    return; // ❗ 停留在弹窗，不关闭
+  }
+
+  // ✅ 验证通过后关闭弹窗
+  document.getElementById("confirmModal").style.display = "none";
+
+  // 提交表单
+  const user = JSON.parse(localStorage.getItem("userInfo")) || {};
+  const formData = new FormData();
+  const timestamp = new Date().toLocaleString();
+  const device = navigator.userAgent;
+  const usageCount = user.usageCount || 0;
+
+  formData.append("entry.537580952", user.nickname || "");
+  formData.append("entry.709455992", user.email || "");
+  formData.append("entry.370855077", orderNumber);
+  formData.append("entry.1504950828", usageCount);
+  formData.append("entry.1488547560", timestamp);
+  formData.append("entry.895875942", device);
+
+  fetch("https://docs.google.com/forms/d/e/1FAIpQLScArA3vlIk7S-Wz5oxHgAT4W4s2xDuC12Qznfq1QlWdE16Oqw/formResponse", {
+    method: "POST",
+    mode: "no-cors",
+    body: formData
+  });
+
+  // 显示下载按钮并跳转
+  const btn = document.getElementById('unlockButton');
+  btn.innerHTML = '<span>✅</span> 已支付，下载行程PDF';
+  const downloadBtn = document.getElementById('pdfButton');
+  downloadBtn.style.display = 'inline-block';
+  document.getElementById("paywall").scrollIntoView({ behavior: "smooth" });
 }
 
 </script><script>
