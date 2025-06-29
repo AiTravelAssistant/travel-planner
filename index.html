@@ -373,9 +373,6 @@ th, td {
   th:nth-child(5), td:nth-child(5) { width: 22%; }
 }
 </style>
-
-
-
 <script>
 let downloadCount = 0;
 
@@ -400,7 +397,14 @@ function trackPDFDownload() {
   });
 }
 </script>
-
+<script>
+  window.onload = function() {
+    const payHint = document.getElementById("payHint");
+    if (payHint) {
+      payHint.style.display = "none";
+    }
+  };
+</script>
 </head>
 <body>
 <div class="container">
@@ -419,9 +423,9 @@ function trackPDFDownload() {
 </div>
 </div>
 <div class="pay-hint" id="payHint" style="display:none; text-align:center; margin-top:20px;">
-<p><strong>如需下载 PDF 文件，请点击下方按钮，支付 ¥10 解锁包月：</strong></p>
+<p><strong>请点击下方按钮，支付后继续使用（包月¥10）：</strong></p>
 <button onclick="showPayment()" style="background-color:#ffa726;">微信支付（¥10）</button>
-</div><div class="paywall" id="paywall" style="display:none;">
+</div><div class="paywall" id="paywall" style="display: none;">
 <p>
 <strong>
       🔒请保存二维码，用微信扫码支付，并添加下面的备注信息。
@@ -429,49 +433,42 @@ function trackPDFDownload() {
 </p><p id="orderCode">
 备注信息：<strong id="orderIdText">20250623-1807</strong>
 </p>
-<img alt="微信支付二维码" src="./wechat_qr.png" style="max-width: 220px; margin: 12px auto; display: block; border: 1px solid #ccc; border-radius: 8px;" />
+<img alt="微信支付二维码" src="./wechat_qr.png" style="max-width: 220px; margin: 12px auto; display: block; border: 1px solid #ccc; border-radius: 8px;"/>
 <button id="unlockButton" onclick="unlockPDF()">
-  <span>☐</span>
-  我已支付，下载行程PDF
+<span>☐</span>
+  确认已支付
 </button>
 </div>
 <div style="text-align: center;">
 <button id="pdfButton" onclick="exportPDF()" style="display: none;">
      📄 下载行程PDF文件
     </button>
-
 <!-- 自定义支付确认弹窗 -->
 <div id="confirmModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:white; padding:24px 20px; border-radius:12px; text-align:center; width:90%; max-width:380px; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
-    <p style="font-size:18px; font-weight:bold; margin-bottom:20px;">💰 您是否已支付？</p>
-    <div style="display: flex; justify-content:space-around;">
-      <button onclick="onConfirmPay(true)" style="flex:1; background:#4CAF50; color:white; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">✅ 已支付</button>
-      <button onclick="onConfirmPay(false)" style="flex:1; background:#e0e0e0; color:black; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">❌ 未支付</button>
-    </div>
-    <input id="orderNumberInput" placeholder="请复制微信支付的转账单号（32位数字）" maxlength="32"
-           style="width:90%; padding:10px; font-size:16px; margin-top:12px;" />
-    <p id="orderError" style="color:red; font-size:14px; display:none;">转账单号不正确，请确实支付。</p>
-
-  </div>
+<div style="background:white; padding:24px 20px; border-radius:12px; text-align:center; width:90%; max-width:380px; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+<p style="font-size:18px; font-weight:bold; margin-bottom:20px;">💰 您是否已支付？</p>
+<div style="display: flex; justify-content:space-around;">
+<button onclick="onConfirmPay(true)" style="flex:1; background:#4CAF50; color:white; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">✅ 已支付</button>
+<button onclick="onConfirmPay(false)" style="flex:1; background:#e0e0e0; color:black; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">❌ 未支付</button>
 </div>
-
-
+<input id="orderNumberInput" maxlength="32" placeholder="请复制微信支付的转账单号（32位数字）" style="width:90%; padding:10px; font-size:16px; margin-top:12px;"/>
+<p id="orderError" style="color:red; font-size:14px; display:none;">转账单号不正确，请确实支付。</p>
+</div>
+</div>
 <!-- 注册弹窗 -->
 <div id="registerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); z-index:10000; justify-content:center; align-items:center;">
-  <div style="background:white; padding:24px 20px; border-radius:12px; text-align:center; width:90%; max-width:360px; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
-    <p style="font-size:18px; font-weight:bold; margin-bottom:12px;">📝 请注册可免费试用AI生成行程。</p>
-    <input id="nickname" placeholder="请输入昵称" style="width:90%; padding:10px; margin:8px 0; font-size:16px;" /><br/>
-    <input id="email" placeholder="请输入邮箱" style="width:90%; padding:10px; margin:8px 0; font-size:16px;" /><br/>
-    <button onclick="submitRegistration()" style="background:#4CAF50; color:white; font-size:16px; padding:10px 24px; border:none; border-radius:8px; margin-top:10px;">注册</button>
-  </div>
+<div style="background:white; padding:24px 20px; border-radius:12px; text-align:center; width:90%; max-width:360px; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+<p style="font-size:18px; font-weight:bold; margin-bottom:12px;">📝 请注册，可免费试用AI生成行程10次。</p>
+<input id="nickname" placeholder="请输入昵称" style="width:90%; padding:10px; margin:8px 0; font-size:16px;"/><br/>
+<input id="email" placeholder="请输入邮箱" style="width:90%; padding:10px; margin:8px 0; font-size:16px;"/><br/>
+<button onclick="submitRegistration()" style="background:#4CAF50; color:white; font-size:16px; padding:10px 24px; border:none; border-radius:8px; margin-top:10px;">注册</button>
 </div>
-
+</div>
 </div>
 </div>
 <footer class="page-footer">
    © 2025 MYG. All rights reserved.
 </footer>
-
 <script>
 // 注册检查和本地存储
 function checkRegistration() {
@@ -483,8 +480,11 @@ function checkRegistration() {
   }
 
   if (!paidDate) {
-    if (user.usageCount >= 10) {
-      alert("您的免费试用次数已用完。");
+    // 超出免费次数限制则提示并引导付费
+  if (user.usageCount >= 10) {
+      alert("您的免费试用10次已用完，请付费解锁。");
+      const pay = document.getElementById("payHint");
+      if (pay) pay.style.display = "block";
       return false;
     }
   }
@@ -524,8 +524,6 @@ function submitRegistration() {
   document.getElementById("registerModal").style.display = "none";
 }
 </script>
-
-
 <script>
 async function generate() {
   if (!checkRegistration()) return;
@@ -587,8 +585,8 @@ ${userInput}
 
 	user = JSON.parse(localStorage.getItem('userInfo'));
 	if (user) {
-	user.usageCount = (user.usageCount || 0) + 1;
-	localStorage.setItem('userInfo', JSON.stringify(user));
+		user.usageCount = (user.usageCount || 0) + 1;
+		localStorage.setItem('userInfo', JSON.stringify(user));
 	}
 
 	// 同步提交到 Google Form（含使用次数/时间/设备信息）
@@ -636,9 +634,18 @@ ${userInput}
       }
 
       output.innerHTML = outputHTML;
-
-      
-      payHint.style.display = "block";
+	
+	//生成行程后判断微信支付按钮显示
+	const paidDate = localStorage.getItem("paidDate");
+	let isPaid = false;
+	if (paidDate) {
+	  const expire = new Date(paidDate);
+	  expire.setDate(expire.getDate() + 30);
+	  if (new Date() <= expire) {
+	    isPaid = true;
+	  }
+	}
+	
       document.getElementById("pdf-content").scrollIntoView({ behavior: "smooth" });
 
     } else {
@@ -650,7 +657,10 @@ ${userInput}
   } finally {
     generateBtn.disabled = false;
     generateBtn.innerText = "🗺️ AI生成旅游行程";
+    localStorage.setItem("hasGenerated", "true");
+    updateButtonDisplayAfterGenerate();
   }
+ 
 }
 </script><script>
 function showPayment() {
@@ -672,12 +682,11 @@ function showPayment() {
     unlockBtn.style.display = "block";
   }, 20000);
 }
+
 </script><script>
 function unlockPDF() {
   document.getElementById("confirmModal").style.display = "flex";
 }
-
-
 
 
 function onConfirmPay(paid) {
@@ -693,6 +702,14 @@ function onConfirmPay(paid) {
   // 验证订单号格式
   const orderNumber = document.getElementById("orderNumberInput").value.trim();
   const regex = /^1000107301\d{8}\d{14}$/;
+  
+  const lastOrder = localStorage.getItem("lastOrderNumber");
+  if (orderNumber === lastOrder) {
+    alert("⚠️ 此订单号已使用，请勿重复提交！");
+    return;
+  }
+  localStorage.setItem("lastOrderNumber", orderNumber);
+
   if (!regex.test(orderNumber)) {
     document.getElementById("orderError").style.display = "block";
     return; // ❗ 停留在弹窗，不关闭
@@ -728,11 +745,17 @@ function onConfirmPay(paid) {
   const btn = document.getElementById('unlockButton');
   btn.innerHTML = '<span>✅</span> 已支付，下载行程PDF';
   const downloadBtn = document.getElementById('pdfButton');
+  
+if (localStorage.getItem("hasGenerated") === "true") {
   downloadBtn.style.display = 'inline-block';
+} else {
+  downloadBtn.style.display = 'none';
+}
+
   document.getElementById("paywall").style.display = "none";
   document.getElementById("paywall").scrollIntoView({ behavior: "smooth" });
 }
-
+ 
 </script><script>
 
 // PDF下载函数，增加权限判断
@@ -773,5 +796,91 @@ function exportPDF() {
     jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
   };
   html2pdf().set(opt).from(element).save();
-}</script></body>
+
+} 
+  
+</script>
+<script>
+// 页面加载时控制按钮显示逻辑
+// 页面加载时自动清除过期的包月状态
+window.onload = function () {
+  // 页面加载时初始化生成状态为 false
+  try {
+  localStorage.setItem("hasGenerated", "false");
+  } catch (e) {
+  console.warn("localStorage 不可用", e);
+  }
+  const pd = localStorage.getItem("paidDate");
+  if (pd) {
+    const expire = new Date(pd);
+    expire.setDate(expire.getDate() + 30);
+    if (new Date() > expire) {
+      localStorage.removeItem("paidDate");
+    }
+  }
+  updateButtonDisplayAfterGenerate();
+  const paidDate = localStorage.getItem("paidDate");
+  const user = JSON.parse(localStorage.getItem("userInfo") || "{}");
+  const usageCount = user.usageCount || 0;
+
+  const pdfButton = document.getElementById("pdfButton");
+  const payHint = document.getElementById("payHint");
+
+  let isPaid = false;
+  if (paidDate) {
+    const expire = new Date(paidDate);
+    expire.setDate(expire.getDate() + 30);
+    if (new Date() <= expire) {
+      isPaid = true;
+    }
+  }
+
+
+}
+</script>
+<script>
+/**
+ * 根据用户当前状态判断是否显示下载PDF按钮和支付提示
+ * - 如果用户包月有效，或使用次数 <= 10：显示下载PDF按钮
+ * - 如果用户未付费，且使用次数 > 10：显示微信支付按钮
+ */
+
+/**
+ * 根据用户当前状态判断是否显示下载PDF按钮和支付提示
+ * - 仅在已生成行程（localStorage.hasGenerated）时才考虑显示PDF按钮
+ */
+
+function updateButtonDisplayAfterGenerate() {
+  const paidDate = localStorage.getItem("paidDate");
+  const hasGenerated = localStorage.getItem("hasGenerated") === "true";
+  const user = JSON.parse(localStorage.getItem("userInfo") || "{}");
+  const usageCount = user.usageCount || 0;
+  const pdfButton = document.getElementById("pdfButton");
+  const payHint = document.getElementById("payHint");
+
+  let isPaid = false;
+  if (paidDate) {
+    const expire = new Date(paidDate);
+    expire.setDate(expire.getDate() + 30);
+    if (new Date() <= expire) {
+      isPaid = true;
+    }
+  }
+
+  // 只有已生成行程 + 有权限，才显示 PDF 按钮
+  if (hasGenerated && (isPaid || usageCount <= 10)) {
+    pdfButton.style.display = "inline-block";
+  } else {
+    pdfButton.style.display = "none";
+  }
+
+  // 超出免费次数且未付费，才显示支付提示
+	if (hasGenerated && !isPaid && usageCount > 10) {
+	  payHint.style.display = "block";
+	} else {
+	  payHint.style.display = "none";
+	}
+}
+</script>
+</body>
 </html>
