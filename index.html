@@ -419,7 +419,7 @@ function trackPDFDownload() {
 </div>
 </div>
 <div class="pay-hint" id="payHint" style="display:none; text-align:center; margin-top:20px;">
-<p><strong>如需下载 PDF 文件，请点击下方按钮，支付 ¥10 解锁：</strong></p>
+<p><strong>如需下载 PDF 文件，请点击下方按钮，支付 ¥10 解锁包月：</strong></p>
 <button onclick="showPayment()" style="background-color:#ffa726;">微信支付（¥10）</button>
 </div><div class="paywall" id="paywall" style="display:none;">
 <p>
@@ -476,14 +476,17 @@ function trackPDFDownload() {
 // 注册检查和本地存储
 function checkRegistration() {
   const user = JSON.parse(localStorage.getItem("userInfo"));
+  const paidDate = localStorage.getItem("paidDate");
   if (!user || !user.nickname || !user.email) {
     document.getElementById("registerModal").style.display = "flex";
     return false;
   }
 
-  if (user.usageCount >= 10) {
-    alert("您的免费试用次数已用完。");
-    return false;
+  if (!paidDate) {
+    if (user.usageCount >= 10) {
+      alert("您的免费试用次数已用完。");
+      return false;
+    }
   }
   return true;
 }
@@ -697,6 +700,9 @@ function onConfirmPay(paid) {
 
   // ✅ 验证通过后关闭弹窗
   document.getElementById("confirmModal").style.display = "none";
+  
+  // 在本地缓存中写入 paidDate = 当前时间
+  localStorage.setItem("paidDate", new Date().toISOString());
 
   // 提交表单
   const user = JSON.parse(localStorage.getItem("userInfo")) || {};
@@ -723,10 +729,29 @@ function onConfirmPay(paid) {
   btn.innerHTML = '<span>✅</span> 已支付，下载行程PDF';
   const downloadBtn = document.getElementById('pdfButton');
   downloadBtn.style.display = 'inline-block';
+  document.getElementById("paywall").style.display = "none";
   document.getElementById("paywall").scrollIntoView({ behavior: "smooth" });
 }
 
 </script><script>
+
+// PDF下载函数，增加权限判断
+function doDownloadPDF() {
+  const paidDate = localStorage.getItem("paidDate");
+
+  if (paidDate) {
+    const expire = new Date(paidDate);
+    expire.setDate(expire.getDate() + 30);
+    if (new Date() <= expire) {
+      return exportPDF();
+    }
+  }
+
+  alert("🔒 请付费解锁下载PDF功能（¥10包月）。");
+  return;
+}
+
+// PDF下载函数
 function exportPDF() {
   trackPDFDownload();
   const element = document.getElementById("pdf-content");
