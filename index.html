@@ -426,18 +426,16 @@ function trackPDFDownload() {
 <p><strong>请点击下方按钮，支付后继续使用（包月¥10）：</strong></p>
 <button onclick="showPayment()" style="background-color:#ffa726;">微信支付（¥10）</button>
 </div><div class="paywall" id="paywall" style="display: none;">
-<p>
-<strong>
-      🔒请保存二维码，用微信扫码支付，并添加下面的备注信息。
-     </strong>
-</p><p id="orderCode">
-备注信息：<strong id="orderIdText">20250623-1807</strong>
-</p>
-<img alt="微信支付二维码" src="./wechat_qr.png" style="max-width: 220px; margin: 12px auto; display: block; border: 1px solid #ccc; border-radius: 8px;"/>
-<button id="unlockButton" onclick="unlockPDF()">
-<span>☐</span>
-  确认已支付
+<p><strong>🔒 请点击复制以下内容，然后在微信中粘贴发送给任意联系人，即可跳转支付：</strong></p>
+<textarea readonly="" style="width:100%; font-size:16px; padding:12px; border-radius:8px; border:1px solid #ccc; margin-top:10px;">
+#付款:孟勇鋼(mengyg2025)/AI旅行助手/001
+AI旅行助手 ￥19.90
+</textarea>
+<button onclick="copyPayText()" style="margin-top:12px; background:#4CAF50; color:white; padding:10px 18px; font-size:16px; border:none; border-radius:8px;">
+📋 一键复制微信支付信息
 </button>
+<p style="font-size:14px; color:#888; margin-top:8px;">复制后，在微信中粘贴发送给任意联系人，即可点击支付</p>
+<p id="orderCode" style="margin-top:12px;">备注信息：<strong id="orderIdText">20250630-xxxx</strong></p>
 </div>
 <div style="text-align: center;">
 <button id="pdfButton" onclick="exportPDF()" style="display: none;">
@@ -882,5 +880,26 @@ function updateButtonDisplayAfterGenerate() {
 	}
 }
 </script>
-</body>
+<script>
+function copyPayText() {
+  const text = `#付款:孟勇鋼(mengyg2025)/AI旅行助手/001\nAI旅行助手 ￥19.90`;
+  navigator.clipboard.writeText(text).then(() => {
+    alert("✅ 已复制付款信息，请打开微信并粘贴发送给任意联系人即可完成支付！");
+  }).catch(err => {
+    alert("❌ 复制失败，请手动复制上面的付款信息");
+  });
+}
+</script>
+<button onclick="forceShowPayHint()" style="position:fixed; bottom:16px; right:16px; z-index:9999; background:#f44336; color:white; padding:10px 16px; border:none; border-radius:8px; font-size:14px;">
+🧪 测试支付入口
+</button>
+<script>
+function forceShowPayHint() {
+  const payHint = document.getElementById("payHint");
+  if (payHint) {
+    payHint.style.display = "block";
+    payHint.scrollIntoView({ behavior: "smooth" });
+  }
+}
+</script></body>
 </html>
