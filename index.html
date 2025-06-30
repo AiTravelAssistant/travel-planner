@@ -374,10 +374,11 @@ th, td {
 }
 </style>
 <script>
-let downloadCount = 0;
-
 function trackPDFDownload() {
+  let downloadCount = parseInt(localStorage.getItem("downloadCount") || "0");
   downloadCount++;
+  localStorage.setItem("downloadCount", downloadCount);
+
   const user = JSON.parse(localStorage.getItem("userInfo"));
   if (!user) return;
 
@@ -386,7 +387,7 @@ function trackPDFDownload() {
   formData.append("entry.537580952", user.nickname || "");
   formData.append("entry.709455992", user.email || "");
   formData.append("entry.1504950828", user.usageCount || 0);
-  formData.append("entry.1488547560", timestamp);  // 使用当前时间更合理
+  formData.append("entry.1488547560", timestamp);
   formData.append("entry.895875942", navigator.userAgent || "");
   formData.append("entry.1513543868", downloadCount);
 
@@ -422,21 +423,6 @@ function trackPDFDownload() {
 </p>
 </div>
 </div>
-<div class="pay-hint" id="payHint" style="display:none; text-align:center; margin-top:20px;">
-<p><strong>请点击下方按钮，支付后继续使用（包月¥10）：</strong></p>
-<button onclick="showPayment()" style="background-color:#ffa726;">微信支付（¥10）</button>
-</div><div class="paywall" id="paywall" style="display: none;">
-<p><strong>🔒 请点击复制以下内容，然后在微信中粘贴发送给任意联系人，即可跳转支付：</strong></p>
-<textarea readonly="" style="width:100%; font-size:16px; padding:12px; border-radius:8px; border:1px solid #ccc; margin-top:10px;">
-#付款:孟勇鋼(mengyg2025)/AI旅行助手/001
-AI旅行助手 ￥19.90
-</textarea>
-<button onclick="copyPayText()" style="margin-top:12px; background:#4CAF50; color:white; padding:10px 18px; font-size:16px; border:none; border-radius:8px;">
-📋 一键复制微信支付信息
-</button>
-<p style="font-size:14px; color:#888; margin-top:8px;">复制后，在微信中粘贴发送给任意联系人，即可点击支付</p>
-<p id="orderCode" style="margin-top:12px;">备注信息：<strong id="orderIdText">20250630-xxxx</strong></p>
-</div>
 <div style="text-align: center;">
 <button id="pdfButton" onclick="exportPDF()" style="display: none;">
      📄 下载行程PDF文件
@@ -449,19 +435,28 @@ AI旅行助手 ￥19.90
 <button onclick="onConfirmPay(true)" style="flex:1; background:#4CAF50; color:white; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">✅ 已支付</button>
 <button onclick="onConfirmPay(false)" style="flex:1; background:#e0e0e0; color:black; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">❌ 未支付</button>
 </div>
-<input id="orderNumberInput" maxlength="32" placeholder="请复制微信支付的转账单号（32位数字）" style="width:90%; padding:10px; font-size:16px; margin-top:12px;"/>
+<input autocomplete="off" id="orderNumberInput" maxlength="32" placeholder="请复制微信支付的转账单号（32位数字）" style="width:90%; padding:10px; font-size:16px; margin-top:12px;"/>
 <p id="orderError" style="color:red; font-size:14px; display:none;">转账单号不正确，请确实支付。</p>
 </div>
 </div>
 <!-- 注册弹窗 -->
 <div id="registerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); z-index:10000; justify-content:center; align-items:center;">
 <div style="background:white; padding:24px 20px; border-radius:12px; text-align:center; width:90%; max-width:360px; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
-<p style="font-size:18px; font-weight:bold; margin-bottom:12px;">📝 请注册，可免费试用AI生成行程10次。</p>
+<p style="font-size:18px; font-weight:bold; margin-bottom:12px;">📝 请注册，可免费试用AI生成行程3次。</p>
 <input id="nickname" placeholder="请输入昵称" style="width:90%; padding:10px; margin:8px 0; font-size:16px;"/><br/>
 <input id="email" placeholder="请输入邮箱" style="width:90%; padding:10px; margin:8px 0; font-size:16px;"/><br/>
 <button onclick="submitRegistration()" style="background:#4CAF50; color:white; font-size:16px; padding:10px 24px; border:none; border-radius:8px; margin-top:10px;">注册</button>
 </div>
 </div>
+</div><div class="pay-hint" id="payHint" style="display:none; text-align:center; margin-top:20px;">
+<p><strong>请点击下方按钮，支付后继续使用（包月¥10）：</strong></p>
+<button onclick="showPayment()" style="background-color:#ffa726;">微信支付（¥10）</button>
+</div><div class="paywall" id="paywall" style="display: none;"><p style="font-size:16px; font-weight:bold; margin-bottom:10px;">📱 请长按二维码保存或转发至微信完成支付</p>
+<a download="微信支付二维码" href="./wechat_qr.png"><img src="./wechat_qr.png" style="max-width: 220px; margin: 12px auto; display: block; border: 1px solid #ccc; border-radius: 8px; cursor: pointer;"/></a>
+<button id="unlockButton" onclick="unlockPDF()">
+<span>☐</span>
+  确认已支付
+</button>
 </div>
 </div>
 <footer class="page-footer">
@@ -479,8 +474,8 @@ function checkRegistration() {
 
   if (!paidDate) {
     // 超出免费次数限制则提示并引导付费
-  if (user.usageCount >= 10) {
-      alert("您的免费试用10次已用完，请付费解锁。");
+  if (user.usageCount >= 3) {
+      alert("您的免费试用3次已用完，请付费解锁。");
       const pay = document.getElementById("payHint");
       if (pay) pay.style.display = "block";
       return false;
@@ -536,7 +531,6 @@ async function generate() {
   const pdfButton = document.getElementById('pdfButton');
   const generateBtn = document.getElementById('generateBtn');
   const payHint = document.getElementById("payHint");
-  const orderCode = document.getElementById("orderIdText");
 
   output.innerHTML = '<p style="font-weight:bold;font-size:16px;">⏳ <span class="dot-typing"></span> 正在生成行程，请稍等...</p>';
   paywall.style.display = 'none';
@@ -549,7 +543,6 @@ async function generate() {
   const yyyyMMdd = now.toISOString().slice(0,10).replace(/-/g, '');
   const hhmm = now.getHours().toString().padStart(2,'0') + now.getMinutes().toString().padStart(2,'0');
   const orderId = `${yyyyMMdd}-${hhmm}`;
-  orderCode.innerText = orderId;
 
   
   const prompt = `
@@ -664,7 +657,6 @@ ${userInput}
 function showPayment() {
   const paywall = document.getElementById('paywall');
   const payHint = document.getElementById('payHint');
-  const orderCode = document.getElementById('orderIdText');
   const unlockBtn = document.getElementById('unlockButton');
 
   const now = new Date();
@@ -672,7 +664,6 @@ function showPayment() {
   const hhmm = now.getHours().toString().padStart(2,'0') + now.getMinutes().toString().padStart(2,'0');
   const orderId = `${yyyyMMdd}-${hhmm}`;
 
-  orderCode.innerText = orderId;
   payHint.style.display = "none";
   paywall.style.display = "block";
   unlockBtn.style.display = "none";
@@ -683,6 +674,7 @@ function showPayment() {
 
 </script><script>
 function unlockPDF() {
+  document.getElementById("orderNumberInput").value = "";  // 清除订单号输入框
   document.getElementById("confirmModal").style.display = "flex";
 }
 
@@ -699,10 +691,14 @@ function onConfirmPay(paid) {
 
   // 验证订单号格式
   const orderNumber = document.getElementById("orderNumberInput").value.trim();
+  if (!orderNumber) {
+    alert("⚠️ 请输入或复制微信支付的转账单号");
+    return;
+  }
   const regex = /^1000107301\d{8}\d{14}$/;
   
   const lastOrder = localStorage.getItem("lastOrderNumber");
-  if (orderNumber === lastOrder) {
+  if (orderNumber === lastOrder && lastOrder) {
     alert("⚠️ 此订单号已使用，请勿重复提交！");
     return;
   }
@@ -866,40 +862,19 @@ function updateButtonDisplayAfterGenerate() {
   }
 
   // 只有已生成行程 + 有权限，才显示 PDF 按钮
-  if (hasGenerated && (isPaid || usageCount <= 10)) {
+  if (hasGenerated && (isPaid || usageCount <= 3)) {
     pdfButton.style.display = "inline-block";
   } else {
     pdfButton.style.display = "none";
   }
 
   // 超出免费次数且未付费，才显示支付提示
-	if (hasGenerated && !isPaid && usageCount > 10) {
+	if (hasGenerated && !isPaid && usageCount > 3) {
 	  payHint.style.display = "block";
 	} else {
 	  payHint.style.display = "none";
 	}
 }
 </script>
-<script>
-function copyPayText() {
-  const text = `#付款:孟勇鋼(mengyg2025)/AI旅行助手/001\nAI旅行助手 ￥19.90`;
-  navigator.clipboard.writeText(text).then(() => {
-    alert("✅ 已复制付款信息，请打开微信并粘贴发送给任意联系人即可完成支付！");
-  }).catch(err => {
-    alert("❌ 复制失败，请手动复制上面的付款信息");
-  });
-}
-</script>
-<button onclick="forceShowPayHint()" style="position:fixed; bottom:16px; right:16px; z-index:9999; background:#f44336; color:white; padding:10px 16px; border:none; border-radius:8px; font-size:14px;">
-🧪 测试支付入口
-</button>
-<script>
-function forceShowPayHint() {
-  const payHint = document.getElementById("payHint");
-  if (payHint) {
-    payHint.style.display = "block";
-    payHint.scrollIntoView({ behavior: "smooth" });
-  }
-}
-</script></body>
+</body>
 </html>
