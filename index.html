@@ -265,6 +265,20 @@ footer {
   100% { content: '...'; }
 }
 
+
+@keyframes carRun {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(10px); }
+  100% { transform: translateX(0); }
+}
+.car-loop {
+  display: inline-block;
+  animation: carRun 0.8s infinite;
+  font-size: 18px;
+  margin-left: 8px;
+}
+
+
 @media print {
   table {
     page-break-inside: avoid !important;
@@ -372,6 +386,7 @@ th, td {
   th:nth-child(4), td:nth-child(4) { width: 15%; }
   th:nth-child(5), td:nth-child(5) { width: 22%; }
 }
+
 </style>
 <script>
 function trackPDFDownload() {
@@ -406,6 +421,8 @@ function trackPDFDownload() {
     }
   };
 </script>
+
+
 </head>
 <body>
 <div class="container">
@@ -424,20 +441,18 @@ function trackPDFDownload() {
 </div>
 </div>
 <div style="text-align: center;">
-<button id="pdfButton" onclick="exportPDF()" style="display: none;">
-     📄 下载行程PDF文件
-    </button>
+<button id="pdfButton" onclick="exportPDF()" style="display: none;"><img src="pdf_icon.png" style="height:38px; vertical-align:middle; margin-right:8px;"/>下载行程PDF文件</button>
 <!-- 自定义支付确认弹窗 -->
 <div id="confirmModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); z-index:9999; justify-content:center; align-items:center;">
 <div style="background:white; padding:24px 20px; border-radius:12px; text-align:center; width:90%; max-width:380px; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
-<p style="font-size:18px; font-weight:bold; margin-bottom:20px;">💰 您是否已支付？</p>
+<p style="font-size:18px; font-weight:bold; margin-bottom:20px;">💰 您是否已支付？</p><img src="wechat_danghao.jpg" style="width:55%; max-width:180px; margin-bottom:10px; border-radius:5px; box-shadow:0 1px 3px rgba(0,0,0,0.1);"/><p>📋 请打开微信账单详情页面，长按复制转账单号，粘贴到上方输入框中</p>
 <div style="display: flex; justify-content:space-around;">
 <button onclick="onConfirmPay(true)" style="flex:1; background:#4CAF50; color:white; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">✅ 已支付</button>
 <button onclick="onConfirmPay(false)" style="flex:1; background:#e0e0e0; color:black; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">❌ 未支付</button>
 </div>
 <input autocomplete="off" id="orderNumberInput" maxlength="32" placeholder="请复制微信支付的转账单号（32位数字）" style="width:90%; padding:10px; font-size:16px; margin-top:12px;"/>
 <p id="orderError" style="color:red; font-size:14px; display:none;">转账单号不正确，请确实支付。</p>
-<img src="wechat_danghao.jpg" style="width:70%; max-width:260px; margin-top:12px; border-radius:6px; box-shadow:0 2px 5px rgba(0,0,0,0.1);"/><p>📋 请打开微信账单详情页面，长按复制转账单号，粘贴到上方输入框中</p></div>
+</div>
 </div>
 <!-- 注册弹窗 -->
 <div id="registerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); z-index:10000; justify-content:center; align-items:center;">
@@ -539,7 +554,7 @@ async function generate() {
   const generateBtn = document.getElementById('generateBtn');
   const payHint = document.getElementById("payHint");
 
-  output.innerHTML = '<p style="font-weight:bold;font-size:16px;">⏳ <span class="dot-typing"></span> 正在生成行程，请稍等...</p>';
+ output.innerHTML = '<p style="font-weight:bold;font-size:16px;">⏳ <span class="dot-typing"></span> 正在生成行程，请稍等 <span class="dot-typing"></span><span class="car-loop">🚗</span></p>';
   paywall.style.display = 'none';
   pdfButton.style.display = 'none';
   payHint.style.display = 'none';
@@ -659,8 +674,7 @@ ${userInput}
     updateButtonDisplayAfterGenerate();
   }
  
-}
-</script><script>
+}</script><script>
 function showPayment() {
   const paywall = document.getElementById('paywall');
   const payHint = document.getElementById('payHint');
