@@ -198,15 +198,19 @@ footer {
 /* 修正 PDF 截断问题：减小字体、保持页边距 */
 @media print {
   .output {
-    font-size: 14px;
-    line-height: 1.5;
-    padding: 20px;
+    font-size: 16px;
+    line-height: 1.6;
+    padding: 24px;
   }
   table {
-    font-size: 13px;
+    font-size: 16px;
+    line-height: 1.6;
+    border-collapse: collapse;
+    margin-top: 16px;
   }
   table th, table td {
-    padding: 6px;
+    padding: 10px 12px;
+    border: 1px solid #aaa;
   }
 }
 
@@ -421,8 +425,6 @@ function trackPDFDownload() {
     }
   };
 </script>
-
-
 </head>
 <body>
 <div class="container">
