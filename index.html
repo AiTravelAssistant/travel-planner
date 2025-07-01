@@ -107,6 +107,7 @@ th, td {
   margin-top: 10px;
 }
 
+ 
 
 /* PDF 输出样式优化 */
 @media print {
@@ -282,28 +283,47 @@ th, td {
 
 /* 移动端表格自然缩放 + 显示完整边框 */
 @media (max-width: 768px) {
-  h2 { font-size: 28px; }
-  textarea { font-size: 20px; height: 32vh; }
-  button { font-size: 24px; width: 85%; padding: 16px; }
-  .output { overflow-x: hidden; padding: 20px; }
-  table, th, td {
-    max-width: 100% !important;
-    box-sizing: border-box;
-    word-break: break-word;
+  h2 {
+    font-size: 28px;
   }
+
+  textarea {
+    font-size: 20px;
+    height: 32vh;
+  }
+
+  button {
+    font-size: 24px;
+    width: 85%;
+    padding: 16px;
+  }
+
+  .output {
+    overflow-x: hidden;
+    padding: 20px;
+  }
+
   table {
     width: 100% !important;
     border-collapse: collapse;
     border: 1px solid #ccc;
-    table-layout: fixed;
-    font-size: 20px;
+    table-layout: auto !important;
+    font-size: 18px;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    word-break: break-word;
   }
+
   th, td {
+    word-break: break-word;
     white-space: normal;
-    font-size: 20px;
+    font-size: 18px;
     padding: 10px 12px;
     border: 1px solid #ccc;
+    max-width: 100% !important;
+    box-sizing: border-box;
   }
+
   th:nth-child(1), td:nth-child(1) { width: 18%; }
   th:nth-child(2), td:nth-child(2) { width: 25%; }
   th:nth-child(3), td:nth-child(3) { width: 20%; }
@@ -311,23 +331,6 @@ th, td {
   th:nth-child(5), td:nth-child(5) { width: 22%; }
 }
 
-
-@media (max-width: 768px) {
-  table {
-    table-layout: auto !important;
-  }
-  td:nth-child(1),
-  th:nth-child(1) {
-    width: 60px;
-    max-width: 80px;
-    white-space: nowrap;
-    font-size: 14px;
-  }
-  td, th {
-    word-break: break-word;
-    white-space: normal;
-  }
-}
 </style>
 <script>
 function trackPDFDownload() {
@@ -354,14 +357,7 @@ function trackPDFDownload() {
   });
 }
 </script>
-<script>
-  window.onload = function() {
-    const payHint = document.getElementById("payHint");
-    if (payHint) {
-      payHint.style.display = "none";
-    }
-  };
-</script>
+
 </head>
 <body>
 <div class="container">
@@ -562,12 +558,14 @@ ${userInput}
 
     const data = await response.json();
     if (data && data.choices && data.choices.length > 0) {
+    
+    localStorage.setItem("hasGenerated", "true");
       
       const parsedHtml = marked.parse(data.choices[0].message.content.trim());
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = parsedHtml;
 
-            const children = Array.from(tempDiv.children);
+      const children = Array.from(tempDiv.children);
       let outputHTML = '';
       let currentBlock = [];
 
@@ -606,10 +604,10 @@ ${userInput}
   } catch (error) {
     console.error("Error:", error);
     output.innerText = "❌ AI请求出错，请检查网络连接或请勿息屏，重新点击生成行程。";
+    localStorage.setItem("hasGenerated", "false");
   } finally {
     generateBtn.disabled = false;
     generateBtn.innerText = "🗺️ AI生成旅游行程";
-    localStorage.setItem("hasGenerated", "true");
     updateButtonDisplayAfterGenerate();
   }
  
@@ -780,7 +778,11 @@ window.onload = function () {
 
   const pdfButton = document.getElementById("pdfButton");
   const payHint = document.getElementById("payHint");
-
+    if (payHint) {
+      payHint.style.display = "none";
+    }
+    
+    
   let isPaid = false;
   if (paidDate) {
     const expire = new Date(paidDate);
@@ -789,6 +791,9 @@ window.onload = function () {
       isPaid = true;
     }
   }
+  
+
+
 
 
 }
