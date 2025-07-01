@@ -242,13 +242,6 @@ th, td {
   white-space: normal;
 }
 
-
-/* PC端表格结构优化 */
-@media (min-width: 769px) {
-  table {
-    table-layout: auto;
-  }
-  
 table th:nth-child(1), table td:nth-child(1) {
   width: 10%;
   min-width: 60px;
@@ -274,6 +267,15 @@ table th:nth-child(5), table td:nth-child(5) {
   min-width: 160px;
   word-break: break-word;
 }
+
+
+/* PC端表格结构优化 */
+@media (min-width: 769px) {
+  table {
+    table-layout: auto;
+  }
+  
+
   th, td {
     padding: 10px;
     font-size: 16px;
@@ -304,7 +306,7 @@ table th:nth-child(5), table td:nth-child(5) {
 
   table {
     width: 100%;
-    table-layout: auto;
+    table-layout: fixed;
     border-collapse: collapse;
     border: 1px solid #ccc;
     font-size: 18px;
