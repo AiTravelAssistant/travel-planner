@@ -231,6 +231,24 @@ footer {
 
 
 
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  word-break: break-word;
+}
+th, td {
+  word-break: break-word;
+  white-space: normal;
+}
+
+
+/* PC端表格结构优化 */
+@media (min-width: 769px) {
+  table {
+    table-layout: auto;
+  }
+  
 table th:nth-child(1), table td:nth-child(1) {
   width: 10%;
   min-width: 60px;
@@ -256,25 +274,6 @@ table th:nth-child(5), table td:nth-child(5) {
   min-width: 160px;
   word-break: break-word;
 }
-
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  word-break: break-word;
-}
-th, td {
-  word-break: break-word;
-  white-space: normal;
-}
-
-
-/* PC端表格结构优化 */
-@media (min-width: 769px) {
-  table {
-    table-layout: auto;
-  }
   th, td {
     padding: 10px;
     font-size: 16px;
@@ -304,26 +303,21 @@ th, td {
   }
 
   table {
-    width: 100% !important;
+    width: 100%;
+    table-layout: auto;
     border-collapse: collapse;
     border: 1px solid #ccc;
-    table-layout: auto !important;
     font-size: 18px;
-    max-width: 100% !important;
-    box-sizing: border-box;
-    word-break: break-word;
   }
 
   th, td {
-    word-break: break-word;
-    white-space: normal;
     font-size: 18px;
     padding: 10px 12px;
     border: 1px solid #ccc;
-    max-width: 100% !important;
+    word-break: break-word;
+    white-space: normal;
     box-sizing: border-box;
   }
-
 }
 
 </style>
