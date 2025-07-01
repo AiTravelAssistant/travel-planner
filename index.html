@@ -99,6 +99,7 @@ th, td {
   margin: 10px auto;
   display: block;
 }
+.paywall button {
   background-color: #e0e0e0;
   font-size: 16px;
   padding: 10px 20px;
@@ -145,6 +146,7 @@ th, td {
   
 
 /* 按钮美化 */
+button {
   background-color: #4CAF50;
   color: white;
   padding: 14px 20px;
@@ -228,22 +230,27 @@ footer {
 
 
 
+table th:nth-child(1), table td:nth-child(1) {
   width: 10%;
   min-width: 60px;
 }
 
+table th:nth-child(2), table td:nth-child(2) {
   width: 28%;
   min-width: 160px;
 }
 
+table th:nth-child(3), table td:nth-child(3) {
   width: 18%;
   min-width: 100px;
 }
 
+table th:nth-child(4), table td:nth-child(4) {
   width: 14%;
   min-width: 60px;
 }
 
+table th:nth-child(5), table td:nth-child(5) {
   width: 30%;
   min-width: 160px;
   word-break: break-word;
@@ -277,6 +284,7 @@ th, td {
 @media (max-width: 768px) {
   h2 { font-size: 28px; }
   textarea { font-size: 20px; height: 32vh; }
+  button { font-size: 24px; width: 85%; padding: 16px; }
   .output { overflow-x: hidden; padding: 20px; }
   table, th, td {
     max-width: 100% !important;
@@ -296,7 +304,31 @@ th, td {
     padding: 10px 12px;
     border: 1px solid #ccc;
   }
-}</style>
+  th:nth-child(1), td:nth-child(1) { width: 18%; }
+  th:nth-child(2), td:nth-child(2) { width: 25%; }
+  th:nth-child(3), td:nth-child(3) { width: 20%; }
+  th:nth-child(4), td:nth-child(4) { width: 15%; }
+  th:nth-child(5), td:nth-child(5) { width: 22%; }
+}
+
+
+@media (max-width: 768px) {
+  table {
+    table-layout: auto !important;
+  }
+  td:nth-child(1),
+  th:nth-child(1) {
+    width: 60px;
+    max-width: 80px;
+    white-space: nowrap;
+    font-size: 14px;
+  }
+  td, th {
+    word-break: break-word;
+    white-space: normal;
+  }
+}
+</style>
 <script>
 function trackPDFDownload() {
   let downloadCount = parseInt(localStorage.getItem("downloadCount") || "0");
@@ -321,6 +353,14 @@ function trackPDFDownload() {
     body: formData
   });
 }
+</script>
+<script>
+  window.onload = function() {
+    const payHint = document.getElementById("payHint");
+    if (payHint) {
+      payHint.style.display = "none";
+    }
+  };
 </script>
 </head>
 <body>
@@ -716,6 +756,44 @@ function exportPDF() {
   
 </script>
 <script>
+// 页面加载时控制按钮显示逻辑
+// 页面加载时自动清除过期的包月状态
+window.onload = function () {
+  // 页面加载时初始化生成状态为 false
+  try {
+  localStorage.setItem("hasGenerated", "false");
+  } catch (e) {
+  console.warn("localStorage 不可用", e);
+  }
+  const pd = localStorage.getItem("paidDate");
+  if (pd) {
+    const expire = new Date(pd);
+    expire.setDate(expire.getDate() + 30);
+    if (new Date() > expire) {
+      localStorage.removeItem("paidDate");
+    }
+  }
+  updateButtonDisplayAfterGenerate();
+  const paidDate = localStorage.getItem("paidDate");
+  const user = JSON.parse(localStorage.getItem("userInfo") || "{}");
+  const usageCount = user.usageCount || 0;
+
+  const pdfButton = document.getElementById("pdfButton");
+  const payHint = document.getElementById("payHint");
+
+  let isPaid = false;
+  if (paidDate) {
+    const expire = new Date(paidDate);
+    expire.setDate(expire.getDate() + 30);
+    if (new Date() <= expire) {
+      isPaid = true;
+    }
+  }
+
+
+}
+</script>
+<script>
 /**
  * 根据用户当前状态判断是否显示下载PDF按钮和支付提示
  * - 如果用户包月有效，或使用次数 <= 10：显示下载PDF按钮
@@ -763,46 +841,5 @@ function updateButtonDisplayAfterGenerate() {
 function showQRPopup() {
   document.getElementById('qrPopup').style.display = 'flex';
 }
-</script><script>window.onload = function() {
-const payHint = document.getElementById("payHint");
-    if (payHint) {
-      payHint.style.display = "none";
-    }
-// 页面加载时控制按钮显示逻辑
-// 页面加载时自动清除过期的包月状态
-window.onload = function () {
-  // 页面加载时初始化生成状态为 false
-  try {
-  localStorage.setItem("hasGenerated", "false");
-  } catch (e) {
-  console.warn("localStorage 不可用", e);
-  }
-  const pd = localStorage.getItem("paidDate");
-  if (pd) {
-    const expire = new Date(pd);
-    expire.setDate(expire.getDate() + 30);
-    if (new Date() > expire) {
-      localStorage.removeItem("paidDate");
-    }
-  }
-  updateButtonDisplayAfterGenerate();
-  const paidDate = localStorage.getItem("paidDate");
-  const user = JSON.parse(localStorage.getItem("userInfo") || "{}");
-  const usageCount = user.usageCount || 0;
-
-  const pdfButton = document.getElementById("pdfButton");
-  const payHint = document.getElementById("payHint");
-
-  let isPaid = false;
-  if (paidDate) {
-    const expire = new Date(paidDate);
-    expire.setDate(expire.getDate() + 30);
-    if (new Date() <= expire) {
-      isPaid = true;
-    }
-  }
-
-
-}
-};</script></body>
+</script></body>
 </html>
