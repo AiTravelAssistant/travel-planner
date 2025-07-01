@@ -107,26 +107,6 @@ th, td {
   margin-top: 10px;
 }
 
-/* 手机端优化 */
-@media (max-width: 768px) {
-  h2 {
-    font-size: 28px;
-  }
-  textarea {
-    font-size: 20px;
-    height: 32vh;
-  }
-  button {
-    font-size: 24px;
-    width: 85%;
-    padding: 16px;
-  }
-  .output {
-    font-size: 18.5px;
-    padding: 26px;
-  }
-}
-  
 
 /* PDF 输出样式优化 */
 @media print {
@@ -287,29 +267,7 @@ th, td {
   word-break: break-word;
   white-space: normal;
 }
-@media (max-width: 768px) {
-  .output {
-    padding: 20px;
-  }
-  table {
-    font-size: 15px;
-  }
-  th, td {
-    font-size: 15px;
-    padding: 6px;
-  }
-}
 
-@media (max-width: 768px) {
-  .output {
-    overflow-x: hidden;
-  }
-  table, th, td {
-    max-width: 100% !important;
-    box-sizing: border-box;
-    word-break: break-word;
-  }
-}
 
 /* PC端表格结构优化 */
 @media (min-width: 769px) {
@@ -324,20 +282,26 @@ th, td {
 
 /* 移动端表格自然缩放 + 显示完整边框 */
 @media (max-width: 768px) {
-  .output {
-    overflow-x: hidden;
+  h2 { font-size: 28px; }
+  textarea { font-size: 20px; height: 32vh; }
+  button { font-size: 24px; width: 85%; padding: 16px; }
+  .output { overflow-x: hidden; padding: 20px; }
+  table, th, td {
+    max-width: 100% !important;
+    box-sizing: border-box;
+    word-break: break-word;
   }
   table {
     width: 100% !important;
     border-collapse: collapse;
     border: 1px solid #ccc;
     table-layout: fixed;
+    font-size: 20px;
   }
   th, td {
-    word-break: break-word;
     white-space: normal;
-    font-size: 15px;
-    padding: 8px 6px;
+    font-size: 20px;
+    padding: 10px 12px;
     border: 1px solid #ccc;
   }
   th:nth-child(1), td:nth-child(1) { width: 18%; }
