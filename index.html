@@ -228,27 +228,22 @@ footer {
 
 
 
-table th:nth-child(1), table td:nth-child(1) {
   width: 10%;
   min-width: 60px;
 }
 
-table th:nth-child(2), table td:nth-child(2) {
   width: 28%;
   min-width: 160px;
 }
 
-table th:nth-child(3), table td:nth-child(3) {
   width: 18%;
   min-width: 100px;
 }
 
-table th:nth-child(4), table td:nth-child(4) {
   width: 14%;
   min-width: 60px;
 }
 
-table th:nth-child(5), table td:nth-child(5) {
   width: 30%;
   min-width: 160px;
   word-break: break-word;
@@ -301,13 +296,7 @@ th, td {
     padding: 10px 12px;
     border: 1px solid #ccc;
   }
-  th:nth-child(1), td:nth-child(1) { width: 18%; }
-  th:nth-child(2), td:nth-child(2) { width: 25%; }
-  th:nth-child(3), td:nth-child(3) { width: 20%; }
-  th:nth-child(4), td:nth-child(4) { width: 15%; }
-  th:nth-child(5), td:nth-child(5) { width: 22%; }
-}
-</style>
+}</style>
 <script>
 function trackPDFDownload() {
   let downloadCount = parseInt(localStorage.getItem("downloadCount") || "0");
@@ -333,7 +322,6 @@ function trackPDFDownload() {
   });
 }
 </script>
-
 </head>
 <body>
 <div class="container">
@@ -727,7 +715,6 @@ function exportPDF() {
 } 
   
 </script>
-
 <script>
 /**
  * 根据用户当前状态判断是否显示下载PDF按钮和支付提示
