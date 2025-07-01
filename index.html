@@ -624,7 +624,7 @@ ${userInput}
     }
   } catch (error) {
     console.error("Error:", error);
-    output.innerText = "❌ AI请求出错，请检查网络连接。";
+    output.innerText = "❌ AI请求出错，请检查网络连接或请勿息屏，重新点击生成行程。";
   } finally {
     generateBtn.disabled = false;
     generateBtn.innerText = "🗺️ AI生成旅游行程";
