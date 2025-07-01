@@ -437,7 +437,7 @@ function trackPDFDownload() {
 </div>
 <input autocomplete="off" id="orderNumberInput" maxlength="32" placeholder="请复制微信支付的转账单号（32位数字）" style="width:90%; padding:10px; font-size:16px; margin-top:12px;"/>
 <p id="orderError" style="color:red; font-size:14px; display:none;">转账单号不正确，请确实支付。</p>
-</div>
+<img src="wechat_danghao.jpg" style="width:70%; max-width:260px; margin-top:12px; border-radius:6px; box-shadow:0 2px 5px rgba(0,0,0,0.1);"/><p>📋 请打开微信账单详情页面，长按复制转账单号，粘贴到上方输入框中</p></div>
 </div>
 <!-- 注册弹窗 -->
 <div id="registerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); z-index:10000; justify-content:center; align-items:center;">
@@ -449,10 +449,9 @@ function trackPDFDownload() {
 </div>
 </div>
 </div><div class="pay-hint" id="payHint" style="display:none; text-align:center; margin-top:20px;">
-<p><strong>请点击下方按钮，支付后继续使用（包月¥10）：</strong></p>
-<button onclick="showPayment()" style="background-color:#ffa726;">微信支付（¥10）</button>
-</div><div class="paywall" id="paywall" style="display: none;"><p style="font-size:16px; font-weight:bold; margin-bottom:10px;">📱 请长按二维码保存或转发至微信完成支付</p>
-<a download="微信支付二维码" href="./wechat_qr.png"><img src="./wechat_qr.png" style="max-width: 220px; margin: 12px auto; display: block; border: 1px solid #ccc; border-radius: 8px; cursor: pointer;"/></a>
+<p><strong>请点击下方按钮，支付后继续使用（包月¥19.9元）：</strong></p>
+<button onclick="showPayment()" style="background-color:#ffa726;">微信支付（¥19.9元）</button>
+</div><div class="paywall" id="paywall" style="display: none;"><p style="font-size:16px; font-weight:bold; margin-bottom:10px;">📱 请长按保存或扫码，用微信完成支付</p><img onclick="showQRPopup()" src="./wechat_qr.png" style="max-width: 220px; margin: 12px auto; display: block; border: 1px solid #ccc; border-radius: 8px; cursor: pointer;cursor:pointer;"/>
 <button id="unlockButton" onclick="unlockPDF()">
 <span>☐</span>
   确认已支付
@@ -488,9 +487,17 @@ function submitRegistration() {
   const nickname = document.getElementById("nickname").value.trim();
   const email = document.getElementById("email").value.trim();
   if (!nickname || !email) {
-    alert("请输入昵称和邮箱");
-
+    alert("⚠️ 请输入昵称和邮箱");
+    return; // 阻止提交
   }
+  
+  // 邮箱格式验证（简单正则）
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email)) {
+    alert("⚠️ 邮箱格式不正确，请重新输入");
+    return;
+  }
+  
   const userInfo = {
     nickname,
     email,
@@ -697,6 +704,11 @@ function onConfirmPay(paid) {
   }
   const regex = /^1000107301\d{8}\d{14}$/;
   
+  if (!regex.test(orderNumber)) {
+    document.getElementById("orderError").style.display = "block";
+    return; // ❗ 停留在弹窗，不关闭
+  }
+
   const lastOrder = localStorage.getItem("lastOrderNumber");
   if (orderNumber === lastOrder && lastOrder) {
     alert("⚠️ 此订单号已使用，请勿重复提交！");
@@ -704,10 +716,6 @@ function onConfirmPay(paid) {
   }
   localStorage.setItem("lastOrderNumber", orderNumber);
 
-  if (!regex.test(orderNumber)) {
-    document.getElementById("orderError").style.display = "block";
-    return; // ❗ 停留在弹窗，不关闭
-  }
 
   // ✅ 验证通过后关闭弹窗
   document.getElementById("confirmModal").style.display = "none";
@@ -764,7 +772,7 @@ function doDownloadPDF() {
     }
   }
 
-  alert("🔒 请付费解锁下载PDF功能（¥10包月）。");
+  alert("🔒 请付费解锁下载PDF功能（¥19.9元包月）。");
   return;
 }
 
@@ -876,5 +884,9 @@ function updateButtonDisplayAfterGenerate() {
 	}
 }
 </script>
-</body>
+<div id="qrPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center;"><div style="background:white; padding:20px; border-radius:12px; text-align:center; max-width:360px; box-shadow:0 4px 10px rgba(0,0,0,0.3);"><p>📷 长按图片保存二维码，用微信扫码完成支付</p><img src="./wechat_qr.png" style="width:100%; border-radius:10px; margin-top:10px;"/><button onclick="document.getElementById('qrPopup').style.display='none'" style="margin-top:12px; padding:8px 16px; font-size:14px; border:none; background:#4CAF50; color:white; border-radius:6px;">关闭</button></div></div><script>
+function showQRPopup() {
+  document.getElementById('qrPopup').style.display = 'flex';
+}
+</script></body>
 </html>
