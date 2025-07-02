@@ -1,16 +1,12 @@
 <!DOCTYPE html>
-
 <html lang="zh">
-<head>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta charset="utf-8"/>
-<title>AI旅行助手(MVP)</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js">
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
-</script>
+ <head>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta charset="utf-8"/>
+  <title>
+   AI旅行助手(MVP)
+  </title>
+  
 <style>
    body {
   font-family: "Microsoft YaHei", sans-serif;
@@ -169,16 +165,7 @@ button:active {
 }
   
 
-/* 页脚版权信息居中显示在页面底部 */
-footer {
-  text-align: center;
-  font-size: 14px;
-  color: #888;
-  margin-top: 40px;
-  margin-bottom: 20px;
-}
-
-/* 修复 PDF 按钮居中失败的问题 */
+/* PDF 按钮居中 */
 #pdfButton {
   display: none;
   margin: 24px auto;
@@ -354,10 +341,21 @@ textarea {
   }
 
 }
-
-</style>
-<script>
-function trackPDFDownload() {
+  </style>
+  
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+  </script>
+  <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
+  </script>
+  
+  
+  <script>
+   function trackPDFDownload() {
   let downloadCount = parseInt(localStorage.getItem("downloadCount") || "0");
   downloadCount++;
   localStorage.setItem("downloadCount", downloadCount);
@@ -380,63 +378,9 @@ function trackPDFDownload() {
     body: formData
   });
 }
-</script>
-
-</head>
-<body>
-<div class="container">
-<h2 style="margin-top: 10px;">✈️ AI旅行助手(MVP)</h2>
-<textarea id="inputText" placeholder="请输入您的旅行需求，例如：东京到大阪6天自由行，2人，蜜月旅行" rows="7"></textarea>
-<button id="generateBtn" onclick="generate()">
-    🗺️ AI生成旅游行程
-   </button>
-<div class="output" id="pdf-content">
-<div id="output">
-<p>
-<strong>
-       这里将显示生成的行程内容...
-      </strong>
-</p>
-</div>
-</div>
-<div style="text-align: center;">
-<button id="pdfButton" onclick="exportPDF()" style="display: none;"><img src="pdf_icon.png" style="height:38px; vertical-align:middle; margin-right:8px;"/>下载行程PDF文件</button>
-<!-- 自定义支付确认弹窗 -->
-<div id="confirmModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); z-index:9999; justify-content:center; align-items:center;">
-<div style="background:white; padding:24px 20px; border-radius:12px; text-align:center; width:90%; max-width:380px; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
-<p style="font-size:18px; font-weight:bold; margin-bottom:20px;">💰 您是否已支付？</p><img src="wechat_danghao.jpg" style="width:55%; max-width:180px; margin-bottom:10px; border-radius:5px; box-shadow:0 1px 3px rgba(0,0,0,0.1);"/><p>📋 请打开微信账单详情页面，长按复制转账单号，粘贴到上方输入框中</p>
-<div style="display: flex; justify-content:space-around;">
-<button onclick="onConfirmPay(true)" style="flex:1; background:#4CAF50; color:white; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">✅ 已支付</button>
-<button onclick="onConfirmPay(false)" style="flex:1; background:#e0e0e0; color:black; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">❌ 未支付</button>
-</div>
-<input autocomplete="off" id="orderNumberInput" maxlength="32" placeholder="请复制微信支付的转账单号（32位数字）" style="width:90%; padding:10px; font-size:16px; margin-top:12px;"/>
-<p id="orderError" style="color:red; font-size:14px; display:none;">转账单号不正确，请确实支付。</p>
-</div>
-</div>
-<!-- 注册弹窗 -->
-<div id="registerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); z-index:10000; justify-content:center; align-items:center;">
-<div style="background:white; padding:24px 20px; border-radius:12px; text-align:center; width:90%; max-width:360px; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
-<p style="font-size:18px; font-weight:bold; margin-bottom:12px;">📝 请注册，可免费试用AI生成行程3次。</p>
-<input id="nickname" placeholder="请输入昵称" style="width:90%; padding:10px; margin:8px 0; font-size:16px;"/><br/>
-<input id="email" placeholder="请输入邮箱" style="width:90%; padding:10px; margin:8px 0; font-size:16px;"/><br/>
-<button onclick="submitRegistration()" style="background:#4CAF50; color:white; font-size:16px; padding:10px 24px; border:none; border-radius:8px; margin-top:10px;">注册</button>
-</div>
-</div>
-</div><div class="pay-hint" id="payHint" style="display:none; text-align:center; margin-top:20px;">
-<p><strong>请点击下方按钮，支付后继续使用（包月¥19.9元）：</strong></p>
-<button onclick="showPayment()" style="background-color:#ffa726;">微信支付（¥19.9元）</button>
-</div><div class="paywall" id="paywall" style="display: none;"><p style="font-size:16px; font-weight:bold; margin-bottom:10px;">📱 请长按保存或扫码，用微信完成支付</p><img onclick="showQRPopup()" src="./wechat_qr.png" style="max-width: 220px; margin: 12px auto; display: block; border: 1px solid #ccc; border-radius: 8px; cursor: pointer;cursor:pointer;"/>
-<button id="unlockButton" onclick="unlockPDF()">
-<span>☐</span>
-  确认已支付
-</button>
-</div>
-</div>
-<footer class="page-footer">
-   © 2025 MYG. All rights reserved.
-</footer>
-<script>
-// 注册检查和本地存储
+  </script>
+  <script>
+   // 注册检查和本地存储
 function checkRegistration() {
   const user = JSON.parse(localStorage.getItem("userInfo"));
   const paidDate = localStorage.getItem("paidDate");
@@ -497,9 +441,9 @@ function submitRegistration() {
   });
   document.getElementById("registerModal").style.display = "none";
 }
-</script>
-<script>
-async function generate() {
+  </script>
+  <script>
+   async function generate() {
   if (!checkRegistration()) return;
   const userInput = document.getElementById('inputText').value.trim();
   if (!userInput) {
@@ -518,7 +462,7 @@ async function generate() {
   pdfButton.style.display = 'none';
   payHint.style.display = 'none';
   generateBtn.disabled = true;
-  generateBtn.innerText = "🗺️ AI生成中…";
+  generateBtn.innerText = "🧠️ AI生成中…";
 
   const now = new Date();
   const yyyyMMdd = now.toISOString().slice(0,10).replace(/-/g, '');
@@ -635,8 +579,10 @@ ${userInput}
     updateButtonDisplayAfterGenerate();
   }
  
-}</script><script>
-function showPayment() {
+}
+  </script>
+  <script>
+   function showPayment() {
   const paywall = document.getElementById('paywall');
   const payHint = document.getElementById('payHint');
   const unlockBtn = document.getElementById('unlockButton');
@@ -653,9 +599,9 @@ function showPayment() {
     unlockBtn.style.display = "block";
   }, 20000);
 }
-
-</script><script>
-function unlockPDF() {
+  </script>
+  <script>
+   function unlockPDF() {
   document.getElementById("orderNumberInput").value = "";  // 清除订单号输入框
   document.getElementById("confirmModal").style.display = "flex";
 }
@@ -732,10 +678,9 @@ if (localStorage.getItem("hasGenerated") === "true") {
   document.getElementById("paywall").style.display = "none";
   document.getElementById("paywall").scrollIntoView({ behavior: "smooth" });
 }
- 
-</script><script>
-
-// PDF下载函数，增加权限判断
+  </script>
+  <script>
+   // PDF下载函数，增加权限判断
 function doDownloadPDF() {
   const paidDate = localStorage.getItem("paidDate");
 
@@ -774,12 +719,12 @@ function exportPDF() {
   };
   html2pdf().set(opt).from(element).save();
 
-} 
+}
+  </script>
   
-</script>
-<script>
+  
+  <script>
 // 页面加载时控制按钮显示逻辑
-// 页面加载时自动清除过期的包月状态
 window.onload = function () {
   // 页面加载时初始化生成状态为 false
   try {
@@ -816,19 +761,9 @@ window.onload = function () {
     }
   }
   
-
-
-
-
 }
-</script>
-<script>
-/**
- * 根据用户当前状态判断是否显示下载PDF按钮和支付提示
- * - 如果用户包月有效，或使用次数 <= 10：显示下载PDF按钮
- * - 如果用户未付费，且使用次数 > 10：显示微信支付按钮
- */
-
+  </script>
+  <script>
 /**
  * 根据用户当前状态判断是否显示下载PDF按钮和支付提示
  * - 仅在已生成行程（localStorage.hasGenerated）时才考虑显示PDF按钮
@@ -865,10 +800,114 @@ function updateButtonDisplayAfterGenerate() {
 	  payHint.style.display = "none";
 	}
 }
-</script>
-<div id="qrPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center;"><div style="background:white; padding:20px; border-radius:12px; text-align:center; max-width:360px; box-shadow:0 4px 10px rgba(0,0,0,0.3);"><p>📷 长按图片保存二维码，用微信扫码完成支付</p><img src="./wechat_qr.png" style="width:100%; border-radius:10px; margin-top:10px;"/><button onclick="document.getElementById('qrPopup').style.display='none'" style="margin-top:12px; padding:8px 16px; font-size:14px; border:none; background:#4CAF50; color:white; border-radius:6px;">关闭</button></div></div><script>
-function showQRPopup() {
+  </script>
+  <script>
+   function showQRPopup() {
   document.getElementById('qrPopup').style.display = 'flex';
 }
-</script></body>
+  </script>
+ </head>
+ <body>
+  <div class="container">
+   <h2 style="margin-top: 10px;">
+    ✈️ AI旅行助手(MVP)
+   </h2>
+   <textarea id="inputText" placeholder="请输入您的旅行需求，例如：东京到大阪6天自由行，2人，蜜月旅行" rows="7"></textarea>
+   <button id="generateBtn" onclick="generate()">
+    🗺️ AI生成旅游行程
+   </button>
+   <div class="output" id="pdf-content">
+    <div id="output">
+     <p>
+      <strong>
+       这里将显示生成的行程内容...
+      </strong>
+     </p>
+    </div>
+   </div>
+   <div style="text-align: center;">
+    <button id="pdfButton" onclick="exportPDF()" style="display: none;">
+     <img src="pdf_icon.png" style="height:38px; vertical-align:middle; margin-right:8px;"/>
+     下载行程PDF文件
+    </button>
+    <!-- 自定义支付确认弹窗 -->
+    <div id="confirmModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); z-index:9999; justify-content:center; align-items:center;">
+     <div style="background:white; padding:24px 20px; border-radius:12px; text-align:center; width:90%; max-width:380px; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+      <p style="font-size:18px; font-weight:bold; margin-bottom:20px;">
+       💰 您是否已支付？
+      </p>
+      <img src="wechat_danghao.jpg" style="width:55%; max-width:180px; margin-bottom:10px; border-radius:5px; box-shadow:0 1px 3px rgba(0,0,0,0.1);"/>
+      <p>
+       📋 请打开微信账单详情页面，长按复制转账单号，粘贴到上方输入框中
+      </p>
+      <div style="display: flex; justify-content:space-around;">
+       <button onclick="onConfirmPay(true)" style="flex:1; background:#4CAF50; color:white; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">
+        ✅ 已支付
+       </button>
+       <button onclick="onConfirmPay(false)" style="flex:1; background:#e0e0e0; color:black; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">
+        ❌ 未支付
+       </button>
+      </div>
+      <input autocomplete="off" id="orderNumberInput" maxlength="32" placeholder="请复制微信支付的转账单号（32位数字）" style="width:90%; padding:10px; font-size:16px; margin-top:12px;"/>
+      <p id="orderError" style="color:red; font-size:14px; display:none;">
+       转账单号不正确，请确实支付。
+      </p>
+     </div>
+    </div>
+    <!-- 注册弹窗 -->
+    <div id="registerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); z-index:10000; justify-content:center; align-items:center;">
+     <div style="background:white; padding:24px 20px; border-radius:12px; text-align:center; width:90%; max-width:360px; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+      <p style="font-size:18px; font-weight:bold; margin-bottom:12px;">
+       📝 请注册，可免费试用AI生成行程3次。
+      </p>
+      <input id="nickname" placeholder="请输入昵称" style="width:90%; padding:10px; margin:8px 0; font-size:16px;"/>
+      <br/>
+      <input id="email" placeholder="请输入邮箱" style="width:90%; padding:10px; margin:8px 0; font-size:16px;"/>
+      <br/>
+      <button onclick="submitRegistration()" style="background:#4CAF50; color:white; font-size:16px; padding:10px 24px; border:none; border-radius:8px; margin-top:10px;">
+       注册
+      </button>
+     </div>
+    </div>
+   </div>
+   <div class="pay-hint" id="payHint" style="display:none; text-align:center; margin-top:20px;">
+    <p>
+     <strong>
+      请点击下方按钮，支付后继续使用（包月¥19.9元）：
+     </strong>
+    </p>
+    <button onclick="showPayment()" style="background-color:#ffa726;">
+     微信支付（¥19.9元）
+    </button>
+   </div>
+   <div class="paywall" id="paywall" style="display: none;">
+    <p style="font-size:16px; font-weight:bold; margin-bottom:10px;">
+     📱 请长按保存或扫码，用微信完成支付
+    </p>
+    <img onclick="showQRPopup()" src="./wechat_qr.png" style="max-width: 220px; margin: 12px auto; display: block; border: 1px solid #ccc; border-radius: 8px; cursor: pointer;cursor:pointer;"/>
+    <button id="unlockButton" onclick="unlockPDF()">
+     <span>
+      ☐
+     </span>
+     确认已支付
+    </button>
+   </div>
+  </div>
+  <div id="qrPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center;">
+   <div style="background:white; padding:20px; border-radius:12px; text-align:center; max-width:360px; box-shadow:0 4px 10px rgba(0,0,0,0.3);">
+    <p>
+     📷 长按图片保存二维码，用微信扫码完成支付
+    </p>
+    <img src="./wechat_qr.png" style="width:100%; border-radius:10px; margin-top:10px;"/>
+    <button onclick="document.getElementById('qrPopup').style.display='none'" style="margin-top:12px; padding:8px 16px; font-size:14px; border:none; background:#4CAF50; color:white; border-radius:6px;">
+     关闭
+    </button>
+   </div>
+  </div>
+
+  <footer class="page-footer">
+   © 2025 MYG. All rights reserved.
+  </footer>
+
+ </body>
 </html>
