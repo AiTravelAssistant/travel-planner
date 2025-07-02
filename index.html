@@ -907,7 +907,39 @@ function updateButtonDisplayAfterGenerate() {
 
   <footer class="page-footer">
    © 2025 MYG. All rights reserved.
-  </footer>
+  
+</footer>
 
- </body>
+
+<div style="display: flex; justify-content: center; gap: 20px; margin: 30px auto; flex-wrap: wrap;">
+  <!-- 分享按钮：蓝色 -->
+  <button onclick="shareApp()" style="all: unset; display: inline-block; font-size: 16px; padding: 12px 24px; border-radius: 8px; background-color: #66BB6A; color: white; box-shadow: 0 2px 6px rgba(0,0,0,0.15); cursor: pointer; text-align: center;">
+    📤 分享转发
+  </button>
+
+  <!-- 反馈按钮：橙色 -->
+  <button onclick="window.open('https://docs.google.com/forms/d/1zl2DIZbs1WpoudOFx0ZbWbip2NJLfHpOev1Yz0oH6vA/edit','_blank')" style="all: unset; display: inline-block; font-size: 16px; padding: 12px 24px; border-radius: 8px; background-color: #81C784; color: white; box-shadow: 0 2px 6px rgba(0,0,0,0.15); cursor: pointer; text-align: center;">
+    📝 反馈建议
+  </button>
+</div>
+
+
+ 
+<script>
+function shareApp() {
+  if (navigator.share) {
+    navigator.share({
+      title: 'AI旅行助手',
+      text: '快来试试这个能自动生成旅游行程的AI工具吧！',
+      url: window.location.href
+    }).catch((err) => {
+      console.log("分享失败:", err);
+    });
+  } else {
+    alert("😅 当前浏览器不支持原生分享功能，请手动复制网址分享");
+  }
+}
+</script>
+</body>
 </html>
+
