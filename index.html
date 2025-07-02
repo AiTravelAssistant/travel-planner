@@ -230,8 +230,6 @@ footer {
 }
 
 
-
-
 table {
   width: 100%;
   border-collapse: collapse;
@@ -242,34 +240,8 @@ th, td {
   white-space: normal;
 }
 
-table th:nth-child(1), table td:nth-child(1) {
-  width: 10%;
-  min-width: 60px;
-}
 
-table th:nth-child(2), table td:nth-child(2) {
-  width: 28%;
-  min-width: 160px;
-}
-
-table th:nth-child(3), table td:nth-child(3) {
-  width: 18%;
-  min-width: 100px;
-}
-
-table th:nth-child(4), table td:nth-child(4) {
-  width: 14%;
-  min-width: 60px;
-}
-
-table th:nth-child(5), table td:nth-child(5) {
-  width: 30%;
-  min-width: 160px;
-  word-break: break-word;
-}
-
-
-/* PC端表格结构优化 */
+/* PC端表格样式 */
 @media (min-width: 769px) {
   table {
     table-layout: auto;
@@ -280,9 +252,36 @@ table th:nth-child(5), table td:nth-child(5) {
     padding: 10px;
     font-size: 16px;
   }
+  
+	table th:nth-child(1), table td:nth-child(1) {
+	  width: 10%;
+	  min-width: 60px;
+	}
+
+	table th:nth-child(2), table td:nth-child(2) {
+	  width: 28%;
+	  min-width: 160px;
+	}
+
+	table th:nth-child(3), table td:nth-child(3) {
+	  width: 18%;
+	  min-width: 100px;
+	}
+
+	table th:nth-child(4), table td:nth-child(4) {
+	  width: 14%;
+	  min-width: 60px;
+	}
+
+	table th:nth-child(5), table td:nth-child(5) {
+	  width: 30%;
+	  min-width: 160px;
+	  word-break: break-word;
+	}
 }
 
-/* 移动端表格自然缩放 + 显示完整边框 */
+/* 移动端样式 */
+
 @media (max-width: 768px) {
   h2 {
     font-size: 28px;
@@ -309,17 +308,51 @@ table th:nth-child(5), table td:nth-child(5) {
     table-layout: fixed;
     border-collapse: collapse;
     border: 1px solid #ccc;
-    font-size: 18px;
+    font-size: 16px;
+    word-break: break-word;
   }
 
   th, td {
-    font-size: 18px;
-    padding: 10px 12px;
+    font-size: 16px;
+    padding: 8px 10px;
     border: 1px solid #ccc;
     word-break: break-word;
     white-space: normal;
     box-sizing: border-box;
+    vertical-align: top;
   }
+
+  th:nth-child(1), td:nth-child(1) {
+    width: 18%;
+  }
+
+  th:nth-child(2), td:nth-child(2) {
+    width: 32%;
+  }
+
+  th:nth-child(3), td:nth-child(3) {
+    width: 20%;
+  }
+
+  th:nth-child(4), td:nth-child(4) {
+    width: 10%;
+  }
+
+  th:nth-child(5), td:nth-child(5) {
+    width: 20%;
+  }
+
+textarea {
+    font-size: 20px;
+    height: 32vh;
+  }
+
+  button {
+    font-size: 24px;
+    width: 85%;
+    padding: 16px;
+  }
+
 }
 
 </style>
