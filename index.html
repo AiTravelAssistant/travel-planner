@@ -362,6 +362,8 @@ async function submitRegistration() {
     });
 
     const result = await res.json();
+    
+    console.log("恢复数据返回：", result);
 
     if (result.found) {
       // 已注册
@@ -381,7 +383,7 @@ async function submitRegistration() {
       } else {
         alert("⚠️ 您已注册，但未查到近30天内的付款记录，请确认是否已付款。");
       }
-
+	
     } 
     
 	if (!result.found) {
@@ -476,47 +478,8 @@ function checkRegistration() {
   return true;
 }
 
-function submitRegistration() {
-  const nickname = document.getElementById("nickname").value.trim();
-  const email = document.getElementById("email").value.trim();
-  if (!nickname || !email) {
-    alert("⚠️ 请输入昵称和邮箱");
-    return; // 阻止提交
-  }
-  
-  // 邮箱格式验证（简单正则）
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailPattern.test(email)) {
-    alert("⚠️ 邮箱格式不正确，请重新输入");
-    return;
-  }
-  
-  const userInfo = {
-    nickname,
-    email,
-    usageCount: 0,
-    startDate: new Date().toISOString()
-  };
-  localStorage.setItem("userInfo", JSON.stringify(userInfo));
-  
-// 同步提交注册信息到 Google Form（含使用次数/时间/设备信息）
-  user = JSON.parse(localStorage.getItem('userInfo'));
-
-  const usage = user.usageCount;
-  const timestamp = new Date().toLocaleString();
-  const device = navigator.userAgent;
-
-  fetch("https://docs.google.com/forms/d/e/1FAIpQLScArA3vlIk7S-Wz5oxHgAT4W4s2xDuC12Qznfq1QlWdE16Oqw/formResponse", {
-    method: "POST",
-    mode: "no-cors",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: `entry.537580952=${encodeURIComponent(nickname)}&entry.709455992=${encodeURIComponent(email)}&entry.1504950828=${usage}&entry.1488547560=${encodeURIComponent(timestamp)}&entry.895875942=${encodeURIComponent(device)}`
-  });
-  document.getElementById("registerModal").style.display = "none";
-}
   </script>
+
 <script>
    async function generate() {
   if (!checkRegistration()) return;
