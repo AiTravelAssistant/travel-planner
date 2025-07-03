@@ -879,23 +879,24 @@ async function submitRegistration() {
   try {
     const res = await fetch("https://script.google.com/macros/s/AKfycbxy0SnIjQCb7ZL-kv6rFVdm4yt3Uol12vTEKcY7Y-U87CB6DpTYJUXm3r8fbrcSSVAP/exec", {
       method: "POST",
-      body: JSON.stringify({ nickname, email }),
-      headers: { "Content-Type": "application/json" }
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ nickname, email })
     });
 
     const result = await res.json();
-    
     console.log("恢复数据返回：", result);
 
     if (result.found) {
-      // 已注册
-	const userInfo = {
-	  nickname,
-	  email,
-	  usageCount: result.usageCount || 0,
-	  downloadCount: result.downloadCount || 0,
-	  startDate: new Date().toISOString()
-	};
+      const userInfo = {
+        nickname,
+        email,
+        usageCount: result.usageCount || 0,
+        downloadCount: result.downloadCount || 0,
+        startDate: new Date().toISOString()
+      };
       localStorage.setItem("userInfo", JSON.stringify(userInfo));
 
       if (result.paid && result.paidDate) {
@@ -905,11 +906,7 @@ async function submitRegistration() {
       } else {
         alert("⚠️ 您已注册，但未查到近30天内的付款记录，请确认是否已付款。");
       }
-	
-    } 
-    
-	if (!result.found) {
-      // 新注册
+    } else {
       const userInfo = {
         nickname,
         email,
@@ -917,36 +914,30 @@ async function submitRegistration() {
         startDate: new Date().toISOString()
       };
       localStorage.setItem("userInfo", JSON.stringify(userInfo));
-      
-	// 同步提交注册信息到 Google Form（含使用次数/时间/设备信息）
-	  user = JSON.parse(localStorage.getItem('userInfo'));
 
-	  const usage = user.usageCount;
-	  const timestamp = new Date().toLocaleString();
-	  const device = navigator.userAgent;
+      const timestamp = new Date().toLocaleString();
+      const device = navigator.userAgent;
 
-	  fetch("https://docs.google.com/forms/d/e/1FAIpQLScArA3vlIk7S-Wz5oxHgAT4W4s2xDuC12Qznfq1QlWdE16Oqw/formResponse", {
-	    method: "POST",
-	    mode: "no-cors",
-	    headers: {
-	      "Content-Type": "application/x-www-form-urlencoded"
-	    },
-	    body: `entry.537580952=${encodeURIComponent(nickname)}&entry.709455992=${encodeURIComponent(email)}&entry.1504950828=${usage}&entry.1488547560=${encodeURIComponent(timestamp)}&entry.895875942=${encodeURIComponent(device)}`
-	  });
-	  
+      fetch("https://docs.google.com/forms/d/e/1FAIpQLScArA3vlIk7S-Wz5oxHgAT4W4s2xDuC12Qznfq1QlWdE16Oqw/formResponse", {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `entry.537580952=${encodeURIComponent(nickname)}&entry.709455992=${encodeURIComponent(email)}&entry.1504950828=0&entry.1488547560=${encodeURIComponent(timestamp)}&entry.895875942=${encodeURIComponent(device)}`
+      });
+
       alert("✅ 注册成功，您可免费试用3次！");
     }
-    
-
 
     document.getElementById("registerModal").style.display = "none";
-
   } catch (e) {
     console.error(e);
     alert("❌ 注册校验出错，请检查网络或稍后再试");
   }
 }
 </script>
+
 
 </body>
 </html>
