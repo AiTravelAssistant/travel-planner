@@ -882,14 +882,14 @@ async function submitRegistration() {
   }
 
   try {
-    const res = await fetch("https://script.google.com/macros/s/AKfycbyi-oW0V5ICFoA8k87VZ9yTDpDy7gu9ySo-SLzz6yTd5QPaSoB7pzPvR_NulRQcQ2C6/exec", {
-      method: "POST",
-      mode: "cors",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ nickname, email })
-    });
+    const res = await fetchfetch("https://script.google.com/macros/s/AKfycbyi-oW0V5ICFoA8k87VZ9yTDpDy7gu9ySo-SLzz6yTd5QPaSoB7pzPvR_NulRQcQ2C6/exec", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ nickname, email }),
+        mode: "cors"
+      });
 
     const result = await res.json();
     console.log("恢复数据返回：", result);
