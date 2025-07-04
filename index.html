@@ -341,7 +341,43 @@ textarea {
   }
 
 }
-  </style>
+  
+.loading-road {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 16px auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+#roadTrack {
+  display: inline-block;
+  font-family: monospace;
+  font-size: 18px;
+  min-width: 260px;
+}
+
+.dot-typing {
+  display: inline-block;
+  width: 1em;
+  text-align: left;
+}
+.dot-typing::after {
+  content: '...';
+  animation: blink 1s steps(3, jump-none) infinite;
+}
+
+@keyframes blink {
+  0% { content: ''; }
+  33% { content: '.'; }
+  66% { content: '..'; }
+  100% { content: '...'; }
+}
+
+</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
 </script>
@@ -412,12 +448,12 @@ function checkRegistration() {
   const generateBtn = document.getElementById('generateBtn');
   const payHint = document.getElementById("payHint");
 
- output.innerHTML = '<p style="font-weight:bold;font-size:16px;">⏳ <span class="dot-typing"></span> 正在生成行程，请稍等 <span class="dot-typing"></span><span class="car-loop">🚗</span></p>';
+ output.innerHTML = `<div class="loading-road">⏳ <span class="dot-typing"></span> 正在生成行程，请稍等 <span id="roadTrack">🚗</span></div>`;
   paywall.style.display = 'none';
   pdfButton.style.display = 'none';
   payHint.style.display = 'none';
   generateBtn.disabled = true;
-  generateBtn.innerText = "📖️ AI生成中…";
+  generateBtn.innerText = "📝️ AI生成中…";
 
   const now = new Date();
   const yyyyMMdd = now.toISOString().slice(0,10).replace(/-/g, '');
@@ -595,7 +631,7 @@ function onConfirmPay(paid) {
 
   // ✅ 验证通过后关闭弹窗
   document.getElementById("confirmModal").style.display = "none";
-  alert("🙏️ 谢谢付费！您可以包月使用，生成行程和下载PDF文件。");
+  alert("🙏️ 谢谢付费！您可以包月使用生成行程和下载PDF文件。");
   
   // 在本地缓存中写入 paidDate = 当前时间
   localStorage.setItem("paidDate", new Date().toISOString());
@@ -903,7 +939,6 @@ async function submitRegistration() {
       });
 
       alert("✅ 注册成功，您可免费试用3次！");
-    }
 
     document.getElementById("registerModal").style.display = "none";
     
@@ -916,5 +951,32 @@ async function submitRegistration() {
 }
 
 </script>
+
+<script>
+let carPosition = 0;
+let direction = 1;
+let maxSteps = 50;
+let intervalId;
+
+function updateRoadTrack() {
+  const car = document.getElementById("roadTrack");
+  if (!car) return;
+  carPosition += direction;
+  if (carPosition >= maxSteps || carPosition <= 0) {
+    direction *= -1;
+  }
+  const dots = ".".repeat(carPosition);  // 更细的中点字符
+  car.innerHTML = dots + "🚗";
+}
+
+const observer = new MutationObserver(() => {
+  const car = document.getElementById("roadTrack");
+  if (car && !intervalId) {
+    intervalId = setInterval(updateRoadTrack, 200);
+  }
+});
+observer.observe(document.body, { childList: true, subtree: true });
+</script>
+
 </body>
 </html>
