@@ -955,7 +955,7 @@ async function submitRegistration() {
 <script>
 let carPosition = 0;
 let direction = 1;
-let maxSteps = 50;
+let maxSteps = 40;
 let intervalId;
 
 function updateRoadTrack() {
@@ -966,7 +966,8 @@ function updateRoadTrack() {
     direction *= -1;
   }
   const dots = ".".repeat(carPosition);  // 更细的中点字符
-  car.innerHTML = dots + "🚗";
+  const emoji = "🚗";  // 可替换为其他emoji
+  car.innerHTML = dots + emoji;
 }
 
 const observer = new MutationObserver(() => {
