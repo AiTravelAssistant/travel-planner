@@ -781,7 +781,7 @@ function updateButtonDisplayAfterGenerate() {
 </div>
 <div style="text-align: center;">
 <button id="pdfButton" onclick="exportPDF()" style="display: none;">
-<img src="https://raw.githubusercontent.com/kingmyg/my-image-host/main/pdf_icon.png" style="height:38px; vertical-align:middle; margin-right:8px;"/>
+<img src="./pdf_icon.png" style="height:38px; vertical-align:middle; margin-right:8px;"/>
      下载行程PDF文件
     </button>
 <!-- 自定义支付确认弹窗 -->
@@ -790,7 +790,7 @@ function updateButtonDisplayAfterGenerate() {
 <p style="font-size:18px; font-weight:bold; margin-bottom:20px;">
        💰 您是否已支付？
       </p>
-<img src="https://raw.githubusercontent.com/kingmyg/my-image-host/main/wechat_danghao.jpg" style="width:55%; max-width:180px; margin-bottom:10px; border-radius:5px; box-shadow:0 1px 3px rgba(0,0,0,0.1);"/>
+<img src="./wechat_danghao.jpg" style="width:55%; max-width:180px; margin-bottom:10px; border-radius:5px; box-shadow:0 1px 3px rgba(0,0,0,0.1);"/>
 <p>
        📋 请打开微信账单详情页面，复制转账单号，粘贴到下方输入框中
       </p>
@@ -838,7 +838,7 @@ function updateButtonDisplayAfterGenerate() {
 <p style="font-size:16px; font-weight:bold; margin-bottom:10px;">
      📱 请长按保存或扫码，用微信完成支付
     </p>
-<img onclick="showQRPopup()" src="https://raw.githubusercontent.com/kingmyg/my-image-host/main/wechat_qr.png" style="max-width: 220px; margin: 12px auto; display: block; border: 1px solid #ccc; border-radius: 8px; cursor: pointer;cursor:pointer;"/>
+<img onclick="showQRPopup()" src="./wechat_qr.png" style="max-width: 220px; margin: 12px auto; display: block; border: 1px solid #ccc; border-radius: 8px; cursor: pointer;cursor:pointer;"/>
 <button id="unlockButton" onclick="unlockPDF()">
 <span>
       ☐
@@ -852,7 +852,7 @@ function updateButtonDisplayAfterGenerate() {
 <p>
      📷 长按图片保存二维码，用微信扫码完成支付
     </p>
-<img src="https://raw.githubusercontent.com/kingmyg/my-image-host/main/wechat_qr.png" style="width:100%; border-radius:10px; margin-top:10px;"/>
+<img src="./wechat_qr.png" style="width:100%; border-radius:10px; margin-top:10px;"/>
 <button onclick="document.getElementById('qrPopup').style.display='none'" style="margin-top:12px; padding:8px 16px; font-size:14px; border:none; background:#4CAF50; color:white; border-radius:6px;">
      关闭
     </button>
@@ -882,36 +882,6 @@ async function submitRegistration() {
   }
 
   try {
-    const res = await fetch("https://script.google.com/macros/s/AKfycbw0MA9-9PAgQtJ5lGU6sJNezCDuAtC8g02wOvqdjtb2JimT_ie_uTKYBZ4VM4GKBq9j/exec", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ nickname, email }),
-        mode: "cors"
-      });
-
-    const result = await res.json();
-    console.log("恢复数据返回：", result);
-
-    if (result.found) {
-      const userInfo = {
-        nickname,
-        email,
-        usageCount: result.usageCount || 0,
-        downloadCount: result.downloadCount || 0,
-        startDate: new Date().toISOString()
-      };
-      localStorage.setItem("userInfo", JSON.stringify(userInfo));
-
-      if (result.paid && result.paidDate) {
-        localStorage.setItem("paidDate", result.paidDate);
-        localStorage.setItem("lastOrderNumber", result.orderId || "");
-        alert("🎉 您是付费用户，可包月使用！");
-      } else {
-        alert("⚠️ 您是免费用户，可生成行程3次。如需继续使用，请付费可包月使用！");
-      }
-    } else {
       const userInfo = {
         nickname,
         email,
@@ -936,6 +906,7 @@ async function submitRegistration() {
     }
 
     document.getElementById("registerModal").style.display = "none";
+    
   } catch (e) {
     console.error(e);
     alert("❌ 注册校验出错，请检查网络或稍后再试");
