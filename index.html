@@ -284,13 +284,13 @@ th, td {
     table-layout: fixed;
     border-collapse: collapse;
     border: 1px solid #ccc;
-    font-size: 16px;
+    font-size: 14px;
     word-break: break-word;
   }
 
   th, td {
-    font-size: 16px;
-    padding: 8px 10px;
+    font-size: 14px;
+    padding: 6px 4px;
     border: 1px solid #ccc;
     word-break: break-word;
     white-space: normal;
@@ -299,23 +299,28 @@ th, td {
   }
 
   th:nth-child(1), td:nth-child(1) {
-    width: 18%;
+    width: 15%;
+    min-width: 64px;
   }
 
   th:nth-child(2), td:nth-child(2) {
-    width: 32%;
+    width: 35%;
+    min-width: 130px;
   }
 
   th:nth-child(3), td:nth-child(3) {
     width: 20%;
+    min-width: 100px;
   }
 
   th:nth-child(4), td:nth-child(4) {
-    width: 10%;
+    width: 20%;
+    min-width: 100px;
   }
 
   th:nth-child(5), td:nth-child(5) {
-    width: 20%;
+    width: 10%;
+    min-width: 60px;
   }
 
 textarea {
@@ -678,14 +683,18 @@ function doDownloadPDF() {
 }
 
 // PDF下载函数
+
 function exportPDF() {
   trackPDFDownload();
   const element = document.getElementById("pdf-content");
   const userInput = document.getElementById("inputText").value.trim();
 
+  // 自动从行程标题中提取PDF文件名
+  let firstHeading = element.querySelector("h3,h2,h1");
   let filename = "旅行行程.pdf";
-  if (userInput) {
-    const cleaned = userInput.replace(/[^\u4e00-\u9fa5\w]+/g, "_").slice(0, 20);
+
+  if (firstHeading && firstHeading.innerText) {
+    const cleaned = firstHeading.innerText.replace(/[^\u4e00-\u9fa5\w]+/g, "").slice(0, 30);
     if (cleaned) {
       filename = `${cleaned}.pdf`;
     }
@@ -699,8 +708,8 @@ function exportPDF() {
     jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
   };
   html2pdf().set(opt).from(element).save();
-
 }
+
   </script>
 <script>
 // 页面加载时控制按钮显示逻辑
@@ -887,10 +896,12 @@ function updateButtonDisplayAfterGenerate() {
      关闭
     </button>
 </div>
+
 </div>
 <footer class="page-footer">
    © 2025 MYG. All rights reserved. 
 </footer>
+
 <script>
 async function submitRegistration() {
   const registerBtn = document.querySelector("button[onclick='submitRegistration()']");
