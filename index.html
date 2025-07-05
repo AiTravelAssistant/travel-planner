@@ -637,7 +637,7 @@ function onConfirmPay(paid) {
 
   // ✅ 验证通过后关闭弹窗
   document.getElementById("confirmModal").style.display = "none";
-  alert("🙏️ 谢谢付费！您可以包月使用生成行程和下载PDF文件。");
+  alert("🙏️ 谢谢付费！您可以包月使用。");
   
   // 在本地缓存中写入 paidDate = 当前时间
   localStorage.setItem("paidDate", new Date().toISOString());
@@ -739,7 +739,10 @@ window.onload = function () {
   localStorage.setItem("hasGenerated", "false");
   } catch (e) {
   console.warn("localStorage 不可用", e);
-  }</script>
+  }
+}
+ 
+</script>
 <script>
 /**
  * 根据用户当前状态判断是否显示下载PDF按钮和支付提示
