@@ -414,15 +414,27 @@ function checkRegistration() {
     return false;
   }
 
-  if (!paidDate) {
-    // 超出免费次数限制则提示并引导付费
+	//包月有效
+	if (isPaidValid()) {
+	  return true; 
+	}
+	
+  // 包月已过期，提示“包月已过期”
+  if (paidDate) {
+    alert("⚠️ 您的包月已过期，请付费后继续使用。");
+    const pay = document.getElementById("payHint");
+    if (pay) pay.style.display = "block";
+    return false;
+  }
+
+   // 未付费。超出免费次数
   if (user.usageCount >= 3) {
       alert("您的免费试用3次已用完，请付费解锁。");
       const pay = document.getElementById("payHint");
       if (pay) pay.style.display = "block";
       return false;
     }
-  }
+
   return true;
 }
 
@@ -710,6 +722,14 @@ function exportPDF() {
   html2pdf().set(opt).from(element).save();
 }
 
+function isPaidValid() {
+  const paidDate = localStorage.getItem("paidDate");
+  if (!paidDate) return false;
+  const expire = new Date(paidDate);
+  expire.setDate(expire.getDate() + 30);
+  return new Date() <= expire;
+}
+
   </script>
 <script>
 // 页面加载时控制按钮显示逻辑
@@ -719,38 +739,7 @@ window.onload = function () {
   localStorage.setItem("hasGenerated", "false");
   } catch (e) {
   console.warn("localStorage 不可用", e);
-  }
-  const pd = localStorage.getItem("paidDate");
-  if (pd) {
-    const expire = new Date(pd);
-    expire.setDate(expire.getDate() + 30);
-    if (new Date() > expire) {
-      localStorage.removeItem("paidDate");
-    }
-  }
-  updateButtonDisplayAfterGenerate();
-  const paidDate = localStorage.getItem("paidDate");
-  const user = JSON.parse(localStorage.getItem("userInfo") || "{}");
-  const usageCount = user.usageCount || 0;
-
-  const pdfButton = document.getElementById("pdfButton");
-  const payHint = document.getElementById("payHint");
-    if (payHint) {
-      payHint.style.display = "none";
-    }
-    
-    
-  let isPaid = false;
-  if (paidDate) {
-    const expire = new Date(paidDate);
-    expire.setDate(expire.getDate() + 30);
-    if (new Date() <= expire) {
-      isPaid = true;
-    }
-  }
-  
-}
-  </script>
+  }</script>
 <script>
 /**
  * 根据用户当前状态判断是否显示下载PDF按钮和支付提示
@@ -801,14 +790,13 @@ function updateButtonDisplayAfterGenerate() {
     ✈️ AI旅行助手(MVP)
 </h2>
 <div class="quick-input-hint" style="background:#e3f2fd; padding:16px 20px; border-radius:12px; margin-bottom:20px; font-size:16px; line-height:1.7;">
-🧳 1分钟一键搞定行程安排！<br>
-🎯 输入简单需求，立刻生成您的专属行程<br>
-📝 输出行程PDF文件，可保存，可分享<br>
+🧳 1分钟一键搞定行程安排！<br/>
+🎯 输入简单需求，立刻生成您的专属行程<br/>
+📝 输出行程PDF文件，可保存，可分享<br/>
 💡 节省做攻略的时间，出行前轻松搞定👌
 </div>
 <textarea id="inputText" placeholder="请输入您的旅行需求，例如：
-东京到大阪6天自由行，3人，8月中旬，以美食和文化体验为主"
-rows="5"></textarea>
+东京到大阪6天自由行，3人，8月中旬，以美食和文化体验为主" rows="5"></textarea>
 <button id="generateBtn" onclick="generate()">
     🗺️ AI生成旅游行程
    </button>
@@ -857,13 +845,13 @@ rows="5"></textarea>
        📝 请注册，可免费试用AI生成行程3次。
       </p>
 <input id="nickname" placeholder="请输入昵称" style="width:90%; padding:10px; margin:8px 0; font-size:16px;"/>
-<br/>
+<br>
 <input id="email" placeholder="请输入邮箱" style="width:90%; padding:10px; margin:8px 0; font-size:16px;"/>
-<br/>
+<br>
 <button onclick="submitRegistration()" style="background:#4CAF50; color:white; font-size:16px; padding:10px 24px; border:none; border-radius:8px; margin-top:10px;">
        注册
       </button>
-</div>
+</br></br></div>
 </div>
 </div>
 <div class="pay-hint" id="payHint" style="display:none; text-align:center; margin-top:20px;">
