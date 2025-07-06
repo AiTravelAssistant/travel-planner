@@ -442,8 +442,6 @@ function checkRegistration() {
 <script>
 async function generate() {
   
-  //恢复用户状态
-  await restoreUserStateFromServer();
   //检查用户注册状态
   if (!checkRegistration()) return;
   
@@ -964,7 +962,10 @@ async function restoreUserStateFromServer() {
 
   try {
     const url = `https://script.google.com/macros/s/AKfycbwyZDP5R-0KqanK8xhsUWQaHJG90dMVA23bE58VOBbfsdZgiwGNguIiWRFNZ9AK7nKr/exec?nickname=${encodeURIComponent(user.nickname)}&email=${encodeURIComponent(user.email)}`;
-    const res = await fetch(url);
+    const res = await fetch(url, {
+     method: "GET",
+     mode: "cors"
+    });
     const data = await res.json();
     if (!data || !data.found) return;
 
