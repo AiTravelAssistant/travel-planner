@@ -440,8 +440,13 @@ function checkRegistration() {
 
   </script>
 <script>
-   async function generate() {
+async function generate() {
+  
+  //恢复用户状态
+  await restoreUserStateFromServer();
+  //检查用户注册状态
   if (!checkRegistration()) return;
+  
   const userInput = document.getElementById('inputText').value.trim();
   if (!userInput) {
     alert("⚠️ 请输入您的旅行需求");
@@ -937,6 +942,9 @@ async function submitRegistration() {
 
     document.getElementById("registerModal").style.display = "none";
     
+    //注册后立即同步历史记录（如从表单中恢复之前的免费使用记录或订单号）
+    await restoreUserStateFromServer();
+    
   } catch (e) {
     console.error(e);
     alert("❌ 注册校验出错，请检查网络或稍后再试");
@@ -946,6 +954,38 @@ async function submitRegistration() {
 }
 
 </script>
+
+
+<script>
+// ✅ 加入自动恢复状态的函数（在 generate 前调用）
+async function restoreUserStateFromServer() {
+  const user = JSON.parse(localStorage.getItem("userInfo") || "{}");
+  if (!user.nickname || !user.email) return;
+
+  try {
+    const url = `https://script.google.com/macros/s/AKfycbwyZDP5R-0KqanK8xhsUWQaHJG90dMVA23bE58VOBbfsdZgiwGNguIiWRFNZ9AK7nKr/exec?nickname=${encodeURIComponent(user.nickname)}&email=${encodeURIComponent(user.email)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data || !data.found) return;
+
+    const updated = {
+      nickname: user.nickname,
+      email: user.email,
+      usageCount: data.usageCount || 0
+    };
+    localStorage.setItem("userInfo", JSON.stringify(updated));
+    localStorage.setItem("downloadCount", data.downloadCount || 0);
+
+    if (data.paid && data.paidDate) {
+      localStorage.setItem("paidDate", new Date(data.paidDate).toISOString());
+      localStorage.setItem("lastOrderNumber", data.orderNumber || "");
+    }
+  } catch (e) {
+    console.warn("❌ 状态恢复失败：", e);
+  }
+}
+</script>
+
 <script>
 let carPosition = 0;
 let direction = 1;
