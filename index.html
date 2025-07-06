@@ -446,6 +446,7 @@ async function generate() {
   if (!checkRegistration()) return;
   
   const userInput = document.getElementById('inputText').value.trim();
+  
   if (!userInput) {
     alert("⚠️ 请输入您的旅行需求");
     return;
@@ -918,14 +919,21 @@ async function submitRegistration() {
   }
 
   try {
-      const userInfo = {
-        nickname,
-        email,
-        usageCount: 0,
-        startDate: new Date().toISOString()
-      };
-      localStorage.setItem("userInfo", JSON.stringify(userInfo));
+    // 保存初步 userInfo（供 restore 使用）
+    const userInfo = { nickname, email };
+    localStorage.setItem("userInfo", JSON.stringify(userInfo));
 
+    // 先恢复老数据
+    await restoreUserStateFromServer();
+
+    //再从 localStorage 获取恢复后的完整 userInfo
+    const recoveredUser = JSON.parse(localStorage.getItem("userInfo") || "{}");
+
+    // 判断是否为新注册（无 usageCount 或 usageCount === 0）
+    const isNew = !recoveredUser.usageCount;
+
+    if (isNew) {
+      // 再上传注册信息
       const timestamp = new Date().toLocaleString();
       const device = navigator.userAgent;
 
@@ -937,15 +945,13 @@ async function submitRegistration() {
         },
         body: `entry.537580952=${encodeURIComponent(nickname)}&entry.709455992=${encodeURIComponent(email)}&entry.1504950828=0&entry.1488547560=${encodeURIComponent(timestamp)}&entry.895875942=${encodeURIComponent(device)}`
       });
+    }
 
     document.getElementById("registerModal").style.display = "none";
-    
-    //注册后立即同步历史记录（如从表单中恢复之前的免费使用记录或订单号）
-    await restoreUserStateFromServer();
-    
+
   } catch (e) {
     console.error(e);
-    alert("❌ 注册校验出错，请检查网络或稍后再试");
+    alert("❌ 注册出错，请稍后再试");
   } finally {
     if (registerBtn) registerBtn.disabled = false;
   }
@@ -961,30 +967,33 @@ async function restoreUserStateFromServer() {
   if (!user.nickname || !user.email) return;
 
   try {
-    const url = `https://script.google.com/macros/s/AKfycbwyZDP5R-0KqanK8xhsUWQaHJG90dMVA23bE58VOBbfsdZgiwGNguIiWRFNZ9AK7nKr/exec?nickname=${encodeURIComponent(user.nickname)}&email=${encodeURIComponent(user.email)}`;
-    const res = await fetch(url, {
-     method: "GET",
-     mode: "cors"
-    });
+    const url = `https://script.google.com/macros/s/AKfycbz6Qup-SVCQ5fF1bBzCwUksEQvY5fSdOdim8U9NWfme3lqLUhbqij-CnD0i-mLDO5By/exec?nickname=${encodeURIComponent(user.nickname)}&email=${encodeURIComponent(user.email)}`;
+    const res = await fetch(url, { method: "GET", mode: "cors" });
     const data = await res.json();
     if (!data || !data.found) return;
 
     const updated = {
       nickname: user.nickname,
       email: user.email,
-      usageCount: data.usageCount || 0
+      usageCount: parseInt(data.usageCount || "0", 10),
+      startDate: user.startDate || new Date().toISOString()
     };
+    
     localStorage.setItem("userInfo", JSON.stringify(updated));
-    localStorage.setItem("downloadCount", data.downloadCount || 0);
+    localStorage.setItem("downloadCount", parseInt(data.downloadCount || "0", 10));
 
     if (data.paid && data.paidDate) {
       localStorage.setItem("paidDate", new Date(data.paidDate).toISOString());
       localStorage.setItem("lastOrderNumber", data.orderNumber || "");
     }
+
+    console.log("✅ 从服务器恢复状态：", updated);
+
   } catch (e) {
     console.warn("❌ 状态恢复失败：", e);
   }
 }
+
 </script>
 
 <script>
