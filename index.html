@@ -914,17 +914,25 @@ function updateButtonDisplayAfterGenerate() {
 
 <script>
 function shareApp() {
-  const shareText = "✈️ AI旅行助手，1分钟一键搞定行旅游行程 👉 https://aitravelassistant.github.io/travel-planner/";
-  if (navigator.share) {
+  const shareText = "✈️ AI旅行助手，1分钟一键搞定旅游行程！";
+
+  // 判断是否在微信中
+  const ua = navigator.userAgent.toLowerCase();
+  const isWeChat = ua.indexOf('micromessenger') !== -1;
+
+  if (isWeChat) {
+    prompt("📋 复制以下链接分享给朋友：\n\n", shareText);
+  } else if (navigator.share) {
     navigator.share({
       title: "AI旅行助手",
       text: shareText,
       url: "https://aitravelassistant.github.io/travel-planner/"
     }).catch(console.error);
   } else {
-    prompt("📋 复制链接转发分享：", shareText);
+    prompt("📋 复制以下链接分享给朋友：\n\n", shareText);
   }
 }
+
 </script>
 
 
