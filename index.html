@@ -914,22 +914,16 @@ function updateButtonDisplayAfterGenerate() {
 
 <script>
 function shareApp() {
-  const shareText = "✈️ AI旅行助手，1分钟一键搞定旅游行程！";
-
-  // 判断是否在微信中
-  const ua = navigator.userAgent.toLowerCase();
-  const isWeChat = ua.indexOf('micromessenger') !== -1;
-
-  if (isWeChat) {
-    prompt("📋 复制以下链接分享给朋友：\n\n", shareText);
-  } else if (navigator.share) {
+  if (navigator.share) {
     navigator.share({
-      title: "AI旅行助手",
-      text: shareText,
-      url: "https://aitravelassistant.github.io/travel-planner/"
-    }).catch(console.error);
+      title: 'AI旅行助手',
+      text: '1分钟一键帮您搞定旅游行程！',
+      url: window.location.href
+    }).catch((err) => {
+      console.log("分享失败:", err);
+    });
   } else {
-    prompt("📋 复制以下链接分享给朋友：\n\n", shareText);
+    alert("😅 分享失败，请手动复制网址分享：\n\n https://aitravelassistant.github.io/travel-planner/");
   }
 }
 
