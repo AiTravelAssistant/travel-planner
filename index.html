@@ -440,6 +440,7 @@ function checkRegistration() {
 
   </script>
 <script>
+
 async function generate() {
   
   //检查用户注册状态
@@ -503,6 +504,12 @@ ${userInput}
 		user.usageCount = (user.usageCount || 0) + 1;
 		localStorage.setItem('userInfo', JSON.stringify(user));
 	}
+	
+
+    // 提前获取地理位置（城市+国家）
+	const locationData = await fetch('https://ipapi.co/json/').then(res => res.json()).catch(() => null);
+	const userLocation = locationData ? `${locationData.city || ''}, ${locationData.country_name || ''}` : "未知位置";
+	console.log("🌍 用户地理位置：", userLocation);
 
 	// 同步提交到 Google Form（含使用次数/时间/设备信息）
 	user = JSON.parse(localStorage.getItem('userInfo'));
@@ -519,7 +526,7 @@ ${userInput}
 	headers: {
 	  "Content-Type": "application/x-www-form-urlencoded"
 	},
-	body: `entry.537580952=${encodeURIComponent(nickname)}&entry.709455992=${encodeURIComponent(email)}&entry.1504950828=${usage}&entry.1488547560=${encodeURIComponent(timestamp)}&entry.895875942=${encodeURIComponent(device)}`
+	body: `entry.537580952=${encodeURIComponent(nickname)}&entry.709455992=${encodeURIComponent(email)}&entry.1504950828=${usage}&entry.1488547560=${encodeURIComponent(timestamp)}&entry.895875942=${encodeURIComponent(device)}&entry.1332377242=${encodeURIComponent(userInput)}&entry.1120642374=${encodeURIComponent(userLocation)}`
 	});
 
 
@@ -1010,6 +1017,14 @@ async function restoreUserStateFromServer() {
     if (data.paid && data.paidDate) {
       localStorage.setItem("paidDate", new Date(data.paidDate).toISOString());
       localStorage.setItem("lastOrderNumber", data.orderNumber || "");
+      
+      // 若包月仍有效，弹出欢迎回来提示
+	  const expire = new Date(data.paidDate);
+	  expire.setDate(expire.getDate() + 30);
+	  if (new Date() <= expire) {
+	    alert("🎉 欢迎回来！你已付费包月，请点击按钮生成行程。");
+	  }
+  
     }
 
     console.log("✅ 从服务器恢复状态：", updated);
