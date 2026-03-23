@@ -39,26 +39,6 @@ textarea {
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-button {
-  display: block;
-  width: 60%;
-  font-size: 22px;
-  padding: 16px;
-  margin: 20px auto;
-  background: linear-gradient(to right, #4CAF50, #2e7d32);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  transition: transform 0.1s ease, box-shadow 0.2s ease;
-}
-button:hover {
-  transform: translateY(1px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.12);
-}
-
-
 .output {
   background-color: #ffffff;
   border-radius: 16px;
@@ -184,36 +164,13 @@ button:active {
   margin-top: 40px;
   margin-bottom: 20px;
 }
-  
 
-.dot-typing {
-  display: inline-block;
-  width: 1em;
-  text-align: left;
-}
-.dot-typing::after {
-  content: '...';
-  animation: blink 1s steps(3, jump-none) infinite;
-}
 
 @keyframes blink {
   0% { content: ''; }
   33% { content: '.'; }
   66% { content: '..'; }
   100% { content: '...'; }
-}
-
-
-@keyframes carRun {
-  0% { transform: translateX(0); }
-  50% { transform: translateX(10px); }
-  100% { transform: translateX(0); }
-}
-.car-loop {
-  display: inline-block;
-  animation: carRun 0.8s infinite;
-  font-size: 18px;
-  margin-left: 8px;
 }
 
 
@@ -364,46 +321,21 @@ textarea {
   animation: blink 1s steps(3, jump-none) infinite;
 }
 
-@keyframes blink {
-  0% { content: ''; }
-  33% { content: '.'; }
-  66% { content: '..'; }
-  100% { content: '...'; }
-}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
-</script>
-<script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js">
-</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
 </script>
+
 <script>
    function trackPDFDownload() {
   let downloadCount = parseInt(localStorage.getItem("downloadCount") || "0");
   downloadCount++;
   localStorage.setItem("downloadCount", downloadCount);
 
-  const user = JSON.parse(localStorage.getItem("userInfo"));
-  if (!user) return;
-
-  const timestamp = new Date().toLocaleString();
-  const formData = new FormData();
-  formData.append("entry.537580952", user.nickname || "");
-  formData.append("entry.709455992", user.email || "");
-  formData.append("entry.1504950828", user.usageCount || 0);
-  formData.append("entry.1488547560", timestamp);
-  formData.append("entry.895875942", navigator.userAgent || "");
-  formData.append("entry.1513543868", downloadCount);
-
-  fetch("https://docs.google.com/forms/d/e/1FAIpQLScArA3vlIk7S-Wz5oxHgAT4W4s2xDuC12Qznfq1QlWdE16Oqw/formResponse", {
-    method: "POST",
-    mode: "no-cors",
-    body: formData
-  });
 }
   </script>
+
 <script>
    // 注册检查和本地存储
 function checkRegistration() {
@@ -437,8 +369,8 @@ function checkRegistration() {
 
   return true;
 }
+ </script>
 
-  </script>
 <script>
 
 async function generate() {
@@ -465,12 +397,6 @@ async function generate() {
   payHint.style.display = 'none';
   generateBtn.disabled = true;
   generateBtn.innerText = "📝️ AI生成中…";
-
-  const now = new Date();
-  const yyyyMMdd = now.toISOString().slice(0,10).replace(/-/g, '');
-  const hhmm = now.getHours().toString().padStart(2,'0') + now.getMinutes().toString().padStart(2,'0');
-  const orderId = `${yyyyMMdd}-${hhmm}`;
-
   
   const prompt = `
 你是一位专业的中文旅行规划师，请根据下方旅行需求，制定详细的旅行行程：
@@ -499,36 +425,12 @@ ${userInput}
   })
 });
 
-	user = JSON.parse(localStorage.getItem('userInfo'));
+	const user = JSON.parse(localStorage.getItem('userInfo'));
 	if (user) {
 		user.usageCount = (user.usageCount || 0) + 1;
 		localStorage.setItem('userInfo', JSON.stringify(user));
 	}
 	
-
-    // 提前获取地理位置（城市+国家）
-	const locationData = await fetch('https://ipapi.co/json/').then(res => res.json()).catch(() => null);
-	const userLocation = locationData ? `${locationData.city || ''}, ${locationData.country_name || ''}` : "未知位置";
-	console.log("🌍 用户地理位置：", userLocation);
-
-	// 同步提交到 Google Form（含使用次数/时间/设备信息）
-	user = JSON.parse(localStorage.getItem('userInfo'));
-
-	const nickname = user.nickname;
-	const email = user.email;
-	const usage = user.usageCount;
-	const timestamp = new Date().toLocaleString();
-	const device = navigator.userAgent;
-
-	fetch("https://docs.google.com/forms/d/e/1FAIpQLScArA3vlIk7S-Wz5oxHgAT4W4s2xDuC12Qznfq1QlWdE16Oqw/formResponse", {
-	method: "POST",
-	mode: "no-cors",
-	headers: {
-	  "Content-Type": "application/x-www-form-urlencoded"
-	},
-	body: `entry.537580952=${encodeURIComponent(nickname)}&entry.709455992=${encodeURIComponent(email)}&entry.1504950828=${usage}&entry.1488547560=${encodeURIComponent(timestamp)}&entry.895875942=${encodeURIComponent(device)}&entry.1332377242=${encodeURIComponent(userInput)}&entry.1120642374=${encodeURIComponent(userLocation)}`
-	});
-
 
     const data = await response.json();
     if (data && data.choices && data.choices.length > 0) {
@@ -559,17 +461,6 @@ ${userInput}
 
       output.innerHTML = outputHTML;
 	
-	//生成行程后判断微信支付按钮显示
-	const paidDate = localStorage.getItem("paidDate");
-	let isPaid = false;
-	if (paidDate) {
-	  const expire = new Date(paidDate);
-	  expire.setDate(expire.getDate() + 30);
-	  if (new Date() <= expire) {
-	    isPaid = true;
-	  }
-	}
-	
       document.getElementById("pdf-content").scrollIntoView({ behavior: "smooth" });
 
     } else {
@@ -587,25 +478,18 @@ ${userInput}
  
 }
   </script>
+
 <script>
    function showPayment() {
   const paywall = document.getElementById('paywall');
   const payHint = document.getElementById('payHint');
-  const unlockBtn = document.getElementById('unlockButton');
-
-  const now = new Date();
-  const yyyyMMdd = now.toISOString().slice(0,10).replace(/-/g, '');
-  const hhmm = now.getHours().toString().padStart(2,'0') + now.getMinutes().toString().padStart(2,'0');
-  const orderId = `${yyyyMMdd}-${hhmm}`;
 
   payHint.style.display = "none";
   paywall.style.display = "block";
-  unlockBtn.style.display = "none";
-  setTimeout(() => {
-    unlockBtn.style.display = "block";
-  }, 20000);
+
 }
   </script>
+
 <script>
    function unlockPDF() {
   document.getElementById("orderNumberInput").value = "";  // 清除订单号输入框
@@ -651,26 +535,6 @@ function onConfirmPay(paid) {
   // 在本地缓存中写入 paidDate = 当前时间
   localStorage.setItem("paidDate", new Date().toISOString());
 
-  // 提交表单
-  const user = JSON.parse(localStorage.getItem("userInfo")) || {};
-  const formData = new FormData();
-  const timestamp = new Date().toLocaleString();
-  const device = navigator.userAgent;
-  const usageCount = user.usageCount || 0;
-
-  formData.append("entry.537580952", user.nickname || "");
-  formData.append("entry.709455992", user.email || "");
-  formData.append("entry.370855077", orderNumber);
-  formData.append("entry.1504950828", usageCount);
-  formData.append("entry.1488547560", timestamp);
-  formData.append("entry.895875942", device);
-
-  fetch("https://docs.google.com/forms/d/e/1FAIpQLScArA3vlIk7S-Wz5oxHgAT4W4s2xDuC12Qznfq1QlWdE16Oqw/formResponse", {
-    method: "POST",
-    mode: "no-cors",
-    body: formData
-  });
-
   // 显示下载按钮并跳转
   const btn = document.getElementById('unlockButton');
   btn.innerHTML = '<span>✅</span> 已支付，下载行程PDF';
@@ -686,6 +550,7 @@ if (localStorage.getItem("hasGenerated") === "true") {
   document.getElementById("paywall").scrollIntoView({ behavior: "smooth" });
 }
   </script>
+
 <script>
    // PDF下载函数，增加权限判断
 function doDownloadPDF() {
@@ -699,7 +564,8 @@ function doDownloadPDF() {
     }
   }
 
-  alert("🔒 请付费解锁下载PDF功能（¥19.9元包月）。");
+  showPayment();
+  document.getElementById("paywall").scrollIntoView({ behavior: "smooth" });
   return;
 }
 
@@ -708,7 +574,6 @@ function doDownloadPDF() {
 function exportPDF() {
   trackPDFDownload();
   const element = document.getElementById("pdf-content");
-  const userInput = document.getElementById("inputText").value.trim();
 
   // 自动从行程标题中提取PDF文件名
   let firstHeading = element.querySelector("h3,h2,h1");
@@ -740,6 +605,7 @@ function isPaidValid() {
 }
 
   </script>
+
 <script>
 // 页面加载时控制按钮显示逻辑
 window.onload = function () {
@@ -752,6 +618,7 @@ window.onload = function () {
 }
  
 </script>
+
 <script>
 /**
  * 根据用户当前状态判断是否显示下载PDF按钮和支付提示
@@ -775,15 +642,15 @@ function updateButtonDisplayAfterGenerate() {
     }
   }
 
-  // 只有已生成行程 + 有权限，才显示 PDF 按钮
-  if (hasGenerated && (isPaid || usageCount <= 3)) {
+  // 只要已生成行程，就显示 PDF 按钮；未付费时点击后弹出支付窗口
+  if (hasGenerated) {
     pdfButton.style.display = "inline-block";
   } else {
     pdfButton.style.display = "none";
   }
 
   // 超出免费次数且未付费，才显示支付提示
-	if (hasGenerated && !isPaid && usageCount > 3) {
+	if (hasGenerated && !isPaid && usageCount >= 3) {
 	  payHint.style.display = "block";
 	} else {
 	  payHint.style.display = "none";
@@ -805,10 +672,10 @@ function updateButtonDisplayAfterGenerate() {
 🧳 1分钟一键搞定行程安排！🚀<br/>
 📝 输出行程PDF文件，可保存，可分享👍<br/>
 💡 节省做攻略的时间，出行前轻松搞定👌<br/>
-💰 免费试用3次，包月19.9元尽情使用🎁
+💰 免费生成行程3次，包月费用19.9元🎁
 </div>
 <textarea id="inputText" placeholder="请输入您的旅行需求，例如：
-东京到大阪6天自由行，3人，8月中旬，以美食和文化体验为主" rows="5"></textarea>
+东京到大阪6天自由行，3人，4月1日到6日，以美食和文化体验为主，预算每人1万人民币" rows="5"></textarea>
 <button id="generateBtn" onclick="generate()">
     🗺️ AI生成旅游行程
    </button>
@@ -822,7 +689,7 @@ function updateButtonDisplayAfterGenerate() {
 </div>
 </div>
 <div style="text-align: center;">
-<button id="pdfButton" onclick="exportPDF()" style="display: none;">
+<button id="pdfButton" onclick="doDownloadPDF()" style="display: none;">
 <img src="./pdf_icon.png" style="height:38px; vertical-align:middle; margin-right:8px;"/>
      下载行程PDF文件
     </button>
@@ -832,7 +699,6 @@ function updateButtonDisplayAfterGenerate() {
 <p style="font-size:18px; font-weight:bold; margin-bottom:20px;">
        💰 您是否已支付？
       </p>
-<img src="./wechat_danghao.jpg" style="width:80%; max-width:280px; height:auto; margin-bottom:10px; border-radius:5px; box-shadow:0 1px 3px rgba(0,0,0,0.1);"/>
 <p>
        📋 请打开微信账单详情页面，复制转账单号，粘贴到下方输入框中
       </p>
@@ -902,32 +768,8 @@ function updateButtonDisplayAfterGenerate() {
 </div>
 
 <footer class="page-footer">
-   © 2025 MYG. All rights reserved. 
+   © 2026 MYG. All rights reserved. 
 </footer>
-
-<div style="display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin: 30px auto; flex-wrap: wrap;">
-  <!-- 反馈按钮：清新浅绿 -->
-  <button onclick="window.open('https://docs.google.com/forms/d/1zl2DIZbs1WpoudOFx0ZbWbip2NJLfHpOev1Yz0oH6vA/viewform','_blank')" style="all: unset; display: inline-block; font-size: 16px; padding: 12px 24px; border-radius: 8px; background-color: #66BB6A; color: white; box-shadow: 0 2px 6px rgba(0,0,0,0.15); cursor: pointer; text-align: center;">
-    📝 反馈建议
-  </button>
-</div>
-
-<script>
-function shareApp() {
-  if (navigator.share) {
-    navigator.share({
-      title: 'AI旅行助手',
-      text: '【AI旅行助手】🚀\n https://aitravelassistant.github.io/travel-planner/',
-      url: window.location.href
-    }).catch((err) => {
-      console.log("分享失败:", err);
-    });
-  } else {
-    alert("😅 分享失败，请手动复制网址分享：\n\n https://aitravelassistant.github.io/travel-planner/");
-  }
-}
-
-</script>
 
 
 <script>
@@ -952,32 +794,8 @@ async function submitRegistration() {
 
   try {
     // 保存初步 userInfo（供 restore 使用）
-    const userInfo = { nickname, email };
+    const userInfo = { nickname, email, usageCount: 0 };
     localStorage.setItem("userInfo", JSON.stringify(userInfo));
-
-    // 先恢复老数据
-    await restoreUserStateFromServer();
-
-    //再从 localStorage 获取恢复后的完整 userInfo
-    const recoveredUser = JSON.parse(localStorage.getItem("userInfo") || "{}");
-
-    // 判断是否为新注册（无 usageCount 或 usageCount === 0）
-    const isNew = !recoveredUser.usageCount;
-
-    if (isNew) {
-      // 再上传注册信息
-      const timestamp = new Date().toLocaleString();
-      const device = navigator.userAgent;
-
-      fetch("https://docs.google.com/forms/d/e/1FAIpQLScArA3vlIk7S-Wz5oxHgAT4W4s2xDuC12Qznfq1QlWdE16Oqw/formResponse", {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: `entry.537580952=${encodeURIComponent(nickname)}&entry.709455992=${encodeURIComponent(email)}&entry.1504950828=0&entry.1488547560=${encodeURIComponent(timestamp)}&entry.895875942=${encodeURIComponent(device)}`
-      });
-    }
 
     document.getElementById("registerModal").style.display = "none";
 
@@ -991,50 +809,6 @@ async function submitRegistration() {
 
 </script>
 
-
-<script>
-// ✅ 加入自动恢复状态的函数（在 generate 前调用）
-async function restoreUserStateFromServer() {
-  const user = JSON.parse(localStorage.getItem("userInfo") || "{}");
-  if (!user.nickname || !user.email) return;
-
-  try {
-    const url = `https://script.google.com/macros/s/AKfycbz6Qup-SVCQ5fF1bBzCwUksEQvY5fSdOdim8U9NWfme3lqLUhbqij-CnD0i-mLDO5By/exec?nickname=${encodeURIComponent(user.nickname)}&email=${encodeURIComponent(user.email)}`;
-    const res = await fetch(url, { method: "GET", mode: "cors" });
-    const data = await res.json();
-    if (!data || !data.found) return;
-
-    const updated = {
-      nickname: user.nickname,
-      email: user.email,
-      usageCount: parseInt(data.usageCount || "0", 10),
-      startDate: user.startDate || new Date().toISOString()
-    };
-    
-    localStorage.setItem("userInfo", JSON.stringify(updated));
-    localStorage.setItem("downloadCount", parseInt(data.downloadCount || "0", 10));
-
-    if (data.paid && data.paidDate) {
-      localStorage.setItem("paidDate", new Date(data.paidDate).toISOString());
-      localStorage.setItem("lastOrderNumber", data.orderNumber || "");
-      
-      // 若包月仍有效，弹出欢迎回来提示
-	  const expire = new Date(data.paidDate);
-	  expire.setDate(expire.getDate() + 30);
-	  if (new Date() <= expire) {
-	    alert("🎉 欢迎回来！你已付费包月，请点击按钮生成行程。");
-	  }
-  
-    }
-
-    console.log("✅ 从服务器恢复状态：", updated);
-
-  } catch (e) {
-    console.warn("❌ 状态恢复失败：", e);
-  }
-}
-
-</script>
 
 <script>
 let carPosition = 0;
