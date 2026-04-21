@@ -337,46 +337,8 @@ textarea {
   </script>
 
 <script>
-   // 注册检查和本地存储
-function checkRegistration() {
-  const user = JSON.parse(localStorage.getItem("userInfo"));
-  const paidDate = localStorage.getItem("paidDate");
-  if (!user || !user.nickname || !user.email) {
-    document.getElementById("registerModal").style.display = "flex";
-    return false;
-  }
-
-	//包月有效
-	if (isPaidValid()) {
-	  return true; 
-	}
-	
-  // 包月已过期，提示“包月已过期”
-  if (paidDate) {
-    alert("⚠️ 您的包月已过期，请付费后继续使用。");
-    const pay = document.getElementById("payHint");
-    if (pay) pay.style.display = "block";
-    return false;
-  }
-
-   // 未付费。超出免费次数
-  if (user.usageCount >= 3) {
-      alert("您的免费试用3次已用完，请付费解锁。");
-      const pay = document.getElementById("payHint");
-      if (pay) pay.style.display = "block";
-      return false;
-    }
-
-  return true;
-}
- </script>
-
-<script>
 
 async function generate() {
-  
-  //检查用户注册状态
-  if (!checkRegistration()) return;
   
   const userInput = document.getElementById('inputText').value.trim();
   
@@ -395,6 +357,7 @@ async function generate() {
   paywall.style.display = 'none';
   pdfButton.style.display = 'none';
   payHint.style.display = 'none';
+  localStorage.setItem("pdfPaid", "false");
   generateBtn.disabled = true;
   generateBtn.innerText = "📝️ AI生成中…";
   
@@ -424,15 +387,7 @@ ${userInput}
     temperature: 0.7
   })
 });
-
-	const user = JSON.parse(localStorage.getItem('userInfo'));
-	if (user) {
-		user.usageCount = (user.usageCount || 0) + 1;
-		localStorage.setItem('userInfo', JSON.stringify(user));
-	}
-	
-
-    const data = await response.json();
+const data = await response.json();
     if (data && data.choices && data.choices.length > 0) {
     
     localStorage.setItem("hasGenerated", "true");
@@ -470,6 +425,7 @@ ${userInput}
     console.error("Error:", error);
     output.innerText = "❌ AI请求出错，请检查网络连接或请勿息屏，重新点击生成行程。";
     localStorage.setItem("hasGenerated", "false");
+  localStorage.setItem("pdfPaid", "false");
   } finally {
     generateBtn.disabled = false;
     generateBtn.innerText = "📖️ AI生成旅游行程";
@@ -530,21 +486,14 @@ function onConfirmPay(paid) {
 
   // ✅ 验证通过后关闭弹窗
   document.getElementById("confirmModal").style.display = "none";
-  alert("🙏️ 谢谢付费！您可以包月使用。");
-  
-  // 在本地缓存中写入 paidDate = 当前时间
-  localStorage.setItem("paidDate", new Date().toISOString());
+  localStorage.setItem("pdfPaid", "true");
 
   // 显示下载按钮并跳转
   const btn = document.getElementById('unlockButton');
   btn.innerHTML = '<span>✅</span> 已支付，下载行程PDF';
   const downloadBtn = document.getElementById('pdfButton');
   
-if (localStorage.getItem("hasGenerated") === "true") {
-  downloadBtn.style.display = 'inline-block';
-} else {
-  downloadBtn.style.display = 'none';
-}
+downloadBtn.style.display = 'inline-block';
 
   document.getElementById("paywall").style.display = "none";
   document.getElementById("paywall").scrollIntoView({ behavior: "smooth" });
@@ -552,16 +501,12 @@ if (localStorage.getItem("hasGenerated") === "true") {
   </script>
 
 <script>
-   // PDF下载函数，增加权限判断
+   // PDF下载函数，增加单次付费判断
 function doDownloadPDF() {
-  const paidDate = localStorage.getItem("paidDate");
+  const paid = localStorage.getItem("pdfPaid") === "true";
 
-  if (paidDate) {
-    const expire = new Date(paidDate);
-    expire.setDate(expire.getDate() + 30);
-    if (new Date() <= expire) {
-      return exportPDF();
-    }
+  if (paid) {
+    return exportPDF();
   }
 
   showPayment();
@@ -596,13 +541,6 @@ function exportPDF() {
   html2pdf().set(opt).from(element).save();
 }
 
-function isPaidValid() {
-  const paidDate = localStorage.getItem("paidDate");
-  if (!paidDate) return false;
-  const expire = new Date(paidDate);
-  expire.setDate(expire.getDate() + 30);
-  return new Date() <= expire;
-}
 
   </script>
 
@@ -612,6 +550,7 @@ window.onload = function () {
   // 页面加载时初始化生成状态为 false
   try {
   localStorage.setItem("hasGenerated", "false");
+  localStorage.setItem("pdfPaid", "false");
   } catch (e) {
   console.warn("localStorage 不可用", e);
   }
@@ -626,35 +565,17 @@ window.onload = function () {
  */
 
 function updateButtonDisplayAfterGenerate() {
-  const paidDate = localStorage.getItem("paidDate");
   const hasGenerated = localStorage.getItem("hasGenerated") === "true";
-  const user = JSON.parse(localStorage.getItem("userInfo") || "{}");
-  const usageCount = user.usageCount || 0;
   const pdfButton = document.getElementById("pdfButton");
   const payHint = document.getElementById("payHint");
 
-  let isPaid = false;
-  if (paidDate) {
-    const expire = new Date(paidDate);
-    expire.setDate(expire.getDate() + 30);
-    if (new Date() <= expire) {
-      isPaid = true;
-    }
-  }
-
-  // 只要已生成行程，就显示 PDF 按钮；未付费时点击后弹出支付窗口
   if (hasGenerated) {
     pdfButton.style.display = "inline-block";
+    payHint.style.display = "block";
   } else {
     pdfButton.style.display = "none";
+    payHint.style.display = "none";
   }
-
-  // 超出免费次数且未付费，才显示支付提示
-	if (hasGenerated && !isPaid && usageCount >= 3) {
-	  payHint.style.display = "block";
-	} else {
-	  payHint.style.display = "none";
-	}
 }
   </script>
 <script>
@@ -662,6 +583,9 @@ function updateButtonDisplayAfterGenerate() {
   document.getElementById('qrPopup').style.display = 'flex';
 }
   </script>
+
+
+
 </head>
 <body>
 <div class="container">
@@ -670,9 +594,9 @@ function updateButtonDisplayAfterGenerate() {
 </h2>
 <div class="quick-input-hint" style="background:#e3f2fd; padding:16px 20px; border-radius:12px; margin-bottom:20px; font-size:16px; line-height:1.7;">
 🧳 1分钟一键搞定行程安排！🚀<br/>
-📝 输出行程PDF文件，可保存，可分享👍<br/>
+📝 输出行程PDF文件，可保存可分享👍<br/>
 💡 节省做攻略的时间，出行前轻松搞定👌<br/>
-💰 免费生成行程3次，包月费用19.9元🎁
+💰 免费生成行程，下载PDF支付9.9元🎁
 </div>
 <textarea id="inputText" placeholder="请输入您的旅行需求，例如：
 东京到大阪6天自由行，3人，4月1日到6日，以美食和文化体验为主，预算每人1万人民币" rows="5"></textarea>
@@ -716,30 +640,15 @@ function updateButtonDisplayAfterGenerate() {
       </p>
 </div>
 </div>
-<!-- 注册弹窗 -->
-<div id="registerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); z-index:10000; justify-content:center; align-items:center;">
-<div style="background:white; padding:24px 20px; border-radius:12px; text-align:center; width:90%; max-width:360px; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
-<p style="font-size:18px; font-weight:bold; margin-bottom:12px;">
-       📝 请注册，可免费试用AI生成行程3次。
-      </p>
-<input id="nickname" placeholder="请输入昵称" style="width:90%; padding:10px; margin:8px 0; font-size:16px;"/>
-<br>
-<input id="email" placeholder="请输入邮箱" style="width:90%; padding:10px; margin:8px 0; font-size:16px;"/>
-<br>
-<button onclick="submitRegistration()" style="background:#4CAF50; color:white; font-size:16px; padding:10px 24px; border:none; border-radius:8px; margin-top:10px;">
-       注册
-      </button>
-</br></br></div>
-</div>
 </div>
 <div class="pay-hint" id="payHint" style="display:none; text-align:center; margin-top:20px;">
 <p>
 <strong>
-      请点击下方按钮，支付后继续使用（包月¥19.9元）：
+      请点击下方按钮，支付后可下载本次PDF（¥9.9元）：
      </strong>
 </p>
 <button onclick="showPayment()" style="background-color:#ffa726;">
-     微信支付（¥19.9元）
+     微信支付（¥9.9元）
     </button>
 </div>
 <div class="paywall" id="paywall" style="display: none;">
@@ -770,44 +679,6 @@ function updateButtonDisplayAfterGenerate() {
 <footer class="page-footer">
    © 2026 MYG. All rights reserved. 
 </footer>
-
-
-<script>
-async function submitRegistration() {
-  const registerBtn = document.querySelector("button[onclick='submitRegistration()']");
-  if (registerBtn) registerBtn.disabled = true;
-
-  const nickname = document.getElementById("nickname").value.trim();
-  const email = document.getElementById("email").value.trim();
-  if (!nickname || !email) {
-    alert("⚠️ 请输入昵称和邮箱");
-    if (registerBtn) registerBtn.disabled = false;
-    return;
-  }
-
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailPattern.test(email)) {
-    alert("⚠️ 邮箱格式不正确");
-    if (registerBtn) registerBtn.disabled = false;
-    return;
-  }
-
-  try {
-    // 保存初步 userInfo（供 restore 使用）
-    const userInfo = { nickname, email, usageCount: 0 };
-    localStorage.setItem("userInfo", JSON.stringify(userInfo));
-
-    document.getElementById("registerModal").style.display = "none";
-
-  } catch (e) {
-    console.error(e);
-    alert("❌ 注册出错，请稍后再试");
-  } finally {
-    if (registerBtn) registerBtn.disabled = false;
-  }
-}
-
-</script>
 
 
 <script>
