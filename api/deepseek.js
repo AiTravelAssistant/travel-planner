@@ -1,5 +1,4 @@
 // api/deepseek.js
-import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
   // ✅ 处理预检请求（preflight）
