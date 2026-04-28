@@ -520,12 +520,12 @@ function exportPDF() {
   trackPDFDownload();
   const element = document.getElementById("pdf-content");
 
-  // 自动从行程标题中提取PDF文件名
-  let firstHeading = element.querySelector("h3,h2,h1");
+  // ✅ 使用用户输入作为PDF文件名
+  let userInput = document.getElementById("inputText").value.trim();
   let filename = "旅行行程.pdf";
 
-  if (firstHeading && firstHeading.innerText) {
-    const cleaned = firstHeading.innerText.replace(/[^\u4e00-\u9fa5\w]+/g, "").slice(0, 30);
+  if (userInput) {
+    const cleaned = userInput.replace(/[^\u4e00-\u9fa5\w]+/g, "").slice(0, 30);
     if (cleaned) {
       filename = `${cleaned}.pdf`;
     }
