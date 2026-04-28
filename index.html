@@ -1,671 +1,367 @@
 <!DOCTYPE html>
+
 <html lang="zh">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI旅行助手(MVP)</title>
-
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: "Microsoft YaHei", sans-serif;
-      background-color: #f5f6f7;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px 16px;
-    }
-
-    h2 {
-      margin-top: 10px;
-      margin-bottom: 24px;
-      text-align: center;
-      font-size: 30px;
-      font-weight: bold;
-      letter-spacing: 1px;
-      color: #2a2a2a;
-    }
-
-    .quick-input-hint {
-      margin-bottom: 20px;
-      padding: 16px 20px;
-      border-radius: 12px;
-      background: #e3f2fd;
-      font-size: 16px;
-      line-height: 1.7;
-    }
-
-    textarea {
-      width: 100%;
-      height: 30vh;
-      box-sizing: border-box;
-      padding: 18px;
-      border: 1px solid #ccc;
-      border-radius: 12px;
-      background-color: #fff;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-      font-size: 20px;
-    }
-
-    .output {
-      margin-top: 30px;
-      padding: 24px;
-      border-radius: 16px;
-      background-color: #fff;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
-      font-size: 18px;
-      line-height: 1.7;
-    }
-
-    table {
-      width: 100%;
-      margin-top: 14px;
-      border-collapse: collapse;
-      font-size: 16px;
-      table-layout: fixed;
-    }
-
-    th,
-    td {
-      padding: 10px 12px;
-      border: 1px solid #ddd;
-      text-align: left;
-      vertical-align: top;
-      white-space: normal;
-      word-break: normal;
-      overflow-wrap: break-word;
-      line-height: 1.8;
-    }
-
-    table th:last-child,
-    table td:last-child {
-      word-break: keep-all;
-      overflow-wrap: anywhere;
-    }
-
-    button {
-      display: block;
-      margin: 16px auto;
-      padding: 14px 20px;
-      border: none;
-      border-radius: 6px;
-      background-color: #4caf50;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-      color: #fff;
-      cursor: pointer;
-      font-size: 18px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    button:hover {
-      background-color: #45a049;
-    }
-
-    button:active {
-      transform: scale(0.97);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-
-    #pdfButton {
-      display: none;
-      width: fit-content;
-      margin: 24px auto;
-      background-color: #2196f3;
-      text-align: center;
-    }
-
-    .pay-hint {
-      display: none;
-      margin-top: 20px;
-      text-align: center;
-    }
-
-    .paywall {
-      display: none;
-      margin-top: 20px;
-      padding: 15px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      background-color: #fffbe8;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-      text-align: center;
-    }
-
-    .paywall img {
-      display: block;
-      max-width: 200px;
-      margin: 10px auto;
-    }
-
-    .paywall button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      border-radius: 6px;
-      background-color: #e0e0e0;
-      font-size: 16px;
-    }
-
-    .page-footer {
-      margin-top: 40px;
-      margin-bottom: 20px;
-      text-align: center;
-      font-size: 20px;
-      color: #888;
-    }
-
-    .loading-road {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      max-width: 100%;
-      margin: 16px auto;
-      white-space: nowrap;
-      font-size: 16px;
-      font-weight: bold;
-    }
-
-    #roadTrack {
-      display: inline-block;
-      min-width: 260px;
-      font-family: monospace;
-      font-size: 18px;
-    }
-
-    @media (min-width: 769px) {
-      th,
-      td {
-        padding: 12px 14px;
-        font-size: 16px;
-      }
-
-      table.cols-5 th:nth-child(1),
-      table.cols-5 td:nth-child(1) {
-        width: 14%;
-      }
-
-      table.cols-5 th:nth-child(2),
-      table.cols-5 td:nth-child(2) {
-        width: 26%;
-      }
-
-      table.cols-5 th:nth-child(3),
-      table.cols-5 td:nth-child(3) {
-        width: 18%;
-      }
-
-      table.cols-5 th:nth-child(4),
-      table.cols-5 td:nth-child(4) {
-        width: 18%;
-      }
-
-      table.cols-5 th:nth-child(5),
-      table.cols-5 td:nth-child(5) {
-        width: 24%;
-      }
-
-      table.cols-6 th:nth-child(1),
-      table.cols-6 td:nth-child(1) {
-        width: 10%;
-      }
-
-      table.cols-6 th:nth-child(2),
-      table.cols-6 td:nth-child(2) {
-        width: 12%;
-      }
-
-      table.cols-6 th:nth-child(3),
-      table.cols-6 td:nth-child(3) {
-        width: 18%;
-      }
-
-      table.cols-6 th:nth-child(4),
-      table.cols-6 td:nth-child(4) {
-        width: 18%;
-      }
-
-      table.cols-6 th:nth-child(5),
-      table.cols-6 td:nth-child(5) {
-        width: 18%;
-      }
-
-      table.cols-6 th:nth-child(6),
-      table.cols-6 td:nth-child(6) {
-        width: 24%;
-      }
-    }
-
-    @media (max-width: 768px) {
-      h2 {
-        font-size: 28px;
-      }
-
-      .output {
-        overflow-x: auto;
-        padding: 20px;
-      }
-
-      table {
-        border: 1px solid #ccc;
-        font-size: 14px;
-        min-width: 860px;
-      }
-
-      th,
-      td {
-        box-sizing: border-box;
-        padding: 8px 8px;
-        border: 1px solid #ccc;
-        vertical-align: top;
-        font-size: 14px;
-        line-height: 1.7;
-      }
-
-      table.cols-5 th:nth-child(1),
-      table.cols-5 td:nth-child(1) {
-        width: 110px;
-      }
-
-      table.cols-5 th:nth-child(2),
-      table.cols-5 td:nth-child(2) {
-        width: 220px;
-      }
-
-      table.cols-5 th:nth-child(3),
-      table.cols-5 td:nth-child(3) {
-        width: 160px;
-      }
-
-      table.cols-5 th:nth-child(4),
-      table.cols-5 td:nth-child(4) {
-        width: 160px;
-      }
-
-      table.cols-5 th:nth-child(5),
-      table.cols-5 td:nth-child(5) {
-        width: 210px;
-      }
-
-      table.cols-6 th:nth-child(1),
-      table.cols-6 td:nth-child(1) {
-        width: 90px;
-      }
-
-      table.cols-6 th:nth-child(2),
-      table.cols-6 td:nth-child(2) {
-        width: 110px;
-      }
-
-      table.cols-6 th:nth-child(3),
-      table.cols-6 td:nth-child(3) {
-        width: 170px;
-      }
-
-      table.cols-6 th:nth-child(4),
-      table.cols-6 td:nth-child(4) {
-        width: 170px;
-      }
-
-      table.cols-6 th:nth-child(5),
-      table.cols-6 td:nth-child(5) {
-        width: 170px;
-      }
-
-      table.cols-6 th:nth-child(6),
-      table.cols-6 td:nth-child(6) {
-        width: 210px;
-      }
-
-      textarea {
-        height: 28vh;
-        font-size: 20px;
-      }
-
-      button {
-        width: 85%;
-        padding: 16px;
-        font-size: 24px;
-      }
-    }
-
-    @media print {
-      body {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-
-      .output {
-        padding: 18px;
-        font-size: 16px;
-        line-height: 1.6;
-      }
-
-      .day-plan {
-        page-break-before: always !important;
-        page-break-inside: avoid !important;
-        break-before: page !important;
-      }
-
-      .day-plan h3 {
-        page-break-before: always;
-      }
-
-      table {
-        width: 100%;
-        margin-top: 16px;
-        border-collapse: collapse;
-        table-layout: fixed;
-        font-size: 14px;
-        line-height: 1.6;
-      }
-
-      table th,
-      table td {
-        padding: 8px 10px;
-        border: 1px solid #666;
-        vertical-align: top;
-        white-space: normal;
-        word-break: normal;
-        overflow-wrap: break-word;
-      }
-
-      table.cols-5 th:nth-child(1),
-      table.cols-5 td:nth-child(1) {
-        width: 14%;
-      }
-
-      table.cols-5 th:nth-child(2),
-      table.cols-5 td:nth-child(2) {
-        width: 26%;
-      }
-
-      table.cols-5 th:nth-child(3),
-      table.cols-5 td:nth-child(3) {
-        width: 18%;
-      }
-
-      table.cols-5 th:nth-child(4),
-      table.cols-5 td:nth-child(4) {
-        width: 18%;
-      }
-
-      table.cols-5 th:nth-child(5),
-      table.cols-5 td:nth-child(5) {
-        width: 24%;
-      }
-
-      table.cols-6 th:nth-child(1),
-      table.cols-6 td:nth-child(1) {
-        width: 10%;
-      }
-
-      table.cols-6 th:nth-child(2),
-      table.cols-6 td:nth-child(2) {
-        width: 12%;
-      }
-
-      table.cols-6 th:nth-child(3),
-      table.cols-6 td:nth-child(3) {
-        width: 18%;
-      }
-
-      table.cols-6 th:nth-child(4),
-      table.cols-6 td:nth-child(4) {
-        width: 18%;
-      }
-
-      table.cols-6 th:nth-child(5),
-      table.cols-6 td:nth-child(5) {
-        width: 18%;
-      }
-
-      table.cols-6 th:nth-child(6),
-      table.cols-6 td:nth-child(6) {
-        width: 24%;
-      }
-
-      table th:last-child,
-      table td:last-child {
-        word-break: keep-all;
-        overflow-wrap: anywhere;
-      }
-    }
-  </style>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-</head>
-<body>
-  <div class="container">
-    <h2>✈️ AI旅行助手(MVP)</h2>
-
-    <div class="quick-input-hint">
-      🧳 1分钟一键搞定行程安排！🚀<br />
-      📝 输出行程PDF文件，可保存可分享👍<br />
-      💡 节省做攻略的时间，出行前轻松搞定👌<br />
-      💰 免费生成行程，下载PDF支付9.9元🎁
-    </div>
-
-    <textarea
-      id="inputText"
-      rows="5"
-      placeholder="请输入您的旅行需求，例如：&#10;东京到大阪6天自由行，3人，4月1日到6日，以美食和文化体验为主，预算每人1万人民币"
-    ></textarea>
-
-    <button id="generateBtn" onclick="generate()">🗺️ AI生成旅游行程</button>
-
-    <div id="pdf-content" class="output">
-      <div id="output">
-        <p><strong>这里将显示生成的行程内容...</strong></p>
-      </div>
-    </div>
-
-    <div style="text-align: center;">
-      <button id="pdfButton" onclick="doDownloadPDF()">
-        <img src="./pdf_icon.png" style="height:38px; vertical-align:middle; margin-right:8px;" />
-        下载行程PDF文件
-      </button>
-
-      <div
-        id="confirmModal"
-        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); z-index:9999; justify-content:center; align-items:center;"
-      >
-        <div
-          style="background:white; padding:24px 20px; border-radius:12px; text-align:center; width:90%; max-width:380px; box-shadow:0 4px 12px rgba(0,0,0,0.2);"
-        >
-          <p style="font-size:18px; font-weight:bold; margin-bottom:20px;">💰 您是否已支付？</p>
-          <p>📋 请打开微信账单详情页面，复制转账单号，粘贴到下方输入框中</p>
-
-          <div style="display:flex; justify-content:space-around;">
-            <button
-              onclick="onConfirmPay(true)"
-              style="flex:1; background:#4CAF50; color:white; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;"
-            >
-              ✅ 已支付
-            </button>
-            <button
-              onclick="onConfirmPay(false)"
-              style="flex:1; background:#e0e0e0; color:black; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;"
-            >
-              ❌ 未支付
-            </button>
-          </div>
-
-          <input
-            id="orderNumberInput"
-            autocomplete="off"
-            maxlength="32"
-            placeholder="请复制微信支付的转账单号（32位数字）"
-            style="width:90%; padding:10px; font-size:16px; margin-top:12px;"
-          />
-          <p id="orderError" style="display:none; color:red; font-size:14px;">转账单号不正确，请确实支付。</p>
-        </div>
-      </div>
-    </div>
-
-    <div id="payHint" class="pay-hint">
-      <p><strong>请点击下方按钮，支付后可下载本次PDF（¥9.9元）：</strong></p>
-      <button onclick="showPayment()" style="background-color:#ffa726;">微信支付（¥9.9元）</button>
-    </div>
-
-    <div id="paywall" class="paywall">
-      <p style="font-size:16px; font-weight:bold; margin-bottom:10px;">📱 请长按保存或扫码，用微信完成支付</p>
-      <img
-        src="./wechat_qr.png"
-        onclick="showQRPopup()"
-        style="max-width:220px; margin:12px auto; display:block; border:1px solid #ccc; border-radius:8px; cursor:pointer;"
-      />
-      <button id="unlockButton" onclick="unlockPDF()">
-        <span>☐</span>
-        确认已支付
-      </button>
-    </div>
-  </div>
-
-  <div
-    id="qrPopup"
-    style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center;"
-  >
-    <div
-      style="background:white; padding:20px; border-radius:12px; text-align:center; max-width:360px; box-shadow:0 4px 10px rgba(0,0,0,0.3);"
-    >
-      <p>📷 长按图片保存二维码，用微信扫码完成支付</p>
-      <img src="./wechat_qr.png" style="width:100%; border-radius:10px; margin-top:10px;" />
-      <button
-        onclick="document.getElementById('qrPopup').style.display='none'"
-        style="margin-top:12px; padding:8px 16px; font-size:14px; border:none; background:#4CAF50; color:white; border-radius:6px;"
-      >
-        关闭
-      </button>
-    </div>
-  </div>
-
-  <footer class="page-footer">© 2026 MYG. All rights reserved.</footer>
-
-  <script>
-    const STORAGE_KEYS = {
-      hasGenerated: "hasGenerated",
-      pdfPaid: "pdfPaid",
-      downloadCount: "downloadCount",
-      lastOrderNumber: "lastOrderNumber"
-    };
-
-    const ORDER_NUMBER_REGEX = /^1000107301\d{8}\d{14}$/;
-
-    function getEl(id) {
-      return document.getElementById(id);
-    }
-
-    function getBool(key) {
-      return localStorage.getItem(key) === "true";
-    }
-
-    function setBool(key, value) {
-      localStorage.setItem(key, value ? "true" : "false");
-    }
-
-    function resetGenerationState() {
-      setBool(STORAGE_KEYS.hasGenerated, false);
-      setBool(STORAGE_KEYS.pdfPaid, false);
-    }
-
-    function markGenerated() {
-      setBool(STORAGE_KEYS.hasGenerated, true);
-    }
-
-    function markPaid() {
-      setBool(STORAGE_KEYS.pdfPaid, true);
-    }
-
-    function hasGeneratedContent() {
-      return getBool(STORAGE_KEYS.hasGenerated);
-    }
-
-    function hasPaidForCurrentPDF() {
-      return getBool(STORAGE_KEYS.pdfPaid);
-    }
-
-    function trackPDFDownload() {
-      const currentCount = parseInt(localStorage.getItem(STORAGE_KEYS.downloadCount) || "0", 10);
-      localStorage.setItem(STORAGE_KEYS.downloadCount, String(currentCount + 1));
-    }
-
-    function updateButtonDisplayAfterGenerate() {
-      const pdfButton = getEl("pdfButton");
-      const payHint = getEl("payHint");
-
-      if (hasGeneratedContent()) {
-        pdfButton.style.display = "inline-block";
-        payHint.style.display = "block";
-      } else {
-        pdfButton.style.display = "none";
-        payHint.style.display = "none";
-      }
-    }
-
-    function showPayment() {
-      getEl("payHint").style.display = "none";
-      getEl("paywall").style.display = "block";
-    }
-
-    function unlockPDF() {
-      getEl("orderNumberInput").value = "";
-      getEl("confirmModal").style.display = "flex";
-      getEl("orderError").style.display = "none";
-    }
-
-    function showQRPopup() {
-      getEl("qrPopup").style.display = "flex";
-    }
-
-    function onConfirmPay(paid) {
-      const confirmModal = getEl("confirmModal");
-      const paywall = getEl("paywall");
-      const orderInput = getEl("orderNumberInput");
-      const orderError = getEl("orderError");
-      const unlockButton = getEl("unlockButton");
-      const pdfButton = getEl("pdfButton");
-
-      orderError.style.display = "none";
-
-      if (!paid) {
-        confirmModal.style.display = "none";
-        paywall.style.display = "block";
-        paywall.scrollIntoView({ behavior: "smooth" });
-        return;
-      }
-
-      const orderNumber = orderInput.value.trim();
-      if (!orderNumber) {
-        alert("⚠️ 请输入或复制微信支付的转账单号");
-        return;
-      }
-
-      if (!ORDER_NUMBER_REGEX.test(orderNumber)) {
-        orderError.style.display = "block";
-        return;
-      }
-
-      const lastOrderNumber = localStorage.getItem(STORAGE_KEYS.lastOrderNumber);
-      if (orderNumber === lastOrderNumber && lastOrderNumber) {
-        alert("⚠️ 此订单号已使用，请勿重复提交！");
-        return;
-      }
-
-      localStorage.setItem(STORAGE_KEYS.lastOrderNumber, orderNumber);
-      markPaid();
-
-      confirmModal.style.display = "none";
-      unlockButton.innerHTML = "<span>✅</span> 已支付，下载行程PDF";
-      pdfButton.style.display = "inline-block";
-      paywall.style.display = "none";
-      paywall.scrollIntoView({ behavior: "smooth" });
-    }
-
-    function buildPrompt(userInput) {
-      return `
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<title>
+   AI旅行助手(MVP)
+  </title>
+<style>
+   body {
+  font-family: "Microsoft YaHei", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f6f7;
+}
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px 16px;
+}
+h2 {
+  text-align: center;
+  font-size: 30px;
+  margin-bottom: 24px;
+  font-weight: bold;
+  color: #2a2a2a;
+  letter-spacing: 1px;
+}
+textarea {
+  width: 100%;
+  font-size: 20px;
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  height: 30vh;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.output {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 30px;
+  font-size: 18px;
+  line-height: 1.7;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 14px;
+  font-size: 16px;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.paywall {
+  text-align: center;
+  border: 1px solid #ccc;
+  padding: 15px;
+  background-color: #fffbe8;
+  border-radius: 10px;
+  margin-top: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.paywall img {
+  max-width: 200px;
+  margin: 10px auto;
+  display: block;
+}
+.paywall button {
+  background-color: #e0e0e0;
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+ 
+
+/* PDF 输出样式优化 */
+@media print {
+  .output {
+    font-size: 20px;
+    line-height: 1.6;
+    padding: 20px;
+  }
+  
+/* PDF 打印优化：每个 Day 的表格尽量单独分页 */
+  .day-plan {
+  page-break-before: always !important;
+  page-break-inside: avoid !important;
+  break-before: page !important;
+  }
+
+  .day-plan h3 {
+    page-break-before: always;
+  }
+  
+  body {
+    -webkit-print-color-adjust: exact;
+  }
+
+  table {
+    font-size: 20px;
+    line-height: 1.8;
+    border-collapse: collapse;
+    margin-top: 16px;
+    width: 100%;
+  }
+  table th, table td {
+    padding: 12px 14px;
+    border: 1px solid #666;
+  }
+}
+  
+
+/* 按钮美化 */
+button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 16px auto;
+  display: block;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+button:hover {
+  background-color: #45a049;
+}
+button:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+  
+
+/* PDF 按钮居中 */
+#pdfButton {
+  display: none;
+  margin: 24px auto;
+  text-align: center;
+  width: fit-content;
+  background-color: #2196F3;
+}
+  
+
+
+/* 页脚版权统一居中 */
+.page-footer {
+  text-align: center;
+  font-size: 20px;
+  color: #888;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+
+@keyframes blink {
+  0% { content: ''; }
+  33% { content: '.'; }
+  66% { content: '..'; }
+  100% { content: '...'; }
+}
+
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  word-break: break-word;
+}
+th, td {
+  word-break: break-word;
+  white-space: normal;
+}
+
+
+/* PC端表格样式 */
+@media (min-width: 769px) {
+  table {
+    table-layout: auto;
+  }
+  
+
+  th, td {
+    padding: 10px;
+    font-size: 16px;
+  }
+  
+	table th:nth-child(1), table td:nth-child(1) {
+	  width: 10%;
+	  min-width: 60px;
+	}
+
+	table th:nth-child(2), table td:nth-child(2) {
+	  width: 28%;
+	  min-width: 160px;
+	}
+
+	table th:nth-child(3), table td:nth-child(3) {
+	  width: 18%;
+	  min-width: 100px;
+	}
+
+	table th:nth-child(4), table td:nth-child(4) {
+	  width: 14%;
+	  min-width: 60px;
+	}
+
+	table th:nth-child(5), table td:nth-child(5) {
+	  width: 30%;
+	  min-width: 160px;
+	  word-break: break-word;
+	}
+}
+
+/* 移动端样式 */
+
+@media (max-width: 768px) {
+  h2 {
+    font-size: 28px;
+  }
+
+  .output {
+    overflow-x: auto;
+    padding: 20px;
+  }
+
+  table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    word-break: break-word;
+  }
+
+  th, td {
+    font-size: 14px;
+    padding: 6px 4px;
+    border: 1px solid #ccc;
+    word-break: break-word;
+    white-space: normal;
+    box-sizing: border-box;
+    vertical-align: top;
+  }
+
+  th:nth-child(1), td:nth-child(1) {
+    width: 15%;
+    min-width: 64px;
+  }
+
+  th:nth-child(2), td:nth-child(2) {
+    width: 35%;
+    min-width: 130px;
+  }
+
+  th:nth-child(3), td:nth-child(3) {
+    width: 20%;
+    min-width: 100px;
+  }
+
+  th:nth-child(4), td:nth-child(4) {
+    width: 20%;
+    min-width: 100px;
+  }
+
+  th:nth-child(5), td:nth-child(5) {
+    width: 10%;
+    min-width: 60px;
+  }
+
+textarea {
+    font-size: 20px;
+    height: 28vh;
+  }
+
+  button {
+    font-size: 24px;
+    width: 85%;
+    padding: 16px;
+  }
+
+}
+  
+.loading-road {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 16px auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+#roadTrack {
+  display: inline-block;
+  font-family: monospace;
+  font-size: 18px;
+  min-width: 260px;
+}
+
+.dot-typing {
+  display: inline-block;
+  width: 1em;
+  text-align: left;
+}
+.dot-typing::after {
+  content: '...';
+  animation: blink 1s steps(3, jump-none) infinite;
+}
+
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
+</script>
+
+<script>
+   function trackPDFDownload() {
+  let downloadCount = parseInt(localStorage.getItem("downloadCount") || "0");
+  downloadCount++;
+  localStorage.setItem("downloadCount", downloadCount);
+
+}
+  </script>
+
+<script>
+
+async function generate() {
+  
+  const userInput = document.getElementById('inputText').value.trim();
+  
+  if (!userInput) {
+    alert("⚠️ 请输入您的旅行需求");
+    return;
+  }
+
+  const output = document.getElementById('output');
+  const paywall = document.getElementById('paywall');
+  const pdfButton = document.getElementById('pdfButton');
+  const generateBtn = document.getElementById('generateBtn');
+  const payHint = document.getElementById("payHint");
+
+ output.innerHTML = `<div class="loading-road">⏳ AI正在生成行程，请稍等 <span id="roadTrack">🚗</span></div>`;
+  paywall.style.display = 'none';
+  pdfButton.style.display = 'none';
+  payHint.style.display = 'none';
+  localStorage.setItem("pdfPaid", "false");
+  generateBtn.disabled = true;
+  generateBtn.innerText = "📝️ AI生成中…";
+  
+  const prompt = `
 你是一位专业的中文旅行规划师，请根据下方旅行需求，制定详细的旅行行程：
 ${userInput}
 
@@ -675,173 +371,341 @@ ${userInput}
 每天行程的住宿安排推荐具体的真实存在的酒店或旅馆名称。
 请列出预算汇总和预约清单。
 `;
-    }
 
-    function applyTableColumnClasses(rootElement) {
-      const tables = rootElement.querySelectorAll("table");
-      tables.forEach((table) => {
-        table.classList.remove("cols-5", "cols-6");
-        const firstRow = table.querySelector("tr");
-        if (!firstRow) return;
-
-        const colCount = firstRow.children.length;
-        if (colCount === 5) {
-          table.classList.add("cols-5");
-        } else if (colCount === 6) {
-          table.classList.add("cols-6");
-        }
-      });
-    }
-
-    function groupDailyPlans(parsedHtml) {
-      const tempDiv = document.createElement("div");
+  try {
+    const response = await fetch("https://deepseek-proxy-three.vercel.app/api/deepseek", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    model: "deepseek-chat",
+    messages: [
+      { role: "system", content: "你是一位专业中文旅行规划师" },
+      { role: "user", content: prompt }
+    ],
+    temperature: 0.7
+  })
+});
+const data = await response.json();
+    if (data && data.choices && data.choices.length > 0) {
+    
+    localStorage.setItem("hasGenerated", "true");
+      
+      const parsedHtml = marked.parse(data.choices[0].message.content.trim());
+      const tempDiv = document.createElement('div');
       tempDiv.innerHTML = parsedHtml;
 
       const children = Array.from(tempDiv.children);
-      let outputHTML = "";
+      let outputHTML = '';
       let currentBlock = [];
 
-      children.forEach((child) => {
-        const text = child.textContent.trim().toLowerCase();
-        const isNewDay = /^day\s*\d+/i.test(text) || /第\s*\d+\s*天/.test(child.textContent.trim());
-
-        if (isNewDay && currentBlock.length > 0) {
-          outputHTML += `<div class="day-plan">${currentBlock.map((el) => el.outerHTML).join("")}</div>`;
-          currentBlock = [];
+      children.forEach(child => {
+        if (/^day\s*\d+/i.test(child.textContent.trim().toLowerCase()) || /第\s*\d+\s*天/.test(child.textContent.trim())) {
+          if (currentBlock.length > 0) {
+            outputHTML += '<div class="day-plan">' + currentBlock.map(el => el.outerHTML).join('') + '</div>';
+            currentBlock = [];
+          }
         }
-
         currentBlock.push(child);
       });
 
       if (currentBlock.length > 0) {
-        outputHTML += `<div class="day-plan">${currentBlock.map((el) => el.outerHTML).join("")}</div>`;
+        outputHTML += '<div class="day-plan">' + currentBlock.map(el => el.outerHTML).join('') + '</div>';
       }
 
-      return outputHTML;
+      output.innerHTML = outputHTML;
+	
+      document.getElementById("pdf-content").scrollIntoView({ behavior: "smooth" });
+
+    } else {
+      output.innerText = "⚠️ AI未返回有效内容，请稍后再试。";
     }
-
-    async function generate() {
-      const userInput = getEl("inputText").value.trim();
-      const output = getEl("output");
-      const paywall = getEl("paywall");
-      const pdfButton = getEl("pdfButton");
-      const generateBtn = getEl("generateBtn");
-      const payHint = getEl("payHint");
-
-      if (!userInput) {
-        alert("⚠️ 请输入您的旅行需求");
-        return;
-      }
-
-      output.innerHTML = '<div class="loading-road">⏳ AI正在生成行程，请稍等 <span id="roadTrack">🚗</span></div>';
-      paywall.style.display = "none";
-      pdfButton.style.display = "none";
-      payHint.style.display = "none";
-      setBool(STORAGE_KEYS.pdfPaid, false);
-      generateBtn.disabled = true;
-      generateBtn.innerText = "📝️ AI生成中…";
-
-      try {
-        const response = await fetch("https://deepseek-proxy-three.vercel.app/api/deepseek", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model: "deepseek-chat",
-            messages: [
-              { role: "system", content: "你是一位专业中文旅行规划师" },
-              { role: "user", content: buildPrompt(userInput) }
-            ],
-            temperature: 0.7
-          })
-        });
-
-        const data = await response.json();
-
-        if (data && data.choices && data.choices.length > 0) {
-          markGenerated();
-          const markdownContent = data.choices[0].message.content.trim();
-          const parsedHtml = marked.parse(markdownContent);
-          output.innerHTML = groupDailyPlans(parsedHtml);
-          applyTableColumnClasses(output);
-          getEl("pdf-content").scrollIntoView({ behavior: "smooth" });
-        } else {
-          output.innerText = "⚠️ AI未返回有效内容，请稍后再试。";
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        output.innerText = "❌ AI请求出错，请检查网络连接或请勿息屏，重新点击生成行程。";
-        resetGenerationState();
-      } finally {
-        generateBtn.disabled = false;
-        generateBtn.innerText = "📖️ AI生成旅游行程";
-        updateButtonDisplayAfterGenerate();
-      }
-    }
-
-    function exportPDF() {
-      trackPDFDownload();
-
-      const element = getEl("pdf-content");
-      const firstHeading = element.querySelector("h3, h2, h1");
-      let filename = "旅行行程.pdf";
-
-      if (firstHeading && firstHeading.innerText) {
-        const cleaned = firstHeading.innerText.replace(/[^一-龥\w]+/g, "").slice(0, 30);
-        if (cleaned) {
-          filename = `${cleaned}.pdf`;
-        }
-      }
-
-      const options = {
-        margin: 0.5,
-        filename,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
-        jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
-      };
-
-      html2pdf().set(options).from(element).save();
-    }
-
-    function doDownloadPDF() {
-      if (hasPaidForCurrentPDF()) {
-        exportPDF();
-        return;
-      }
-
-      showPayment();
-      getEl("paywall").scrollIntoView({ behavior: "smooth" });
-    }
-
-    let carPosition = 0;
-    let direction = 1;
-    const maxSteps = 8;
-    let intervalId;
-
-    function updateRoadTrack() {
-      const car = getEl("roadTrack");
-      if (!car) return;
-
-      carPosition += direction;
-      if (carPosition >= maxSteps || carPosition <= 0) {
-        direction *= -1;
-      }
-
-      car.innerHTML = ".".repeat(carPosition) + "🚗";
-    }
-
-    const observer = new MutationObserver(() => {
-      const car = getEl("roadTrack");
-      if (car && !intervalId) {
-        intervalId = setInterval(updateRoadTrack, 200);
-      }
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    window.onload = function () {
-      resetGenerationState();
-    };
+  } catch (error) {
+    console.error("Error:", error);
+    output.innerText = "❌ AI请求出错，请检查网络连接或请勿息屏，重新点击生成行程。";
+    localStorage.setItem("hasGenerated", "false");
+  localStorage.setItem("pdfPaid", "false");
+  } finally {
+    generateBtn.disabled = false;
+    generateBtn.innerText = "📖️ AI生成旅游行程";
+    updateButtonDisplayAfterGenerate();
+  }
+ 
+}
   </script>
+
+<script>
+   function showPayment() {
+  const paywall = document.getElementById('paywall');
+  const payHint = document.getElementById('payHint');
+
+  payHint.style.display = "none";
+  paywall.style.display = "block";
+
+}
+  </script>
+
+<script>
+   function unlockPDF() {
+  document.getElementById("orderNumberInput").value = "";  // 清除订单号输入框
+  document.getElementById("confirmModal").style.display = "flex";
+}
+
+
+function onConfirmPay(paid) {
+  document.getElementById("orderError").style.display = "none";
+
+  if (!paid) {
+    document.getElementById("confirmModal").style.display = "none";
+    document.getElementById("paywall").style.display = "block";
+    document.getElementById("paywall").scrollIntoView({ behavior: "smooth" });
+    return;
+  }
+
+  // 验证订单号格式
+  const orderNumber = document.getElementById("orderNumberInput").value.trim();
+  if (!orderNumber) {
+    alert("⚠️ 请输入或复制微信支付的转账单号");
+    return;
+  }
+  const regex = /^1000107301\d{8}\d{14}$/;
+  
+  if (!regex.test(orderNumber)) {
+    document.getElementById("orderError").style.display = "block";
+    return; // ❗ 停留在弹窗，不关闭
+  }
+
+  const lastOrder = localStorage.getItem("lastOrderNumber");
+  if (orderNumber === lastOrder && lastOrder) {
+    alert("⚠️ 此订单号已使用，请勿重复提交！");
+    return;
+  }
+  localStorage.setItem("lastOrderNumber", orderNumber);
+
+
+  // ✅ 验证通过后关闭弹窗
+  document.getElementById("confirmModal").style.display = "none";
+  localStorage.setItem("pdfPaid", "true");
+
+  // 显示下载按钮并跳转
+  const btn = document.getElementById('unlockButton');
+  btn.innerHTML = '<span>✅</span> 已支付，下载行程PDF';
+  const downloadBtn = document.getElementById('pdfButton');
+  
+downloadBtn.style.display = 'inline-block';
+
+  document.getElementById("paywall").style.display = "none";
+  document.getElementById("paywall").scrollIntoView({ behavior: "smooth" });
+}
+  </script>
+
+<script>
+   // PDF下载函数，增加单次付费判断
+function doDownloadPDF() {
+  const paid = localStorage.getItem("pdfPaid") === "true";
+
+  if (paid) {
+    return exportPDF();
+  }
+
+  showPayment();
+  document.getElementById("paywall").scrollIntoView({ behavior: "smooth" });
+  return;
+}
+
+// PDF下载函数
+
+function exportPDF() {
+  trackPDFDownload();
+  const element = document.getElementById("pdf-content");
+
+  // 自动从行程标题中提取PDF文件名
+  let firstHeading = element.querySelector("h3,h2,h1");
+  let filename = "旅行行程.pdf";
+
+  if (firstHeading && firstHeading.innerText) {
+    const cleaned = firstHeading.innerText.replace(/[^\u4e00-\u9fa5\w]+/g, "").slice(0, 30);
+    if (cleaned) {
+      filename = `${cleaned}.pdf`;
+    }
+  }
+
+  const opt = {
+    margin: 0.5,
+    filename: filename,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+    jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
+  };
+  html2pdf().set(opt).from(element).save();
+}
+
+
+  </script>
+
+<script>
+// 页面加载时控制按钮显示逻辑
+window.onload = function () {
+  // 页面加载时初始化生成状态为 false
+  try {
+  localStorage.setItem("hasGenerated", "false");
+  localStorage.setItem("pdfPaid", "false");
+  } catch (e) {
+  console.warn("localStorage 不可用", e);
+  }
+}
+ 
+</script>
+
+<script>
+/**
+ * 根据用户当前状态判断是否显示下载PDF按钮和支付提示
+ * - 仅在已生成行程（localStorage.hasGenerated）时才考虑显示PDF按钮
+ */
+
+function updateButtonDisplayAfterGenerate() {
+  const hasGenerated = localStorage.getItem("hasGenerated") === "true";
+  const pdfButton = document.getElementById("pdfButton");
+  const payHint = document.getElementById("payHint");
+
+  if (hasGenerated) {
+    pdfButton.style.display = "inline-block";
+    payHint.style.display = "block";
+  } else {
+    pdfButton.style.display = "none";
+    payHint.style.display = "none";
+  }
+}
+  </script>
+<script>
+   function showQRPopup() {
+  document.getElementById('qrPopup').style.display = 'flex';
+}
+  </script>
+
+
+
+</head>
+<body>
+<div class="container">
+<h2 style="margin-top: 10px;">
+    ✈️ AI旅行助手(MVP)
+</h2>
+<div class="quick-input-hint" style="background:#e3f2fd; padding:16px 20px; border-radius:12px; margin-bottom:20px; font-size:16px; line-height:1.7;">
+🧳 1分钟一键搞定行程安排！🚀<br/>
+📝 输出行程PDF文件，可保存可分享👍<br/>
+💡 节省做攻略的时间，出行前轻松搞定👌<br/>
+💰 免费生成行程，下载PDF支付9.9元🎁
+</div>
+<textarea id="inputText" placeholder="请输入您的旅行需求，例如：
+东京到大阪6天自由行，3人，4月1日到6日，以美食和文化体验为主，预算每人1万人民币" rows="5"></textarea>
+<button id="generateBtn" onclick="generate()">
+    🗺️ AI生成旅游行程
+   </button>
+<div class="output" id="pdf-content">
+<div id="output">
+<p>
+<strong>
+       这里将显示生成的行程内容...
+      </strong>
+</p>
+</div>
+</div>
+<div style="text-align: center;">
+<button id="pdfButton" onclick="doDownloadPDF()" style="display: none;">
+<img src="./pdf_icon.png" style="height:38px; vertical-align:middle; margin-right:8px;"/>
+     下载行程PDF文件
+    </button>
+<!-- 自定义支付确认弹窗 -->
+<div id="confirmModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); z-index:9999; justify-content:center; align-items:center;">
+<div style="background:white; padding:24px 20px; border-radius:12px; text-align:center; width:90%; max-width:380px; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+<p style="font-size:18px; font-weight:bold; margin-bottom:20px;">
+       💰 您是否已支付？
+      </p>
+<p>
+       📋 请打开微信账单详情页面，复制转账单号，粘贴到下方输入框中
+      </p>
+<div style="display: flex; justify-content:space-around;">
+<button onclick="onConfirmPay(true)" style="flex:1; background:#4CAF50; color:white; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">
+        ✅ 已支付
+       </button>
+<button onclick="onConfirmPay(false)" style="flex:1; background:#e0e0e0; color:black; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">
+        ❌ 未支付
+       </button>
+</div>
+<input autocomplete="off" id="orderNumberInput" maxlength="32" placeholder="请复制微信支付的转账单号（32位数字）" style="width:90%; padding:10px; font-size:16px; margin-top:12px;"/>
+<p id="orderError" style="color:red; font-size:14px; display:none;">
+       转账单号不正确，请确实支付。
+      </p>
+</div>
+</div>
+</div>
+<div class="pay-hint" id="payHint" style="display:none; text-align:center; margin-top:20px;">
+<p>
+<strong>
+      请点击下方按钮，支付后可下载本次PDF（¥9.9元）：
+     </strong>
+</p>
+<button onclick="showPayment()" style="background-color:#ffa726;">
+     微信支付（¥9.9元）
+    </button>
+</div>
+<div class="paywall" id="paywall" style="display: none;">
+<p style="font-size:16px; font-weight:bold; margin-bottom:10px;">
+     📱 请长按保存或扫码，用微信完成支付
+    </p>
+<img onclick="showQRPopup()" src="./wechat_qr.png" style="max-width: 220px; margin: 12px auto; display: block; border: 1px solid #ccc; border-radius: 8px; cursor: pointer;cursor:pointer;"/>
+<button id="unlockButton" onclick="unlockPDF()">
+<span>
+      ☐
+     </span>
+     确认已支付
+    </button>
+</div>
+</div>
+<div id="qrPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center;">
+<div style="background:white; padding:20px; border-radius:12px; text-align:center; max-width:360px; box-shadow:0 4px 10px rgba(0,0,0,0.3);">
+<p>
+     📷 长按图片保存二维码，用微信扫码完成支付
+    </p>
+<img src="./wechat_qr.png" style="width:100%; border-radius:10px; margin-top:10px;"/>
+<button onclick="document.getElementById('qrPopup').style.display='none'" style="margin-top:12px; padding:8px 16px; font-size:14px; border:none; background:#4CAF50; color:white; border-radius:6px;">
+     关闭
+    </button>
+</div>
+</div>
+
+<footer class="page-footer">
+   © 2026 MYG. All rights reserved. 
+</footer>
+
+
+<script>
+let carPosition = 0;
+let direction = 1;
+let maxSteps = 8;
+let intervalId;
+
+function updateRoadTrack() {
+  const car = document.getElementById("roadTrack");
+  if (!car) return;
+  carPosition += direction;
+  if (carPosition >= maxSteps || carPosition <= 0) {
+    direction *= -1;
+  }
+  const dots = ".".repeat(carPosition);  // 更细的中点字符
+  const emoji = "🚗";  // 可替换为其他emoji
+  car.innerHTML = dots + emoji;
+}
+
+const observer = new MutationObserver(() => {
+  const car = document.getElementById("roadTrack");
+  if (car && !intervalId) {
+    intervalId = setInterval(updateRoadTrack, 200);
+  }
+});
+observer.observe(document.body, { childList: true, subtree: true });
+</script>
 </body>
 </html>
