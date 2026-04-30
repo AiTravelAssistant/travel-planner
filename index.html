@@ -203,23 +203,23 @@ th, td {
 	}
 
 	table th:nth-child(2), table td:nth-child(2) {
-	  width: 28%;
+	  width: 30%;
 	  min-width: 160px;
 	}
 
 	table th:nth-child(3), table td:nth-child(3) {
+	  width: 28%;
+	  min-width: 160px;
+	}
+
+	table th:nth-child(4), table td:nth-child(4) {
 	  width: 18%;
 	  min-width: 100px;
 	}
 
-	table th:nth-child(4), table td:nth-child(4) {
-	  width: 14%;
-	  min-width: 60px;
-	}
-
 	table th:nth-child(5), table td:nth-child(5) {
-	  width: 30%;
-	  min-width: 160px;
+	  width: 14%;
+	  min-width: 100px;
 	  word-break: break-word;
 	}
 }
@@ -256,17 +256,17 @@ th, td {
   }
 
   th:nth-child(1), td:nth-child(1) {
-    width: 15%;
+    width: 10%;
     min-width: 64px;
   }
 
   th:nth-child(2), td:nth-child(2) {
-    width: 35%;
-    min-width: 130px;
+    width: 25%;
+    min-width: 100px;
   }
 
   th:nth-child(3), td:nth-child(3) {
-    width: 20%;
+    width: 25%;
     min-width: 100px;
   }
 
@@ -276,8 +276,8 @@ th, td {
   }
 
   th:nth-child(5), td:nth-child(5) {
-    width: 10%;
-    min-width: 60px;
+    width: 20%;
+    min-width: 50px;
   }
 
 textarea {
@@ -469,7 +469,7 @@ function onConfirmPay(paid) {
     alert("⚠️ 请输入或复制微信支付的转账单号");
     return;
   }
-  const regex = /^1000107301\d{8}\d{14}$/;
+  const regex = /^\d{10}(20\d{2}(0[1-9]|1[0-2])([0-2]\d|3[01]))\d*$/;
   
   if (!regex.test(orderNumber)) {
     document.getElementById("orderError").style.display = "block";
