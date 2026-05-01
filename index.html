@@ -322,6 +322,92 @@ textarea {
 }
 
 
+
+/* ===== 表格显示优化：PC / 手机 / PDF 共用 ===== */
+.output table {
+  width: 100%;
+  max-width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  word-break: break-word;
+}
+.output th, .output td {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  vertical-align: top;
+  box-sizing: border-box;
+}
+
+/* PC端：整体宽度稍微放大，5列表格更自然 */
+@media (min-width: 769px) {
+  .container {
+    max-width: 980px;
+  }
+  .output table {
+    font-size: 15px;
+  }
+  .output th, .output td {
+    padding: 8px 10px;
+  }
+  .output th:nth-child(1), .output td:nth-child(1) { width: 15%; }
+  .output th:nth-child(2), .output td:nth-child(2) { width: 24%; }
+  .output th:nth-child(3), .output td:nth-child(3) { width: 24%; }
+  .output th:nth-child(4), .output td:nth-child(4) { width: 20%; }
+  .output th:nth-child(5), .output td:nth-child(5) { width: 17%; }
+}
+
+/* 手机端：保留横向滑动，但减少最小宽度，尽量完整显示 */
+@media (max-width: 768px) {
+  .output {
+    overflow-x: auto;
+    padding: 14px;
+  }
+  .output table {
+    min-width: 680px;
+    font-size: 13px;
+  }
+  .output th, .output td {
+    padding: 6px 5px;
+  }
+  .output th:nth-child(1), .output td:nth-child(1) { width: 15%; }
+  .output th:nth-child(2), .output td:nth-child(2) { width: 24%; }
+  .output th:nth-child(3), .output td:nth-child(3) { width: 24%; }
+  .output th:nth-child(4), .output td:nth-child(4) { width: 20%; }
+  .output th:nth-child(5), .output td:nth-child(5) { width: 17%; }
+}
+
+/* PDF导出时临时使用：缩小字号、减少留白、固定列宽 */
+.pdf-export {
+  padding: 14px !important;
+  font-size: 14px !important;
+  line-height: 1.45 !important;
+  box-shadow: none !important;
+}
+.pdf-export h1, .pdf-export h2 {
+  font-size: 24px !important;
+  text-align: center;
+}
+.pdf-export table {
+  width: 100% !important;
+  max-width: 100% !important;
+  table-layout: fixed !important;
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+}
+.pdf-export th, .pdf-export td {
+  padding: 5px 4px !important;
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+  white-space: normal !important;
+  vertical-align: top !important;
+}
+.pdf-export th:nth-child(1), .pdf-export td:nth-child(1) { width: 15% !important; }
+.pdf-export th:nth-child(2), .pdf-export td:nth-child(2) { width: 24% !important; }
+.pdf-export th:nth-child(3), .pdf-export td:nth-child(3) { width: 24% !important; }
+.pdf-export th:nth-child(4), .pdf-export td:nth-child(4) { width: 20% !important; }
+.pdf-export th:nth-child(5), .pdf-export td:nth-child(5) { width: 17% !important; }
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
@@ -519,6 +605,7 @@ function doDownloadPDF() {
 function exportPDF() {
   trackPDFDownload();
   const element = document.getElementById("pdf-content");
+  element.classList.add("pdf-export");
 
   // ✅ 使用用户输入作为PDF文件名
   let userInput = document.getElementById("inputText").value.trim();
@@ -535,10 +622,12 @@ function exportPDF() {
     margin: 0.5,
     filename: filename,
     image: { type: "jpeg", quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+    html2canvas: { scale: 2, useCORS: true, scrollY: 0, windowWidth: element.scrollWidth },
     jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
   };
-  html2pdf().set(opt).from(element).save();
+  html2pdf().set(opt).from(element).save().then(() => {
+    element.classList.remove("pdf-export");
+  });
 }
 
 
