@@ -54,6 +54,7 @@ table {
   border-collapse: collapse;
   margin-top: 14px;
   font-size: 16px;
+  table-layout: fixed;
 }
 th, td {
   border: 1px solid #ddd;
@@ -178,6 +179,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   word-break: break-word;
+  table-layout: fixed;
 }
 th, td {
   word-break: break-word;
@@ -189,41 +191,21 @@ th, td {
 /* PC端表格样式 */
 @media (min-width: 769px) {
   table {
-    table-layout: auto;
+    table-layout: fixed;
   }
-  
 
   th, td {
-    padding: 10px;
-    font-size: 16px;
+    padding: 8px;
+    font-size: 15px;
+    overflow-wrap: anywhere;
   }
-  
-	table th:nth-child(1), table td:nth-child(1) {
-	  width: 15%;
-	  min-width: 80px;
-	}
 
-	table th:nth-child(2), table td:nth-child(2) {
-	  width: 25%;
-	  min-width: 160px;
-	}
-
-	table th:nth-child(3), table td:nth-child(3) {
-	  width: 25%;
-	  min-width: 160px;
-	}
-
-	table th:nth-child(4), table td:nth-child(4) {
-	  width: 20%;
-	  min-width: 100px;
-	}
-
-	table th:nth-child(5), table td:nth-child(5) {
-	  width: 17%;
-	  max-width: 140px;
-	  min-width: 80px;
-	  word-break: break-word;
-	}
+  table th:nth-child(1), table td:nth-child(1) { width: 14%; }
+  table th:nth-child(2), table td:nth-child(2) { width: 18%; }
+  table th:nth-child(3), table td:nth-child(3) { width: 18%; }
+  table th:nth-child(4), table td:nth-child(4) { width: 18%; }
+  table th:nth-child(5), table td:nth-child(5) { width: 16%; }
+  table th:nth-child(6), table td:nth-child(6) { width: 16%; }
 }
 
 /* 移动端样式 */
@@ -257,30 +239,12 @@ th, td {
     vertical-align: top;
   }
 
-  th:nth-child(1), td:nth-child(1) {
-    width: 15%;
-    min-width: 80px;
-  }
-
-  th:nth-child(2), td:nth-child(2) {
-    width: 25%;
-    min-width: 100px;
-  }
-
-  th:nth-child(3), td:nth-child(3) {
-    width: 25%;
-    min-width: 100px;
-  }
-
-  th:nth-child(4), td:nth-child(4) {
-    width: 20%;
-    min-width: 100px;
-  }
-
-  th:nth-child(5), td:nth-child(5) {
-    width: 15%;
-    min-width: 80px;
-  }
+  th:nth-child(1), td:nth-child(1) { width: 14%; }
+  th:nth-child(2), td:nth-child(2) { width: 18%; }
+  th:nth-child(3), td:nth-child(3) { width: 18%; }
+  th:nth-child(4), td:nth-child(4) { width: 18%; }
+  th:nth-child(5), td:nth-child(5) { width: 16%; }
+  th:nth-child(6), td:nth-child(6) { width: 16%; }
 
 textarea {
     font-size: 20px;
@@ -325,13 +289,22 @@ textarea {
 
 
 
+/* PDF导出专用：兼容5列/6列表格 */
 .pdf-export table {
   table-layout: fixed !important;
-  font-size: 12px !important;
+  width: 100% !important;
+  font-size: 11px !important;
 }
-.pdf-export th, .pdf-export td {
-  padding: 6px !important;
+
+.pdf-export th,
+.pdf-export td {
+  padding: 5px !important;
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+  white-space: normal !important;
+  vertical-align: top !important;
 }
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
@@ -550,8 +523,8 @@ function exportPDF() {
     jsPDF: { unit: "in", format: "a4", orientation: "landscape" }
   };
   html2pdf().set(opt).from(element).save().then(() => {
-  element.classList.remove("pdf-export");
-});
+    element.classList.remove("pdf-export");
+  });
 }
 
 
