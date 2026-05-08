@@ -426,26 +426,31 @@ function sendFeedback(type) {
   if (thanks) thanks.style.display = 'none';
 }
 
+const TENCENT_SURVEY_URL = 'https://wj.qq.com/s2/26593191/2c8e/';
+
 function submitFeedbackComment() {
   const type = localStorage.getItem('lastFeedbackType') || 'unknown';
   const comment = (document.getElementById('feedbackComment')?.value || '').trim();
 
-  // 当前版本不连接数据库：满意度通过百度统计记录，文字建议暂存在用户本机，后续可改为提交到腾讯问卷/后端接口。
-  const feedbackList = JSON.parse(localStorage.getItem('feedbackList') || '[]');
-  feedbackList.push({
-    type: type,
-    comment: comment,
-    time: new Date().toISOString()
-  });
-  localStorage.setItem('feedbackList', JSON.stringify(feedbackList));
+  // 满意度和是否填写文字建议通过百度统计记录；详细文字建议请到腾讯问卷中提交。
+  trackEvent('feedback', 'submit', comment ? type + '_open_survey_with_comment' : type + '_open_survey_no_comment');
 
-  trackEvent('feedback', 'submit', comment ? type + '_with_comment' : type + '_no_comment');
+  // 为了避免丢失用户刚输入的内容，先复制到剪贴板，方便用户粘贴到腾讯问卷。
+  if (comment && navigator.clipboard) {
+    navigator.clipboard.writeText(comment).catch(function(e) {
+      console.warn('反馈内容复制失败', e);
+    });
+  }
 
   const thanks = document.getElementById('feedbackThanks');
   if (thanks) {
     thanks.style.display = 'block';
-    thanks.innerText = '✅ 感谢反馈！你的满意度已记录。';
+    thanks.innerText = comment
+      ? '✅ 感谢反馈！已打开腾讯问卷，刚才填写的建议已尝试复制，可直接粘贴。'
+      : '✅ 感谢反馈！请在腾讯问卷中填写具体建议。';
   }
+
+  window.open(TENCENT_SURVEY_URL, '_blank');
 }
 </script>
 
@@ -757,14 +762,15 @@ function updateButtonDisplayAfterGenerate() {
 </div>
 <div class="feedback-box" id="feedbackBox">
   <p>这个行程对你有帮助吗？</p>
+  <p style="font-size:14px; font-weight:normal; color:#666; margin-top:-6px;">🙏 你的建议会直接帮助这个AI旅行助手继续改进</p>
   <div class="feedback-buttons">
     <button type="button" onclick="sendFeedback('good')">👍 有帮助</button>
     <button type="button" onclick="sendFeedback('normal')">😐 一般</button>
     <button type="button" onclick="sendFeedback('bad')">👎 不满意</button>
   </div>
   <div id="feedbackCommentBox">
-    <textarea id="feedbackComment" placeholder="可选：哪里需要改进？例如：酒店不合适、交通太复杂、行程太赶、预算不准确等"></textarea>
-    <button id="feedbackSubmitBtn" type="button" onclick="submitFeedbackComment()">提交反馈</button>
+    <textarea id="feedbackComment" placeholder="可选：先写下建议，点击后会打开腾讯问卷；例如：酒店不合适、交通太复杂、行程太赶、预算不准确等"></textarea>
+    <button id="feedbackSubmitBtn" type="button" onclick="submitFeedbackComment()">提交到腾讯问卷</button>
   </div>
   <p id="feedbackThanks"></p>
 </div>
