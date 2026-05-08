@@ -7,6 +7,17 @@
 <title>
    AI旅行助手(MVP)
   </title>
+<!-- 百度统计 -->
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?d227d7adabbefe411e9e9d4620a61216";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
 <style>
    body {
   font-family: "Microsoft YaHei", sans-serif;
@@ -306,13 +317,141 @@ textarea {
   vertical-align: top !important;
 }
 
+
+
+/* 用户反馈区 */
+.feedback-box {
+  display: none;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 18px 16px;
+  margin-top: 22px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.feedback-box p {
+  margin: 8px 0 14px;
+  font-size: 17px;
+  font-weight: bold;
+}
+.feedback-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.feedback-buttons button {
+  width: auto;
+  min-width: 96px;
+  margin: 6px;
+  padding: 10px 14px;
+  font-size: 16px;
+  background: #f5f5f5;
+  color: #333;
+  box-shadow: none;
+  border: 1px solid #ddd;
+}
+.feedback-buttons button:hover {
+  background: #e3f2fd;
+}
+#feedbackCommentBox {
+  display: none;
+  margin-top: 14px;
+}
+#feedbackComment {
+  width: 100%;
+  height: 86px;
+  font-size: 15px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+#feedbackSubmitBtn {
+  width: auto;
+  font-size: 15px;
+  padding: 10px 18px;
+  margin-top: 10px;
+  background: #2196F3;
+}
+#feedbackThanks {
+  display: none;
+  color: #4CAF50;
+  font-size: 15px;
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .feedback-buttons button {
+    width: 30%;
+    min-width: 90px;
+    font-size: 15px;
+    padding: 10px 6px;
+  }
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
 </script>
 
+
+
+<script>
+// 百度统计事件埋点：用于观察真实用户行为
+function trackEvent(category, action, label, value) {
+  try {
+    if (window._hmt) {
+      window._hmt.push(['_trackEvent', category, action, label || '', value || 0]);
+    }
+  } catch (e) {
+    console.warn('百度统计事件发送失败', e);
+  }
+}
+
+function showFeedbackBox() {
+  const feedbackBox = document.getElementById('feedbackBox');
+  if (feedbackBox) {
+    feedbackBox.style.display = 'block';
+  }
+}
+
+function sendFeedback(type) {
+  localStorage.setItem('lastFeedbackType', type);
+  trackEvent('feedback', 'click', type);
+
+  const commentBox = document.getElementById('feedbackCommentBox');
+  const thanks = document.getElementById('feedbackThanks');
+  if (commentBox) commentBox.style.display = 'block';
+  if (thanks) thanks.style.display = 'none';
+}
+
+function submitFeedbackComment() {
+  const type = localStorage.getItem('lastFeedbackType') || 'unknown';
+  const comment = (document.getElementById('feedbackComment')?.value || '').trim();
+
+  // 当前版本不连接数据库：满意度通过百度统计记录，文字建议暂存在用户本机，后续可改为提交到腾讯问卷/后端接口。
+  const feedbackList = JSON.parse(localStorage.getItem('feedbackList') || '[]');
+  feedbackList.push({
+    type: type,
+    comment: comment,
+    time: new Date().toISOString()
+  });
+  localStorage.setItem('feedbackList', JSON.stringify(feedbackList));
+
+  trackEvent('feedback', 'submit', comment ? type + '_with_comment' : type + '_no_comment');
+
+  const thanks = document.getElementById('feedbackThanks');
+  if (thanks) {
+    thanks.style.display = 'block';
+    thanks.innerText = '✅ 感谢反馈！你的满意度已记录。';
+  }
+}
+</script>
+
 <script>
    function trackPDFDownload() {
+  trackEvent('button', 'click', 'download_pdf_success');
   let downloadCount = parseInt(localStorage.getItem("downloadCount") || "0");
   downloadCount++;
   localStorage.setItem("downloadCount", downloadCount);
@@ -328,8 +467,11 @@ async function generate() {
   
   if (!userInput) {
     alert("⚠️ 请输入您的旅行需求");
+    trackEvent('generate', 'error', 'empty_input');
     return;
   }
+
+  trackEvent('button', 'click', 'generate_trip');
 
   const output = document.getElementById('output');
   const paywall = document.getElementById('paywall');
@@ -341,6 +483,8 @@ async function generate() {
   paywall.style.display = 'none';
   pdfButton.style.display = 'none';
   payHint.style.display = 'none';
+  const feedbackBox = document.getElementById('feedbackBox');
+  if (feedbackBox) feedbackBox.style.display = 'none';
   localStorage.setItem("pdfPaid", "false");
   generateBtn.disabled = true;
   generateBtn.innerText = "📝️ AI生成中…";
@@ -400,15 +544,19 @@ const data = await response.json();
       }
 
       output.innerHTML = outputHTML;
+      trackEvent('generate', 'success', 'trip_plan');
+      showFeedbackBox();
 	
       document.getElementById("pdf-content").scrollIntoView({ behavior: "smooth" });
 
     } else {
       output.innerText = "⚠️ AI未返回有效内容，请稍后再试。";
+      trackEvent('generate', 'error', 'empty_ai_response');
     }
   } catch (error) {
     console.error("Error:", error);
     output.innerText = "❌ AI请求出错，请检查网络连接或请勿息屏，重新点击生成行程。";
+    trackEvent('generate', 'error', 'request_failed');
     localStorage.setItem("hasGenerated", "false");
   localStorage.setItem("pdfPaid", "false");
   } finally {
@@ -422,6 +570,7 @@ const data = await response.json();
 
 <script>
    function showPayment() {
+  trackEvent('payment', 'show', 'wechat_qr');
   const paywall = document.getElementById('paywall');
   const payHint = document.getElementById('payHint');
 
@@ -433,6 +582,7 @@ const data = await response.json();
 
 <script>
    function unlockPDF() {
+  trackEvent('payment', 'click', 'confirm_paid');
   document.getElementById("orderNumberInput").value = "";  // 清除订单号输入框
   document.getElementById("confirmModal").style.display = "flex";
 }
@@ -452,18 +602,21 @@ function onConfirmPay(paid) {
   const orderNumber = document.getElementById("orderNumberInput").value.trim();
   if (!orderNumber) {
     alert("⚠️ 请输入或复制微信支付的转账单号");
+    trackEvent('payment', 'error', 'empty_order_number');
     return;
   }
   const regex = /^\d{10}(20\d{2}(0[1-9]|1[0-2])([0-2]\d|3[01]))\d*$/;
   
   if (!regex.test(orderNumber)) {
     document.getElementById("orderError").style.display = "block";
+    trackEvent('payment', 'error', 'invalid_order_number');
     return; // ❗ 停留在弹窗，不关闭
   }
 
   const lastOrder = localStorage.getItem("lastOrderNumber");
   if (orderNumber === lastOrder && lastOrder) {
     alert("⚠️ 此订单号已使用，请勿重复提交！");
+    trackEvent('payment', 'error', 'duplicate_order_number');
     return;
   }
   localStorage.setItem("lastOrderNumber", orderNumber);
@@ -472,6 +625,7 @@ function onConfirmPay(paid) {
   // ✅ 验证通过后关闭弹窗
   document.getElementById("confirmModal").style.display = "none";
   localStorage.setItem("pdfPaid", "true");
+  trackEvent('payment', 'success', 'order_verified');
 
   // 显示下载按钮并跳转
   const btn = document.getElementById('unlockButton');
@@ -488,6 +642,7 @@ downloadBtn.style.display = 'inline-block';
 <script>
    // PDF下载函数，增加单次付费判断
 function doDownloadPDF() {
+  trackEvent('button', 'click', 'download_pdf');
   const paid = localStorage.getItem("pdfPaid") === "true";
 
   if (paid) {
@@ -600,6 +755,20 @@ function updateButtonDisplayAfterGenerate() {
 </p>
 </div>
 </div>
+<div class="feedback-box" id="feedbackBox">
+  <p>这个行程对你有帮助吗？</p>
+  <div class="feedback-buttons">
+    <button type="button" onclick="sendFeedback('good')">👍 有帮助</button>
+    <button type="button" onclick="sendFeedback('normal')">😐 一般</button>
+    <button type="button" onclick="sendFeedback('bad')">👎 不满意</button>
+  </div>
+  <div id="feedbackCommentBox">
+    <textarea id="feedbackComment" placeholder="可选：哪里需要改进？例如：酒店不合适、交通太复杂、行程太赶、预算不准确等"></textarea>
+    <button id="feedbackSubmitBtn" type="button" onclick="submitFeedbackComment()">提交反馈</button>
+  </div>
+  <p id="feedbackThanks"></p>
+</div>
+
 <div style="text-align: center;">
 <button id="pdfButton" onclick="doDownloadPDF()" style="display: none;">
 <img src="./pdf_icon.png" style="height:38px; vertical-align:middle; margin-right:8px;"/>
