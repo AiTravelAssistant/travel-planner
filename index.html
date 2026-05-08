@@ -318,58 +318,6 @@ textarea {
 }
 
 
-
-/* 用户反馈区 */
-.feedback-box {
-  display: none;
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 18px 16px;
-  margin-top: 22px;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-.feedback-box p {
-  margin: 8px 0 14px;
-  font-size: 17px;
-  font-weight: bold;
-}
-.feedback-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.feedback-buttons button {
-  width: auto;
-  min-width: 96px;
-  margin: 6px;
-  padding: 10px 14px;
-  font-size: 16px;
-  background: #f5f5f5;
-  color: #333;
-  box-shadow: none;
-  border: 1px solid #ddd;
-}
-.feedback-buttons button:hover {
-  background: #e3f2fd;
-}
-#feedbackThanks {
-  display: none;
-  color: #4CAF50;
-  font-size: 15px;
-  margin-top: 10px;
-}
-
-@media (max-width: 768px) {
-  .feedback-buttons button {
-    width: 30%;
-    min-width: 90px;
-    font-size: 15px;
-    padding: 10px 6px;
-  }
-}
-
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
@@ -389,29 +337,10 @@ function trackEvent(category, action, label, value) {
   }
 }
 
-function showFeedbackBox() {
-  const feedbackBox = document.getElementById('feedbackBox');
-  if (feedbackBox) {
-    feedbackBox.style.display = 'block';
-  }
-}
-
-function sendFeedback(type) {
-  localStorage.setItem('lastFeedbackType', type);
-  trackEvent('feedback', 'click', type);
-
-  const thanks = document.getElementById('feedbackThanks');
-  if (thanks) {
-    thanks.style.display = 'block';
-    thanks.innerText = '✅ 感谢反馈！如愿意留下具体建议，请点击页面底部的“用户反馈”。';
-  }
-}
-
 const TENCENT_SURVEY_URL = 'https://wj.qq.com/s2/26593191/2c8e/';
 
 function openTencentSurvey() {
-  const type = localStorage.getItem('lastFeedbackType') || 'unknown';
-  trackEvent('feedback', 'open', 'tencent_survey_' + type);
+  trackEvent('feedback', 'open', 'tencent_survey_footer');
   window.open(TENCENT_SURVEY_URL, '_blank');
 }
 </script>
@@ -450,8 +379,6 @@ async function generate() {
   paywall.style.display = 'none';
   pdfButton.style.display = 'none';
   payHint.style.display = 'none';
-  const feedbackBox = document.getElementById('feedbackBox');
-  if (feedbackBox) feedbackBox.style.display = 'none';
   localStorage.setItem("pdfPaid", "false");
   generateBtn.disabled = true;
   generateBtn.innerText = "📝️ AI生成中…";
@@ -512,7 +439,6 @@ const data = await response.json();
 
       output.innerHTML = outputHTML;
       trackEvent('generate', 'success', 'trip_plan');
-      showFeedbackBox();
 	
       document.getElementById("pdf-content").scrollIntoView({ behavior: "smooth" });
 
@@ -722,16 +648,7 @@ function updateButtonDisplayAfterGenerate() {
 </p>
 </div>
 </div>
-<div class="feedback-box" id="feedbackBox">
-  <p>这个行程对你有帮助吗？</p>
-  <p style="font-size:14px; font-weight:normal; color:#666; margin-top:-6px;">🙏 点击下方按钮可以快速反馈满意度；详细建议请点页面底部“用户反馈”。</p>
-  <div class="feedback-buttons">
-    <button type="button" onclick="sendFeedback('good')">👍 有帮助</button>
-    <button type="button" onclick="sendFeedback('normal')">😐 一般</button>
-    <button type="button" onclick="sendFeedback('bad')">👎 不满意</button>
-  </div>
-  <p id="feedbackThanks"></p>
-</div>
+
 
 <div style="text-align: center;">
 <button id="pdfButton" onclick="doDownloadPDF()" style="display: none;">
