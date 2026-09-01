@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'task**'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate JavaScript syntax
+        run: |
+          node --check api/deepseek.js
+
+      - name: Check for exposed DeepSeek API key
+        run: |
+          if grep -RInE 'sk-[A-Za-z0-9_-]{20,}' --exclude-dir=.git --exclude-dir=node_modules .; then
+            echo 'Potential DeepSeek API key found in repository.'
+            exit 1
+          fi
+          echo 'No obvious DeepSeek API key pattern found.'
+
+      - name: Verify required proxy file
+        run: test -f api/deepseek.js
