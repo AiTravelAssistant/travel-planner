@@ -146,3 +146,13 @@ index.html
 ## 🧠 总结
 
 用 AI 替代“做攻略 + 安排行程”，并逐步实现自动预订。
+
+---
+
+## 🧪 Workflow Experiment 01
+
+本实验用于验证 AI MVP 的自动化开发流程：
+
+**需求 → 分支 → 修改 → Commit → PR → CI → Review**
+
+实验原则：只修改 README，不涉及业务逻辑，不影响 Production。
