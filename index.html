@@ -243,6 +243,16 @@ th, td {
     width: 100%;
     font-size: 16px;
   }
+  .my-trip-delete {
+    width: 48px;
+    min-width: 48px;
+    font-size: 20px;
+    padding: 10px;
+  }
+  .my-trips-clear {
+    width: 100%;
+    font-size: 16px;
+  }
 }
 
 .loading-road {
@@ -309,9 +319,16 @@ th, td {
   padding: 0;
   list-style: none;
 }
+.my-trip-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 8px;
+}
 .my-trip-item {
-  width: 100%;
-  margin: 8px 0 0;
+  flex: 1;
+  width: auto;
+  margin: 0;
   padding: 12px 14px;
   display: block;
   text-align: left;
@@ -328,6 +345,31 @@ th, td {
   margin-top: 4px;
   font-size: 13px;
   color: #777;
+}
+.my-trip-delete {
+  width: 48px;
+  min-width: 48px;
+  margin: 0;
+  padding: 10px;
+  background-color: #fff3f3;
+  color: #c62828;
+  font-size: 18px;
+  box-shadow: none;
+}
+.my-trip-delete:hover {
+  background-color: #ffebee;
+}
+.my-trips-clear {
+  width: auto;
+  margin: 16px 0 0;
+  padding: 10px 14px;
+  background-color: #f5f5f5;
+  color: #c62828;
+  font-size: 15px;
+  box-shadow: none;
+}
+.my-trips-clear:hover {
+  background-color: #eeeeee;
 }
 </style>
 
@@ -429,6 +471,27 @@ function saveTripToHistory(userInput, outputHTML) {
   return trip;
 }
 
+function deleteTripFromHistory(id) {
+  const trip = getMyTrips().find(item => item.id === id);
+  if (!trip) return;
+
+  if (!window.confirm(`确定删除“${trip.title}”吗？`)) return;
+
+  const remainingTrips = getMyTrips().filter(item => item.id !== id);
+  localStorage.setItem(MY_TRIPS_STORAGE_KEY, JSON.stringify(remainingTrips));
+  renderMyTrips();
+  trackEvent('my_trips', 'delete', 'single_trip');
+}
+
+function clearAllTrips() {
+  if (getMyTrips().length === 0) return;
+  if (!window.confirm("确定清空全部旅行吗？此操作无法撤销。")) return;
+
+  localStorage.removeItem(MY_TRIPS_STORAGE_KEY);
+  renderMyTrips();
+  trackEvent('my_trips', 'delete', 'all_trips');
+}
+
 function renderMyTrips() {
   const container = document.getElementById("myTripsContent");
   if (!container) return;
@@ -449,24 +512,42 @@ function renderMyTrips() {
 
   trips.forEach(trip => {
     const item = document.createElement("li");
+    const row = document.createElement("div");
     const button = document.createElement("button");
+    const deleteButton = document.createElement("button");
     const title = document.createElement("strong");
     const date = document.createElement("span");
+
+    row.className = "my-trip-row";
 
     button.type = "button";
     button.className = "my-trip-item";
     button.addEventListener("click", () => loadTripFromHistory(trip.id));
+
+    deleteButton.type = "button";
+    deleteButton.className = "my-trip-delete";
+    deleteButton.setAttribute("aria-label", `删除 ${trip.title}`);
+    deleteButton.title = "删除这次旅行";
+    deleteButton.textContent = "🗑️";
+    deleteButton.addEventListener("click", () => deleteTripFromHistory(trip.id));
 
     title.textContent = trip.title;
     date.className = "my-trip-date";
     date.textContent = new Date(trip.createdAt).toLocaleString("zh-CN");
 
     button.append(title, date);
-    item.appendChild(button);
+    row.append(button, deleteButton);
+    item.appendChild(row);
     list.appendChild(item);
   });
 
-  container.appendChild(list);
+  const clearButton = document.createElement("button");
+  clearButton.type = "button";
+  clearButton.className = "my-trips-clear";
+  clearButton.textContent = "清空全部旅行";
+  clearButton.addEventListener("click", clearAllTrips);
+
+  container.append(list, clearButton);
 }
 
 function loadTripFromHistory(id) {
