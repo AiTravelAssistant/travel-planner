@@ -349,6 +349,7 @@ function saveItinerary(userInput, outputHTML) {
   return itinerary;
 }
 
+// 保留旧支付状态数据结构，方便未来恢复付费模式。
 function getPaidItineraries() {
   const paidItineraries = safeReadJson(ITINERARY_PAYMENTS_KEY, {});
   if (!paidItineraries || typeof paidItineraries !== "object" || Array.isArray(paidItineraries)) {
@@ -406,15 +407,11 @@ async function generate() {
   trackEvent('button', 'click', 'generate_trip');
 
   const output = document.getElementById('output');
-  const paywall = document.getElementById('paywall');
   const pdfButton = document.getElementById('pdfButton');
   const generateBtn = document.getElementById('generateBtn');
-  const payHint = document.getElementById("payHint");
 
   output.innerHTML = `<div class="loading-road">⏳ AI正在生成行程，请稍等 <span id="roadTrack">🚗</span></div>`;
-  paywall.style.display = 'none';
   pdfButton.style.display = 'none';
-  payHint.style.display = 'none';
   localStorage.removeItem(ITINERARY_STORAGE_KEY);
   localStorage.setItem("hasGenerated", "false");
   localStorage.setItem("pdfPaid", "false");
@@ -498,30 +495,39 @@ ${userInput}
 </script>
 
 <script>
+// 付费模式保留在代码中，当前MVP不调用。
 function showPayment() {
   trackEvent('payment', 'show', 'wechat_qr');
   const paywall = document.getElementById('paywall');
   const payHint = document.getElementById('payHint');
-
+  if (!paywall || !payHint) return;
   payHint.style.display = "none";
   paywall.style.display = "block";
 }
 </script>
 
 <script>
+// 付费模式保留在代码中，当前MVP不调用。
 function unlockPDF() {
   trackEvent('payment', 'click', 'confirm_paid');
+  const modal = document.getElementById("confirmModal");
+  if (!modal) return;
   document.getElementById("orderNumberInput").value = "";
-  document.getElementById("confirmModal").style.display = "flex";
+  modal.style.display = "flex";
 }
 
 function onConfirmPay(paid) {
-  document.getElementById("orderError").style.display = "none";
+  const modal = document.getElementById("confirmModal");
+  const paywall = document.getElementById("paywall");
+  const orderError = document.getElementById("orderError");
+  if (!modal || !paywall || !orderError) return;
+
+  orderError.style.display = "none";
 
   if (!paid) {
-    document.getElementById("confirmModal").style.display = "none";
-    document.getElementById("paywall").style.display = "block";
-    document.getElementById("paywall").scrollIntoView({ behavior: "smooth" });
+    modal.style.display = "none";
+    paywall.style.display = "block";
+    paywall.scrollIntoView({ behavior: "smooth" });
     return;
   }
 
@@ -536,7 +542,7 @@ function onConfirmPay(paid) {
   const regex = /^\d{10}(20\d{2}(0[1-9]|1[0-2])([0-2]\d|3[01]))\d*$/;
 
   if (!regex.test(orderNumber)) {
-    document.getElementById("orderError").style.display = "block";
+    orderError.style.display = "block";
     trackEvent('payment', 'error', 'invalid_order_number');
     return;
   }
@@ -556,34 +562,25 @@ function onConfirmPay(paid) {
   }
 
   localStorage.setItem("lastOrderNumber", orderNumber);
-
-  document.getElementById("confirmModal").style.display = "none";
+  modal.style.display = "none";
   trackEvent('payment', 'success', 'order_verified');
 
   const btn = document.getElementById('unlockButton');
-  btn.innerHTML = '<span>✅</span> 已支付，下载行程PDF';
+  if (btn) btn.innerHTML = '<span>✅</span> 已支付，下载行程PDF';
 
   const downloadBtn = document.getElementById('pdfButton');
   downloadBtn.style.display = 'inline-block';
 
-  document.getElementById("paywall").style.display = "none";
-  document.getElementById("paywall").scrollIntoView({ behavior: "smooth" });
+  paywall.style.display = "none";
+  paywall.scrollIntoView({ behavior: "smooth" });
 }
 </script>
 
 <script>
-// PDF下载函数，增加单次付费判断
+// 当前MVP：PDF免费下载，点击后直接导出，不再经过支付墙。
 function doDownloadPDF() {
   trackEvent('button', 'click', 'download_pdf');
-  const paid = isCurrentItineraryPaid();
-
-  if (paid) {
-    return exportPDF();
-  }
-
-  showPayment();
-  document.getElementById("paywall").scrollIntoView({ behavior: "smooth" });
-  return;
+  return exportPDF();
 }
 
 // PDF下载函数
@@ -630,7 +627,7 @@ function exportPDF() {
 </script>
 
 <script>
-// 页面加载时恢复未过期行程与当前行程支付状态
+// 页面加载时恢复未过期行程；当前MVP恢复后即可直接免费下载PDF。
 window.onload = function () {
   try {
     const itinerary = getStoredItinerary();
@@ -639,7 +636,7 @@ window.onload = function () {
       document.getElementById("output").innerHTML = itinerary.outputHTML;
       document.getElementById("inputText").value = itinerary.input || "";
       localStorage.setItem("hasGenerated", "true");
-      localStorage.setItem("pdfPaid", isCurrentItineraryPaid() ? "true" : "false");
+      localStorage.setItem("pdfPaid", "true");
     } else {
       localStorage.setItem("hasGenerated", "false");
       localStorage.setItem("pdfPaid", "false");
@@ -659,28 +656,26 @@ window.onload = function () {
 
 <script>
 /**
- * 根据用户当前状态判断是否显示下载PDF按钮和支付提示
- * - 仅在已生成行程（localStorage.hasGenerated）时才考虑显示PDF按钮
+ * 当前MVP只根据是否存在已生成行程显示PDF下载按钮。
+ * 不再显示支付提示。
  */
 function updateButtonDisplayAfterGenerate() {
   const hasGenerated = Boolean(getStoredItinerary()) || localStorage.getItem("hasGenerated") === "true";
-  const paid = isCurrentItineraryPaid();
   const pdfButton = document.getElementById("pdfButton");
-  const payHint = document.getElementById("payHint");
 
   if (hasGenerated) {
     pdfButton.style.display = "inline-block";
-    payHint.style.display = paid ? "none" : "block";
   } else {
     pdfButton.style.display = "none";
-    payHint.style.display = "none";
   }
 }
 </script>
 
 <script>
+// 未来恢复付费模式时使用；当前MVP不调用。
 function showQRPopup() {
-  document.getElementById('qrPopup').style.display = 'flex';
+  const popup = document.getElementById('qrPopup');
+  if (popup) popup.style.display = 'flex';
 }
 </script>
 
@@ -697,7 +692,7 @@ function showQRPopup() {
 🧳 1分钟一键搞定行程安排！🚀<br/>
 📝 输出行程PDF文件，可保存可分享👍<br/>
 💡 节省做攻略的时间，出行前轻松搞定👌<br/>
-💰 免费生成行程，下载PDF支付9.9元🎁
+🎁 免费生成行程，PDF免费下载！
 </div>
 
 <textarea id="inputText" placeholder="请输入您的旅行需求，例如： 东京到大阪6天自由行，3人，8月1日到6日，以美食和文化体验为主，预算每人1万人民币" rows="5"></textarea>
@@ -720,60 +715,7 @@ function showQRPopup() {
     下载行程PDF文件
   </button>
 
-  <!-- 自定义支付确认弹窗 -->
-  <div id="confirmModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); z-index:9999; justify-content:center; align-items:center;">
-    <div style="background:white; padding:24px 20px; border-radius:12px; text-align:center; width:90%; max-width:380px; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
-      <p style="font-size:18px; font-weight:bold; margin-bottom:20px;">
-        💰 您是否已支付？
-      </p>
-      <p>
-        📋 请打开微信账单详情页面，复制转账单号，粘贴到下方输入框中
-      </p>
-      <div style="display: flex; justify-content:space-around;">
-        <button onclick="onConfirmPay(true)" style="flex:1; background:#4CAF50; color:white; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">
-          ✅ 已支付
-        </button>
-        <button onclick="onConfirmPay(false)" style="flex:1; background:#e0e0e0; color:black; font-size:16px; padding:10px 0; border:none; border-radius:8px; margin:4px 8px;">
-          ❌ 未支付
-        </button>
-      </div>
-      <input autocomplete="off" id="orderNumberInput" placeholder="请复制微信支付的转账单号" style="width:90%; padding:10px; font-size:16px; margin-top:12px;"/>
-      <p id="orderError" style="color:red; font-size:14px; display:none;">
-        转账单号不正确，请确实支付。
-      </p>
-    </div>
-  </div>
-</div>
-
-<div class="pay-hint" id="payHint" style="display:none; text-align:center; margin-top:20px;">
-  <p>
-    <strong> 请点击下方按钮，支付后可下载本次PDF（¥9.9元）： </strong>
-  </p>
-  <button onclick="showPayment()" style="background-color:#ffa726;">
-    微信支付（¥9.9元）
-  </button>
-</div>
-
-<div class="paywall" id="paywall" style="display: none;">
-  <p style="font-size:16px; font-weight:bold; margin-bottom:10px;">
-    📱 请长按保存或扫码，用微信完成支付
-  </p>
-  <img onclick="showQRPopup()" src="./wechat_qr.png" style="max-width: 220px; margin: 12px auto; display: block; border: 1px solid #ccc; border-radius: 8px; cursor: pointer;cursor:pointer;"/>
-  <button id="unlockButton" onclick="unlockPDF()">
-    <span> ☐ </span> 确认已支付
-  </button>
-</div>
-
-</div>
-
-<div id="qrPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center;">
-  <div style="background:white; padding:20px; border-radius:12px; text-align:center; max-width:360px; box-shadow:0 4px 10px rgba(0,0,0,0.3);">
-    <p>📷 长按图片保存二维码，用微信扫码完成支付</p>
-    <img src="./wechat_qr.png" style="width:100%; border-radius:10px; margin-top:10px;"/>
-    <button onclick="document.getElementById('qrPopup').style.display='none'" style="margin-top:12px; padding:8px 16px; font-size:14px; border:none; background:#4CAF50; color:white; border-radius:6px;">
-      关闭
-    </button>
-  </div>
+  <!-- 付费模式暂时停用；保留在代码逻辑中，当前页面不渲染支付入口。 -->
 </div>
 
 <footer class="page-footer">
