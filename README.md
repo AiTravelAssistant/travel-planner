@@ -156,3 +156,4 @@ index.html
 **需求 → 分支 → 修改 → Commit → PR → CI → Review**
 
 实验原则：只修改 README，不涉及业务逻辑，不影响 Production。
+Mobile Work GitHub write test - 2026-09-03
