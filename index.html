@@ -239,6 +239,10 @@ th, td {
     width: 85%;
     padding: 16px;
   }
+  .my-trip-item {
+    width: 100%;
+    font-size: 16px;
+  }
 }
 
 .loading-road {
@@ -281,6 +285,50 @@ th, td {
   white-space: normal !important;
   vertical-align: top !important;
 }
+
+/* 我的旅行：轻量本地历史卡片 */
+.my-trips {
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.my-trips h3 {
+  margin: 0 0 12px;
+  font-size: 20px;
+  color: #2a2a2a;
+}
+.my-trips-empty {
+  margin: 0;
+  color: #666;
+  line-height: 1.7;
+}
+.my-trips-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.my-trip-item {
+  width: 100%;
+  margin: 8px 0 0;
+  padding: 12px 14px;
+  display: block;
+  text-align: left;
+  font-size: 16px;
+  background-color: #f7fbf7;
+  color: #2a2a2a;
+  box-shadow: none;
+}
+.my-trip-item:hover {
+  background-color: #e8f5e9;
+}
+.my-trip-date {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: #777;
+}
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
@@ -302,6 +350,8 @@ const TENCENT_SURVEY_URL = 'https://wj.qq.com/s2/26593191/2c8e/';
 const ITINERARY_STORAGE_KEY = "currentItinerary";
 const ITINERARY_PAYMENTS_KEY = "paidItineraries";
 const ITINERARY_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const MY_TRIPS_STORAGE_KEY = "myTrips";
+const MY_TRIPS_MAX_COUNT = 20;
 
 function createItineraryId() {
   if (window.crypto && window.crypto.randomUUID) {
@@ -347,6 +397,88 @@ function saveItinerary(userInput, outputHTML) {
   localStorage.setItem(ITINERARY_STORAGE_KEY, JSON.stringify(itinerary));
   localStorage.setItem("hasGenerated", "true");
   return itinerary;
+}
+
+function getMyTrips() {
+  const trips = safeReadJson(MY_TRIPS_STORAGE_KEY, []);
+  if (!Array.isArray(trips)) return [];
+
+  return trips
+    .filter(trip => trip && typeof trip === "object" &&
+      typeof trip.id === "string" &&
+      typeof trip.title === "string" &&
+      typeof trip.input === "string" &&
+      typeof trip.outputHTML === "string" &&
+      typeof trip.createdAt === "number")
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .slice(0, MY_TRIPS_MAX_COUNT);
+}
+
+function saveTripToHistory(userInput, outputHTML) {
+  const trip = {
+    id: createItineraryId(),
+    title: userInput.slice(0, 30),
+    input: userInput,
+    outputHTML: outputHTML,
+    createdAt: Date.now()
+  };
+
+  const trips = [trip, ...getMyTrips()].slice(0, MY_TRIPS_MAX_COUNT);
+  localStorage.setItem(MY_TRIPS_STORAGE_KEY, JSON.stringify(trips));
+  renderMyTrips();
+  return trip;
+}
+
+function renderMyTrips() {
+  const container = document.getElementById("myTripsContent");
+  if (!container) return;
+
+  const trips = getMyTrips();
+  container.innerHTML = "";
+
+  if (trips.length === 0) {
+    const emptyMessage = document.createElement("p");
+    emptyMessage.className = "my-trips-empty";
+    emptyMessage.innerHTML = "还没有保存的旅行计划<br>生成一次旅行后，它会自动保存在这里。";
+    container.appendChild(emptyMessage);
+    return;
+  }
+
+  const list = document.createElement("ul");
+  list.className = "my-trips-list";
+
+  trips.forEach(trip => {
+    const item = document.createElement("li");
+    const button = document.createElement("button");
+    const title = document.createElement("strong");
+    const date = document.createElement("span");
+
+    button.type = "button";
+    button.className = "my-trip-item";
+    button.addEventListener("click", () => loadTripFromHistory(trip.id));
+
+    title.textContent = trip.title;
+    date.className = "my-trip-date";
+    date.textContent = new Date(trip.createdAt).toLocaleString("zh-CN");
+
+    button.append(title, date);
+    item.appendChild(button);
+    list.appendChild(item);
+  });
+
+  container.appendChild(list);
+}
+
+function loadTripFromHistory(id) {
+  const trip = getMyTrips().find(item => item.id === id);
+  if (!trip) return;
+
+  document.getElementById("inputText").value = trip.input;
+  document.getElementById("output").innerHTML = trip.outputHTML;
+  saveItinerary(trip.input, trip.outputHTML);
+  localStorage.setItem("pdfPaid", "true");
+  updateButtonDisplayAfterGenerate();
+  document.getElementById("pdf-content").scrollIntoView({ behavior: "smooth" });
 }
 
 // 保留旧支付状态数据结构，方便未来恢复付费模式。
@@ -473,6 +605,7 @@ ${userInput}
 
       output.innerHTML = outputHTML;
       saveItinerary(userInput, outputHTML);
+      saveTripToHistory(userInput, outputHTML);
       trackEvent('generate', 'success', 'trip_plan');
 
       document.getElementById("pdf-content").scrollIntoView({ behavior: "smooth" });
@@ -643,6 +776,7 @@ window.onload = function () {
     }
 
     updateButtonDisplayAfterGenerate();
+    renderMyTrips();
 
   } catch (e) {
     console.warn("恢复行程状态失败", e);
@@ -650,6 +784,7 @@ window.onload = function () {
     localStorage.setItem("hasGenerated", "false");
     localStorage.setItem("pdfPaid", "false");
     updateButtonDisplayAfterGenerate();
+    renderMyTrips();
   }
 }
 </script>
@@ -717,6 +852,11 @@ function showQRPopup() {
 
   <!-- 付费模式暂时停用；保留在代码逻辑中，当前页面不渲染支付入口。 -->
 </div>
+
+<section class="my-trips" aria-labelledby="myTripsTitle">
+  <h3 id="myTripsTitle">🧳 我的旅行</h3>
+  <div id="myTripsContent"></div>
+</section>
 
 <footer class="page-footer">
   © 2026 MYG. All rights reserved.
