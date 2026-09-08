@@ -127,6 +127,12 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Only POST requests allowed' });
   }
 
+  // Origin filtering reduces accidental/browser abuse; it is not authentication.
+  // Non-browser clients can forge Origin. Require it even for local development.
+  if (!origin) {
+    return res.status(403).json({ error: 'Origin required' });
+  }
+
   const API_KEY = process.env.DEEPSEEK_API_KEY;
   if (!API_KEY) {
     console.error('DEEPSEEK_API_KEY is not configured');
