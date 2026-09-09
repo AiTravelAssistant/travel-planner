@@ -109,6 +109,27 @@ function validateRequestBody(body) {
   return null;
 }
 
+function getLatestUserInput(messages) {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (messages[i]?.role === 'user') return messages[i].content;
+  }
+  return '';
+}
+
+function createRequestId() {
+  return `req-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function logTravelRequest(requestId, status, userInput, extra = {}) {
+  console.log('[travel-request]', JSON.stringify({
+    time: new Date().toISOString(),
+    requestId,
+    status,
+    userInput,
+    ...extra
+  }));
+}
+
 export default async function handler(req, res) {
   const origin = applyCors(req, res);
 
@@ -155,6 +176,10 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: validationError });
   }
 
+  const requestId = createRequestId();
+  const userInput = getLatestUserInput(body.messages);
+  logTravelRequest(requestId, 'started', userInput);
+
   const upstreamBody = {
     model: 'deepseek-chat',
     messages: body.messages,
@@ -175,14 +200,17 @@ export default async function handler(req, res) {
     const data = await response.json().catch(() => null);
 
     if (!response.ok) {
+      logTravelRequest(requestId, 'failed', '', { upstreamStatus: response.status });
       console.error('DeepSeek API error:', response.status);
       return res.status(response.status >= 400 && response.status < 600 ? response.status : 502).json({
         error: 'AI service request failed'
       });
     }
 
+    logTravelRequest(requestId, 'success', '');
     return res.status(200).json(data);
   } catch (err) {
+    logTravelRequest(requestId, 'failed', '', { error: err?.name || 'unknown' });
     console.error('代理出错:', err);
     return res.status(502).json({ error: 'AI service unavailable' });
   }
