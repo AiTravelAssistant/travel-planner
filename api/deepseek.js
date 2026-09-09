@@ -114,6 +114,19 @@ function validateRequestBody(body) {
   return null;
 }
 
+function getLogUserInput(body) {
+  if (body.userInput) return body.userInput;
+
+  // Older open pages do not send userInput. Only unwrap our exact legacy template.
+  const prefix = '\n你是一位专业的中文旅行规划师，请根据下方旅行需求，制定详细的旅行行程：\n';
+  const suffix = '\n\n请提供每天的活动安排，并以 Markdown 表格输出。\n表格必须为5列：日期、行程内容、交通工具、餐食推荐、住宿推荐（不要增加或减少列）。\n要求内容结构清晰、语言自然，加入适量 emoji 图标增强可读性。\n\n每天行程的住宿安排推荐具体的真实存在的酒店或旅馆名称。\n请列出预算汇总和预约清单。\n';
+  const message = body.messages.findLast(message => message.role === 'user');
+  if (message?.content.startsWith(prefix) && message.content.endsWith(suffix)) {
+    return message.content.slice(prefix.length, -suffix.length);
+  }
+  return '';
+}
+
 function createRequestId() {
   return `req-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
@@ -175,7 +188,7 @@ export default async function handler(req, res) {
   }
 
   const requestId = createRequestId();
-  const userInput = body.userInput === undefined ? '' : body.userInput;
+  const userInput = getLogUserInput(body);
   logTravelRequest(requestId, 'started', userInput);
 
   const upstreamBody = {
