@@ -101,19 +101,17 @@ function validateRequestBody(body) {
     return 'Invalid max_tokens';
   }
 
-  const allowedKeys = new Set(['model', 'messages', 'temperature', 'max_tokens']);
+  if (body.userInput !== undefined &&
+      (typeof body.userInput !== 'string' || body.userInput.length > MAX_MESSAGE_CHARS)) {
+    return 'Invalid userInput';
+  }
+
+  const allowedKeys = new Set(['model', 'messages', 'temperature', 'max_tokens', 'userInput']);
   for (const key of Object.keys(body)) {
     if (!allowedKeys.has(key)) return `Unsupported parameter: ${key}`;
   }
 
   return null;
-}
-
-function getLatestUserInput(messages) {
-  for (let i = messages.length - 1; i >= 0; i--) {
-    if (messages[i]?.role === 'user') return messages[i].content;
-  }
-  return '';
 }
 
 function createRequestId() {
@@ -177,7 +175,7 @@ export default async function handler(req, res) {
   }
 
   const requestId = createRequestId();
-  const userInput = getLatestUserInput(body.messages);
+  const userInput = body.userInput === undefined ? '' : body.userInput;
   logTravelRequest(requestId, 'started', userInput);
 
   const upstreamBody = {
