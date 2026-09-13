@@ -71,7 +71,7 @@ function getRequestBody(req) {
 function validateRequestBody(body) {
   if (!body) return 'Invalid JSON body';
 
-  if (body.model !== undefined && body.model !== 'deepseek-flash') {
+  if (body.model !== undefined && !['deepseek-chat', 'deepseek-flash'].includes(body.model)) {
     return 'Unsupported model';
   }
 
