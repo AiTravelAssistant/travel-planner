@@ -195,7 +195,8 @@ export default async function handler(req, res) {
     model: 'deepseek-flash',
     messages: body.messages,
     temperature: body.temperature === undefined ? 0.7 : body.temperature,
-    max_tokens: body.max_tokens === undefined ? 4096 : body.max_tokens
+    max_tokens: body.max_tokens === undefined ? 4096 : body.max_tokens,
+    thinking: { type: 'disabled' }
   };
 
   try {
