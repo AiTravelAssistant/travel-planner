@@ -312,6 +312,78 @@ th, td {
   font-size: 13px;
   color: #777;
 }
+
+/* 输入辅助：示例与快捷需求 */
+.input-assist {
+  margin-bottom: 14px;
+}
+.input-assist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.input-assist-title {
+  margin: 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 700;
+}
+.example-fill-button {
+  width: auto;
+  margin: 0;
+  padding: 8px 13px;
+  border: 1px solid #2e7d32;
+  border-radius: 999px;
+  background: #fff;
+  color: #2e7d32;
+  box-shadow: none;
+  font-size: 14px;
+}
+.example-fill-button:hover {
+  background: #e8f5e9;
+}
+.quick-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.quick-option {
+  width: auto;
+  margin: 0;
+  padding: 9px 13px;
+  border: 1px solid #d8e6d9;
+  border-radius: 999px;
+  background: #f7fbf7;
+  color: #2f5f33;
+  box-shadow: none;
+  font-size: 14px;
+}
+.quick-option:hover {
+  background: #e8f5e9;
+  border-color: #81c784;
+}
+.input-assist-note {
+  margin: 9px 0 0;
+  color: #777;
+  font-size: 13px;
+  line-height: 1.5;
+}
+@media (max-width: 768px) {
+  .input-assist-header {
+    align-items: flex-start;
+  }
+  .input-assist-title {
+    padding-top: 7px;
+  }
+  .example-fill-button,
+  .quick-option {
+    width: auto;
+    font-size: 14px;
+  }
+}
+
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
@@ -334,6 +406,28 @@ const ITINERARY_STORAGE_KEY = "currentItinerary";
 const ITINERARY_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const MY_TRIPS_STORAGE_KEY = "myTrips";
 const MY_TRIPS_MAX_COUNT = 20;
+
+function fillExampleInput() {
+  const input = document.getElementById("inputText");
+  input.value = "东京到大阪6天自由行，3人，8月1日到6日，以美食和文化体验为主，预算每人1万元人民币，行程轻松不要太赶";
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
+  trackEvent('input_assist', 'click', 'fill_example');
+}
+
+function addQuickRequirement(requirement) {
+  const input = document.getElementById("inputText");
+  const current = input.value.trim();
+  if (current.includes(requirement)) {
+    input.focus();
+    return;
+  }
+  input.value = current ? current.replace(/[，,。\s]+$/, "") + "，" + requirement : requirement;
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
+  trackEvent('input_assist', 'click', requirement);
+}
+
 
 // Every untrusted HTML boundary uses the same policy, including legacy localStorage data.
 function sanitizeItineraryHTML(html) {
@@ -629,7 +723,24 @@ function updateButtonDisplayAfterGenerate() {
 💡 节省做攻略的时间，出行前轻松搞定👌<br/>
 🎁 免费生成行程，PDF免费下载！
 </div>
-<textarea id="inputText" placeholder="请输入您的旅行需求，例如： 东京到大阪6天自由行，3人，8月1日到6日，以美食和文化体验为主，预算每人1万人民币" rows="5"></textarea>
+<div class="input-assist" aria-label="快速填写旅行需求">
+  <div class="input-assist-header">
+    <p class="input-assist-title">不知道怎么写？可以从这里开始</p>
+    <button type="button" class="example-fill-button" onclick="fillExampleInput()">✨ 填入示例</button>
+  </div>
+  <div class="quick-options" aria-label="快捷需求选项">
+    <button type="button" class="quick-option" onclick="addQuickRequirement('亲子出行')">👨‍👩‍👧 亲子出行</button>
+    <button type="button" class="quick-option" onclick="addQuickRequirement('带父母出行')">👵 带父母</button>
+    <button type="button" class="quick-option" onclick="addQuickRequirement('情侣出行')">💑 情侣</button>
+    <button type="button" class="quick-option" onclick="addQuickRequirement('以当地美食为主')">🍜 美食</button>
+    <button type="button" class="quick-option" onclick="addQuickRequirement('喜欢自然风景')">🏞️ 自然</button>
+    <button type="button" class="quick-option" onclick="addQuickRequirement('安排购物时间')">🛍️ 购物</button>
+    <button type="button" class="quick-option" onclick="addQuickRequirement('行程轻松，不要太赶')">😌 轻松不赶</button>
+    <button type="button" class="quick-option" onclick="addQuickRequirement('请控制整体预算')">💰 控制预算</button>
+  </div>
+  <p class="input-assist-note">先填写目的地和天数，再点选适合你的需求；仍可自由修改。</p>
+</div>
+<textarea id="inputText" aria-label="旅行需求" placeholder="例如：东京到大阪6天自由行，3人，8月1日到6日，预算每人1万元人民币" rows="5"></textarea>
 <button id="generateBtn" onclick="generate()">🗺️ AI生成旅游行程</button>
 <div class="output" id="pdf-content"><div id="output"><p><strong> 这里将显示生成的行程内容... </strong></p></div></div>
 <div style="text-align: center;">
