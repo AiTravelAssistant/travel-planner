@@ -370,6 +370,79 @@ th, td {
   font-size: 13px;
   line-height: 1.5;
 }
+
+/* 页面内轻量反馈 */
+.feedback-wrap {
+  margin: 28px auto 10px;
+  text-align: center;
+}
+.feedback-toggle {
+  background: #2196F3;
+  width: auto;
+  font-size: 16px;
+  padding: 10px 18px;
+  box-shadow: none;
+}
+.feedback-panel {
+  max-width: 620px;
+  margin: 12px auto 0;
+  padding: 22px;
+  text-align: left;
+  background: #fff;
+  border: 1px solid #dce8f2;
+  border-radius: 14px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+}
+.feedback-panel[hidden] { display: none; }
+.feedback-panel fieldset {
+  margin: 0 0 20px;
+  padding: 0;
+  border: 0;
+}
+.feedback-panel legend {
+  margin-bottom: 10px;
+  color: #2a2a2a;
+  font-size: 16px;
+  font-weight: bold;
+}
+.feedback-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px 14px;
+}
+.feedback-options label {
+  display: flex;
+  gap: 7px;
+  align-items: flex-start;
+  padding: 9px 10px;
+  background: #f7fafc;
+  border-radius: 8px;
+  cursor: pointer;
+  line-height: 1.35;
+}
+.feedback-options input { margin-top: 3px; }
+.feedback-comment {
+  width: 100%;
+  min-height: 88px;
+  height: 88px;
+  padding: 12px;
+  font-size: 16px;
+  resize: vertical;
+}
+.feedback-submit {
+  margin: 18px auto 4px;
+  width: auto;
+  min-width: 150px;
+}
+.feedback-submit:disabled { opacity: 0.65; cursor: wait; }
+.feedback-message {
+  min-height: 24px;
+  margin: 10px 0 0;
+  text-align: center;
+  font-size: 15px;
+}
+.feedback-message.success { color: #2e7d32; font-weight: bold; }
+.feedback-message.error { color: #c62828; }
 @media (max-width: 768px) {
   .input-assist-header {
     align-items: flex-start;
@@ -382,6 +455,11 @@ th, td {
     width: auto;
     font-size: 14px;
   }
+  .feedback-panel { padding: 18px 14px; }
+  .feedback-options { grid-template-columns: 1fr; }
+  .feedback-toggle,
+  .feedback-submit { width: auto; font-size: 16px; }
+  .feedback-comment { font-size: 16px; }
 }
 
 </style>
@@ -401,7 +479,7 @@ function trackEvent(category, action, label, value) {
   }
 }
 
-const TENCENT_SURVEY_URL = 'https://wj.qq.com/s2/26593191/2c8e/';
+const FEEDBACK_API_URL = 'https://deepseek-proxy-three.vercel.app/api/feedback';
 const ITINERARY_STORAGE_KEY = "currentItinerary";
 const ITINERARY_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const MY_TRIPS_STORAGE_KEY = "myTrips";
@@ -541,9 +619,60 @@ function loadTripFromHistory(id) {
   document.getElementById("pdf-content").scrollIntoView({ behavior: "smooth" });
 }
 
-function openTencentSurvey() {
-  trackEvent('feedback', 'open', 'tencent_survey_footer');
-  window.open(TENCENT_SURVEY_URL, '_blank');
+function toggleFeedback() {
+  const panel = document.getElementById('feedbackPanel');
+  const button = document.getElementById('feedbackToggle');
+  const isOpening = panel.hidden;
+  panel.hidden = !panel.hidden;
+  button.setAttribute('aria-expanded', String(isOpening));
+  if (isOpening) {
+    trackEvent('feedback', 'open', 'inline_feedback');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+async function submitFeedback(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const message = document.getElementById('feedbackMessage');
+  const submitButton = document.getElementById('feedbackSubmit');
+  const helpfulness = new FormData(form).get('helpfulness');
+  const payment = new FormData(form).get('payment');
+  const features = Array.from(form.querySelectorAll('input[name="features"]:checked'), input => input.value);
+  const comment = form.elements.comment.value.trim();
+
+  if (!helpfulness || !payment) {
+    message.textContent = '请先选择“是否有帮助”和“付费意愿”。';
+    message.className = 'feedback-message error';
+    return;
+  }
+
+  submitButton.disabled = true;
+  submitButton.textContent = '送信中…';
+  message.textContent = '';
+  message.className = 'feedback-message';
+
+  try {
+    const response = await fetch(FEEDBACK_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ helpfulness, payment, features, comment })
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    form.reset();
+    message.textContent = '✓ 感谢您的反馈！';
+    message.className = 'feedback-message success';
+    trackEvent('feedback', 'submit', `${helpfulness}_${payment}`);
+  } catch (error) {
+    console.warn('反馈送信失败', error);
+    message.textContent = '送信失败，请稍后再试。';
+    message.className = 'feedback-message error';
+    trackEvent('feedback', 'error', 'submit_failed');
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = '确认送信';
+  }
 }
 </script>
 
@@ -748,9 +877,46 @@ function updateButtonDisplayAfterGenerate() {
 </div>
 <section class="my-trips" aria-labelledby="myTripsTitle"><h3 id="myTripsTitle">🧳 我的旅行</h3><div id="myTripsContent"></div></section>
 <footer class="page-footer">© 2026 MYG. All rights reserved.</footer>
-<div style="text-align:center; margin: 0 auto 28px;">
-  <button type="button" onclick="openTencentSurvey()" style="background:#2196F3; width:auto; font-size:16px; padding:10px 18px; box-shadow:none;">用户反馈</button>
+<div class="feedback-wrap">
+  <button id="feedbackToggle" class="feedback-toggle" type="button" onclick="toggleFeedback()" aria-expanded="false" aria-controls="feedbackPanel">用户反馈</button>
   <p style="font-size:13px; color:#888; margin-top:-8px;">欢迎提出建议，帮助我们继续改进 AI旅行助手</p>
+  <section id="feedbackPanel" class="feedback-panel" hidden aria-label="用户反馈表单">
+    <form id="feedbackForm" onsubmit="submitFeedback(event)">
+      <fieldset>
+        <legend>这次行程对您有帮助吗？</legend>
+        <div class="feedback-options">
+          <label><input type="radio" name="helpfulness" value="very_helpful">很有帮助</label>
+          <label><input type="radio" name="helpfulness" value="average">一般</label>
+          <label><input type="radio" name="helpfulness" value="not_helpful">没什么帮助</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>您愿意为这样的服务付费吗？</legend>
+        <div class="feedback-options">
+          <label><input type="radio" name="payment" value="free_only">免费才会用</label>
+          <label><input type="radio" name="payment" value="cny_3_5">¥3～5 / 次</label>
+          <label><input type="radio" name="payment" value="cny_6_10">¥6～10 / 次</label>
+          <label><input type="radio" name="payment" value="cny_10_20">¥10～20 / 次</label>
+          <label><input type="radio" name="payment" value="subscription">功能更完善后考虑订阅</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>您最希望增加什么？（可多选）</legend>
+        <div class="feedback-options">
+          <label><input type="checkbox" name="features" value="transport">交通路线</label>
+          <label><input type="checkbox" name="features" value="restaurant">餐厅推荐</label>
+          <label><input type="checkbox" name="features" value="hotel">酒店推荐</label>
+          <label><input type="checkbox" name="features" value="map">地图 / 导航</label>
+          <label><input type="checkbox" name="features" value="budget">预算估算</label>
+          <label><input type="checkbox" name="features" value="other">其他</label>
+        </div>
+      </fieldset>
+      <label for="feedbackComment" style="display:block; font-weight:bold; margin-bottom:10px;">还有什么想告诉我们？（可不填）</label>
+      <textarea id="feedbackComment" class="feedback-comment" name="comment" maxlength="500" placeholder="请写下一句话意见"></textarea>
+      <button id="feedbackSubmit" class="feedback-submit" type="submit">确认送信</button>
+      <p id="feedbackMessage" class="feedback-message" role="status" aria-live="polite"></p>
+    </form>
+  </section>
 </div>
 <script>
 let carPosition = 0;

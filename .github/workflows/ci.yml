@@ -22,6 +22,7 @@ jobs:
       - name: Validate JavaScript syntax
         run: |
           node --check api/deepseek.js
+          node --check api/feedback.js
 
       - name: Check for exposed DeepSeek API key
         run: |
@@ -32,4 +33,4 @@ jobs:
           echo 'No obvious DeepSeek API key pattern found.'
 
       - name: Verify required proxy file
-        run: test -f api/deepseek.js
+        run: test -f api/deepseek.js && test -f api/feedback.js
