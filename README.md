@@ -244,6 +244,6 @@
 ## Production Hardening
 
 - AI Markdown 转换后的 HTML、行程保存及本地历史恢复均经过 DOMPurify 清洗；安全组件不可用时不渲染不可信 HTML。
-- 代理要求 POST 携带允许的 Origin，保留 GitHub Pages 和 localhost:3000 / localhost:5173；无 Origin 的脚本调用会返回 403。Origin/CORS 不是身份认证，非浏览器客户端仍能伪造该请求头。
+- 代理要求 POST 携带允许的 Origin，允许 GitHub Pages、mengtrip.com（含 www）和 localhost:3000 / localhost:5173；无 Origin 的脚本调用会返回 403。Origin/CORS 不是身份认证，非浏览器客户端仍能伪造该请求头。
 - 保留请求大小、消息、token 和每 IP 频率限制。内存 rate limit 仅作用于当前 serverless 实例，不跨实例共享，冷启动会重置，不能保证全局限流。
 - 客户端请求约 90 秒超时，并对 429 / 5xx 显示简短提示；客户端取消不保证上游模型停止计算。
