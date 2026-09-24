@@ -511,7 +511,6 @@ const ITINERARY_STORAGE_KEY = "currentItinerary";
 const ITINERARY_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const MY_TRIPS_STORAGE_KEY = "myTrips";
 const MY_TRIPS_MAX_COUNT = 20;
-const PAYMENT_SELF_DECLARED_KEY = "paymentSelfDeclaredV1";
 
 function fillExampleInput() {
   const input = document.getElementById("inputText");
@@ -811,8 +810,6 @@ function doDownloadPDF() {
   const itinerary = getStoredItinerary();
   if (!itinerary) return;
   trackEvent('payment', 'click', 'pdf_download_intent');
-  const declared = safeReadJson(PAYMENT_SELF_DECLARED_KEY, []);
-  if (Array.isArray(declared) && declared.includes(itinerary.id)) return exportPDF();
   const panel = document.getElementById('paymentPanel');
   panel.hidden = false;
   document.getElementById('paidDownloadButton').focus();
@@ -826,10 +823,6 @@ function closePaymentPanel() {
 function confirmPaymentAndDownload() {
   const itinerary = getStoredItinerary();
   if (!itinerary || document.getElementById('paymentPanel').hidden) return;
-  const stored = safeReadJson(PAYMENT_SELF_DECLARED_KEY, []);
-  const declared = Array.isArray(stored) ? stored.filter(id => typeof id === 'string') : [];
-  if (!declared.includes(itinerary.id)) declared.push(itinerary.id);
-  localStorage.setItem(PAYMENT_SELF_DECLARED_KEY, JSON.stringify(declared.slice(-MY_TRIPS_MAX_COUNT)));
   trackEvent('payment', 'self_declared', 'qr_9_90');
   closePaymentPanel();
   return exportPDF();
