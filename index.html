@@ -129,6 +129,23 @@ button:active {
   width: fit-content;
   background-color: #2196F3;
 }
+.payment-panel {
+  max-width: 520px;
+  margin: 12px auto 28px;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #cfe4d4;
+  border-radius: 14px;
+  text-align: center;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+}
+.payment-panel[hidden] { display: none; }
+.payment-panel h3 { margin: 0 0 10px; }
+.payment-panel p { line-height: 1.6; }
+.payment-qr { display: block; max-width: min(100%, 320px); height: auto; margin: 12px auto; }
+.payment-note { color: #555; font-size: 14px; }
+.payment-panel button { width: auto; max-width: 100%; font-size: 16px; }
+.payment-panel .payment-cancel { background: #777; }
 
 /* 页脚版权统一居中 */
 .page-footer {
@@ -484,6 +501,7 @@ const ITINERARY_STORAGE_KEY = "currentItinerary";
 const ITINERARY_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const MY_TRIPS_STORAGE_KEY = "myTrips";
 const MY_TRIPS_MAX_COUNT = 20;
+const PAYMENT_SELF_DECLARED_KEY = "paymentSelfDeclaredV1";
 
 function fillExampleInput() {
   const input = document.getElementById("inputText");
@@ -550,10 +568,10 @@ function getStoredItinerary() {
   return itinerary;
 }
 
-function saveItinerary(userInput, outputHTML) {
+function saveItinerary(userInput, outputHTML, id = createItineraryId()) {
   outputHTML = sanitizeItineraryHTML(outputHTML);
   const now = Date.now();
-  const itinerary = { id: createItineraryId(), input: userInput, outputHTML, createdAt: now, expiresAt: now + ITINERARY_TTL_MS };
+  const itinerary = { id, input: userInput, outputHTML, createdAt: now, expiresAt: now + ITINERARY_TTL_MS };
   localStorage.setItem(ITINERARY_STORAGE_KEY, JSON.stringify(itinerary));
   localStorage.setItem("hasGenerated", "true");
   return itinerary;
@@ -614,7 +632,8 @@ function loadTripFromHistory(id) {
   if (!trip) return;
   document.getElementById("inputText").value = trip.input;
   document.getElementById("output").innerHTML = sanitizeItineraryHTML(trip.outputHTML);
-  saveItinerary(trip.input, trip.outputHTML);
+  closePaymentPanel();
+  saveItinerary(trip.input, trip.outputHTML, trip.id);
   updateButtonDisplayAfterGenerate();
   document.getElementById("pdf-content").scrollIntoView({ behavior: "smooth" });
 }
@@ -698,6 +717,7 @@ async function generate() {
   const output = document.getElementById('output');
   const pdfButton = document.getElementById('pdfButton');
   const generateBtn = document.getElementById('generateBtn');
+  closePaymentPanel();
   output.innerHTML = `<div class="loading-road">⏳ AI正在生成行程，请稍等 <span id="roadTrack">🚗</span></div>`;
   pdfButton.style.display = 'none';
   localStorage.removeItem(ITINERARY_STORAGE_KEY);
@@ -748,8 +768,8 @@ ${userInput}
       if (currentBlock.length > 0) outputHTML += '<div class="day-plan">' + currentBlock.map(el => el.outerHTML).join('') + '</div>';
       outputHTML = sanitizeItineraryHTML(outputHTML);
       output.innerHTML = outputHTML;
-      saveItinerary(userInput, outputHTML);
-      saveTripToHistory(userInput, outputHTML);
+      const trip = saveTripToHistory(userInput, outputHTML);
+      saveItinerary(userInput, outputHTML, trip.id);
       trackEvent('generate', 'success', 'trip_plan');
       document.getElementById("pdf-content").scrollIntoView({ behavior: "smooth" });
     } else {
@@ -778,7 +798,30 @@ ${userInput}
 
 <script>
 function doDownloadPDF() {
-  trackEvent('button', 'click', 'download_pdf');
+  const itinerary = getStoredItinerary();
+  if (!itinerary) return;
+  trackEvent('payment', 'click', 'pdf_download_intent');
+  const declared = safeReadJson(PAYMENT_SELF_DECLARED_KEY, []);
+  if (Array.isArray(declared) && declared.includes(itinerary.id)) return exportPDF();
+  const panel = document.getElementById('paymentPanel');
+  panel.hidden = false;
+  document.getElementById('paidDownloadButton').focus();
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  trackEvent('payment', 'view', 'qr_9_90');
+}
+function closePaymentPanel() {
+  const panel = document.getElementById('paymentPanel');
+  if (panel) panel.hidden = true;
+}
+function confirmPaymentAndDownload() {
+  const itinerary = getStoredItinerary();
+  if (!itinerary || document.getElementById('paymentPanel').hidden) return;
+  const stored = safeReadJson(PAYMENT_SELF_DECLARED_KEY, []);
+  const declared = Array.isArray(stored) ? stored.filter(id => typeof id === 'string') : [];
+  if (!declared.includes(itinerary.id)) declared.push(itinerary.id);
+  localStorage.setItem(PAYMENT_SELF_DECLARED_KEY, JSON.stringify(declared.slice(-MY_TRIPS_MAX_COUNT)));
+  trackEvent('payment', 'self_declared', 'qr_9_90');
+  closePaymentPanel();
   return exportPDF();
 }
 function exportPDF() {
@@ -788,7 +831,7 @@ function exportPDF() {
   pdfButton.disabled = true;
   pdfButton.innerHTML = "⏳ 正在生成PDF...";
   element.classList.add("pdf-export");
-  let userInput = document.getElementById("inputText").value.trim();
+  let userInput = (getStoredItinerary()?.input || "").trim();
   let filename = "旅行行程.pdf";
   if (userInput) {
     const cleaned = userInput.replace(/[^\u4e00-\u9fa5\w]+/g, "").slice(0, 30);
@@ -810,7 +853,7 @@ function exportPDF() {
 <script>
 window.onload = function () {
   try {
-    // Discard obsolete payment data from earlier versions; PDF is always free.
+    // Discard obsolete payment data from earlier versions; it is not proof of payment.
     ['paidItineraries', 'pdfPaid', 'lastOrderNumber'].forEach(key => localStorage.removeItem(key));
     const itinerary = getStoredItinerary();
     if (itinerary) {
@@ -850,7 +893,7 @@ function updateButtonDisplayAfterGenerate() {
 🧳 1分钟一键搞定行程安排！🚀<br/>
 📝 输出行程PDF文件，可保存可分享👍<br/>
 💡 节省做攻略的时间，出行前轻松搞定👌<br/>
-🎁 免费生成行程，PDF免费下载！
+🎁 免费生成、查看行程；每份行程 PDF 导出体验价 ¥9.90（微信扫码）
 </div>
 <div class="input-assist" aria-label="快速填写旅行需求">
   <div class="input-assist-header">
@@ -873,8 +916,17 @@ function updateButtonDisplayAfterGenerate() {
 <button id="generateBtn" onclick="generate()">🗺️ AI生成旅游行程</button>
 <div class="output" id="pdf-content"><div id="output"><p><strong> 这里将显示生成的行程内容... </strong></p></div></div>
 <div style="text-align: center;">
-  <button id="pdfButton" onclick="doDownloadPDF()" style="display: none;"><img src="./pdf_icon.png" style="height:38px; vertical-align:middle; margin-right:8px;"/>下载行程PDF文件</button>
+  <button id="pdfButton" onclick="doDownloadPDF()" style="display: none;"><img src="./pdf_icon.png" alt="" style="height:38px; vertical-align:middle; margin-right:8px;"/>导出本份行程 PDF · ¥9.90</button>
 </div>
+<section id="paymentPanel" class="payment-panel" hidden aria-labelledby="paymentTitle">
+  <h3 id="paymentTitle">导出本份行程 PDF · ¥9.90</h3>
+  <p>行程已生成并可免费查看。请使用微信扫码支付 ¥9.90，支付完成后点击下方按钮下载。本份行程在当前浏览器可再次下载，无需重复支付。</p>
+  <img class="payment-qr" src="./wechat-payment-9.90.jpeg" alt="AI旅行助手微信收款二维码，金额 ¥9.90" width="320" height="434"/>
+  <p class="payment-note">手机上可长按二维码保存图片，再在微信“扫一扫”中从相册选择。请核对微信支付页面的收款方与金额。</p>
+  <button id="paidDownloadButton" type="button" onclick="confirmPaymentAndDownload()">我已支付 ¥9.90，下载 PDF</button>
+  <button type="button" class="payment-cancel" onclick="closePaymentPanel()">稍后再说</button>
+  <p class="payment-note">当前为自助体验流程，网站无法自动确认微信付款；点击上方按钮仅记录您的自行确认，不代表平台已核实收款。</p>
+</section>
 <section class="my-trips" aria-labelledby="myTripsTitle"><h3 id="myTripsTitle">🧳 我的旅行</h3><div id="myTripsContent"></div></section>
 <footer class="page-footer">© 2026 MYG. All rights reserved.</footer>
 <div class="feedback-wrap">
