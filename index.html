@@ -3,7 +3,7 @@
 <head>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <meta charset="utf-8"/>
-<title> AI旅行助手(MVP) </title>
+<title>AI旅行助手</title>
 
 <!-- 百度统计 -->
 <script>
@@ -28,6 +28,16 @@ body {
   margin: 0 auto;
   padding: 20px 16px;
 }
+.quick-input-hint {
+  background: #e3f2fd;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  line-height: 1.7;
+}
+.quick-input-hint p { margin: 0 0 8px; }
+.quick-input-hint p:last-child { margin-bottom: 0; }
 h2 {
   text-align: center;
   font-size: 30px;
@@ -888,12 +898,12 @@ function updateButtonDisplayAfterGenerate() {
 </head>
 <body>
 <div class="container">
-<h2 style="margin-top: 10px;">✈️ AI旅行助手(MVP)</h2>
-<div class="quick-input-hint" style="background:#e3f2fd; padding:16px 20px; border-radius:12px; margin-bottom:20px; font-size:16px; line-height:1.7;">
-1分钟一键搞定行程安排！<br/>
-输出行程PDF文件，可保存可分享<br/>
-节省做攻略的时间，出行前轻松搞定<br/>
-免费生成行程，下载PDF文件（¥9.90）
+<h2 style="margin-top: 10px;">✈️ AI旅行助手</h2>
+<div class="quick-input-hint">
+  <p>🧳 1分钟一键搞定行程安排！</p>
+  <p>📝 输出行程PDF文件，可保存可分享</p>
+  <p>💡 节省做攻略的时间，出行前轻松搞定</p>
+  <p>🎁 免费生成行程，下载PDF文件（¥9.90）</p>
 </div>
 <div class="input-assist" aria-label="快速填写旅行需求">
   <div class="input-assist-header">
@@ -925,7 +935,6 @@ function updateButtonDisplayAfterGenerate() {
   <button type="button" class="payment-cancel" onclick="closePaymentPanel()">稍后再说</button>
 </section>
 <section class="my-trips" aria-labelledby="myTripsTitle"><h3 id="myTripsTitle">🧳 我的旅行</h3><div id="myTripsContent"></div></section>
-<footer class="page-footer">© 2026 MYG. All rights reserved.</footer>
 <div class="feedback-wrap">
   <button id="feedbackToggle" class="feedback-toggle" type="button" onclick="toggleFeedback()" aria-expanded="false" aria-controls="feedbackPanel">用户反馈</button>
   <p style="font-size:13px; color:#888; margin-top:-8px;">欢迎提出建议，帮助我们继续改进 AI旅行助手</p>
@@ -967,6 +976,7 @@ function updateButtonDisplayAfterGenerate() {
     </form>
   </section>
 </div>
+<footer class="page-footer">© 2026 MYG. All rights reserved.</footer>
 <script>
 let carPosition = 0;
 let direction = 1;
