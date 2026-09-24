@@ -890,10 +890,7 @@ function updateButtonDisplayAfterGenerate() {
 <div class="container">
 <h2 style="margin-top: 10px;">✈️ AI旅行助手(MVP)</h2>
 <div class="quick-input-hint" style="background:#e3f2fd; padding:16px 20px; border-radius:12px; margin-bottom:20px; font-size:16px; line-height:1.7;">
-🧳 1分钟一键搞定行程安排！🚀<br/>
-📝 输出行程PDF文件，可保存可分享👍<br/>
-💡 节省做攻略的时间，出行前轻松搞定👌<br/>
-🎁 免费生成、查看行程；每份行程 PDF 导出体验价 ¥9.90（微信扫码）
+免费生成行程，下载 PDF ¥9.90（微信扫码支付）
 </div>
 <div class="input-assist" aria-label="快速填写旅行需求">
   <div class="input-assist-header">
@@ -916,16 +913,14 @@ function updateButtonDisplayAfterGenerate() {
 <button id="generateBtn" onclick="generate()">🗺️ AI生成旅游行程</button>
 <div class="output" id="pdf-content"><div id="output"><p><strong> 这里将显示生成的行程内容... </strong></p></div></div>
 <div style="text-align: center;">
-  <button id="pdfButton" onclick="doDownloadPDF()" style="display: none;"><img src="./pdf_icon.png" alt="" style="height:38px; vertical-align:middle; margin-right:8px;"/>导出本份行程 PDF · ¥9.90</button>
+  <button id="pdfButton" onclick="doDownloadPDF()" style="display: none;"><img src="./pdf_icon.png" alt="" style="height:38px; vertical-align:middle; margin-right:8px;"/>下载PDF</button>
 </div>
 <section id="paymentPanel" class="payment-panel" hidden aria-labelledby="paymentTitle">
-  <h3 id="paymentTitle">导出本份行程 PDF · ¥9.90</h3>
-  <p>行程已生成并可免费查看。请使用微信扫码支付 ¥9.90，支付完成后点击下方按钮下载。本份行程在当前浏览器可再次下载，无需重复支付。</p>
+  <h3 id="paymentTitle">下载 PDF · ¥9.90</h3>
   <img class="payment-qr" src="./wechat-payment-9.90.jpeg" alt="AI旅行助手微信收款二维码，金额 ¥9.90" width="320" height="434"/>
-  <p class="payment-note">手机上可长按二维码保存图片，再在微信“扫一扫”中从相册选择。请核对微信支付页面的收款方与金额。</p>
-  <button id="paidDownloadButton" type="button" onclick="confirmPaymentAndDownload()">我已支付 ¥9.90，下载 PDF</button>
+  <p class="payment-note">手机长按保存二维码，再用微信扫一扫识别</p>
+  <button id="paidDownloadButton" type="button" onclick="confirmPaymentAndDownload()">已支付，下载PDF</button>
   <button type="button" class="payment-cancel" onclick="closePaymentPanel()">稍后再说</button>
-  <p class="payment-note">当前为自助体验流程，网站无法自动确认微信付款；点击上方按钮仅记录您的自行确认，不代表平台已核实收款。</p>
 </section>
 <section class="my-trips" aria-labelledby="myTripsTitle"><h3 id="myTripsTitle">🧳 我的旅行</h3><div id="myTripsContent"></div></section>
 <footer class="page-footer">© 2026 MYG. All rights reserved.</footer>
