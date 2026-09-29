@@ -2,7 +2,8 @@ import resourceHandler from './resources.js';
 
 const tool = {
   name: 'searchJapanLocalResources',
-  description: 'Search MengTrip static demo catalog of Japanese local travel experiences and places. Results are not live availability or bookings.',
+  title: 'Search Japan local travel resources',
+  description: 'Search MengTrip static demo catalog of Japanese local travel experiences and places by keyword, prefecture, municipality, category, or type. Use this for Japan local-resource discovery. Results are not live availability, prices, or confirmed bookings.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -15,7 +16,7 @@ const tool = {
     },
     additionalProperties: false
   },
-  annotations: { readOnlyHint: true, openWorldHint: false }
+  annotations: { readOnlyHint: true, openWorldHint: false, destructiveHint: false }
 };
 
 const reply = (id, result) => ({ jsonrpc: '2.0', id, result });
@@ -27,7 +28,8 @@ export default function handler(req, res) {
   if (req.method === 'GET') return res.status(405).end();
   if (req.method !== 'POST') return res.status(405).end();
   const origin = req.headers?.origin;
-  if (origin && origin !== 'https://www.mengtrip.com' && origin !== 'https://mengtrip.com') return res.status(403).end();
+  const allowedOrigins = new Set(['https://www.mengtrip.com', 'https://mengtrip.com', 'https://chatgpt.com']);
+  if (origin && !allowedOrigins.has(origin)) return res.status(403).end();
   if (req.headers?.accept && !req.headers.accept.includes('application/json')) return res.status(406).end();
   const body = req.body;
   if (!body || Array.isArray(body) || body.jsonrpc !== '2.0' || typeof body.method !== 'string') {
@@ -43,7 +45,8 @@ export default function handler(req, res) {
     return res.status(200).json(reply(id, {
       protocolVersion: version,
       capabilities: { tools: {} },
-      serverInfo: { name: 'mengtrip-japan-local-resource', version: '0.1.0' }
+      serverInfo: { name: 'mengtrip-japan-local-resource', version: '0.1.0' },
+      instructions: 'Use searchJapanLocalResources for Japan local experiences and places. This demo catalog is static; never present results as live availability, current prices, or confirmed bookings. Preserve source and booking URLs so users can verify details.'
     }));
   }
   if (method === 'ping') return res.status(200).json(reply(id, {}));
