@@ -1,6 +1,4 @@
-import { readFileSync } from 'node:fs';
-
-const catalog = JSON.parse(readFileSync(new URL('../data/japan-local-resources.demo.json', import.meta.url), 'utf8'));
+import { catalog } from '../data/japan-local-resources.demo.js';
 const fields = ['q', 'prefecture', 'municipality', 'category', 'type', 'limit'];
 const normalize = value => value.normalize('NFKC').toLocaleLowerCase().trim();
 
