@@ -1,0 +1,181 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "MengTrip Japan Local Resource Demo",
+    "version": "0.1.0",
+    "description": "从静态样例文件检索日本本地体验和场所。无实时库存、价格或自动预订。"
+  },
+  "servers": [
+    {
+      "url": "https://www.mengtrip.com"
+    }
+  ],
+  "paths": {
+    "/api/resources": {
+      "get": {
+        "operationId": "searchJapanLocalResources",
+        "summary": "按地区、类别或关键词检索日本本地旅行资源",
+        "description": "返回来源链接和预约入口（如有）。结果仅作行程灵感；向用户明确说明须在来源网站核实开放时间、费用、语言及预约情况。",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "description": "中文或日文名称、简介关键词"
+          },
+          {
+            "name": "prefecture",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "description": "都道府县，例如 千叶县"
+          },
+          {
+            "name": "municipality",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "description": "市町村，例如 金泽市"
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "description": "craft, food, museum, farm, factory, market, cultural_performance"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "place",
+                "experience"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "default": 5
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "匹配的静态资源",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "dataset": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "string"
+                    },
+                    "data_type": {
+                      "type": "string",
+                      "enum": [
+                        "static_demo"
+                      ]
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "returned": {
+                      "type": "integer"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Resource"
+                      }
+                    },
+                    "notice": {
+                      "type": "string"
+                    },
+                    "source_compiled_at": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "405": {
+            "description": "仅支持 GET"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Resource": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "name_ja": {
+            "type": "string",
+            "nullable": true
+          },
+          "name_zh": {
+            "type": "string"
+          },
+          "prefecture": {
+            "type": "string"
+          },
+          "municipality": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "summary_zh": {
+            "type": "string"
+          },
+          "source_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "booking_url": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "booking_mode": {
+            "type": "string"
+          },
+          "verified_on": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      }
+    }
+  }
+}
