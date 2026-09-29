@@ -203,6 +203,22 @@
 
 部署后可直接打开 `/api/resources?q=金箔` 验证 JSON。自定义 GPT 中导入 OpenAPI schema 后，可试问“推荐金泽的金箔体验，给我来源链接”，并在 Actions 测试面板确认实际调用。公开只读接口无账号或配额保障，正式商用前应加入密钥、全局限流与监控。资源对外推荐时请让用户到来源网站确认最新信息。
 
+### 🤖 MCP / AI Agent Demo（v0.1，2026-09-29）
+
+MengTrip 已在现有 Japan Local Resource API 之上增加最小 MCP Server，使支持 MCP 的 AI 客户端可以把 MengTrip 日本本地旅行资源作为原生工具调用，而不只是让用户直接访问网站。
+
+- MCP Endpoint：`https://www.mengtrip.com/mcp`
+- MCP Tool：`searchJapanLocalResources`
+- 支持参数：`q`、`prefecture`、`municipality`、`category`、`type`、`limit`
+- Tool 底层复用现有 `/api/resources` 查询逻辑，不改变原有行程生成、PDF 与支付流程
+- ChatGPT Plugin：`MengTrip Japan Local Resource` v0.2.0
+- MCP `tools/list` 已成功识别 `searchJapanLocalResources`，实际 Tool Call 已成功返回 MengTrip 资源
+- 2026-09-29 已在 ChatGPT Desktop App 的 Work 模式完成端到端人工验收：**ChatGPT → MengTrip Plugin → MCP → `searchJapanLocalResources` → MengTrip Japan Local Resource → AI 回答**
+
+验收用例：“用 MengTrip 查找金泽的传统工艺体验。”成功返回 4 项静态 Demo 资源，包括金泽 Katani 金箔贴饰、今井金箔工坊、加贺友禅手帕染色和九谷光仙窑陶轮制陶，并返回来源/商家链接。
+
+当前 MCP Demo 仍使用 20 条静态样本数据（`data_type: static_demo`），不代表实时价格、库存、营业时间或预约结果。下一阶段重点是扩充真实日本本地资源数据，并逐步接入实时 API、库存/价格和预约能力。
+
 ---
 
 ## 🔥 下一步优化
@@ -212,16 +228,16 @@
 - 增加用户系统与云端旅行历史
 - 若要可靠限制访问，接入正式订单、微信支付回调与服务端验单
 - 接入酒店 / OTA API
-- 构建 AI Agent 调用能力
+- 扩展已验证的 MCP / AI Agent 调用能力，逐步接入更多日本本地资源与实时 API
 - 探索可保存、可分享、可共创的公共旅行行程库
 
 ---
 
 ## 🧠 项目定位
 
-当前：**AI 旅行规划工具 MVP**  
-中期：**个人旅行计划保存与分享平台**  
-未来：**AI 旅行基础设施 / Agent 平台**
+当前：**AI 旅行规划工具 MVP + Japan Local Resource API / MCP Demo**  
+中期：**扩充日本本地资源库，并接入实时 API / 库存 / 价格能力**  
+未来：**AI 旅行基础设施 / Agent 平台（预约与佣金闭环）**
 
 ---
 
