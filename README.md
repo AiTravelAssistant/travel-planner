@@ -190,6 +190,21 @@
 
 ---
 
+## 🧪 Japan Local Resource API Demo
+
+这是现有网站旁边的独立只读试验接口，原有行程生成、PDF 和支付页面不受影响。数据来自已整理的 20 条日本本地资源，以静态 JSON 文件保存；未接入楽天或其他实时库存 API。
+
+- 数据：`data/japan-local-resources.demo.json`
+- 查询：`GET https://www.mengtrip.com/api/resources?prefecture=千叶县&limit=3`
+- 组合筛选：`?municipality=金泽市&category=craft`；也支持 `q`、`type`，默认返回 5 条，最多 20 条
+- OpenAPI：`https://www.mengtrip.com/openapi.json`（可导入支持 OpenAPI Actions 的自定义 GPT）
+- 返回 `data_type: static_demo`、来源链接、核对日期及预约入口（如有）。价格、空房、开放日和预约状态都不是实时数据。
+- Gemini 的 function calling 需开发者将同一个 HTTP 接口注册为工具并在自己的应用内执行请求；发布 OpenAPI 文件本身不会让所有 Gemini 用户自动调用。
+
+部署后可直接打开 `/api/resources?q=金箔` 验证 JSON。自定义 GPT 中导入 OpenAPI schema 后，可试问“推荐金泽的金箔体验，给我来源链接”，并在 Actions 测试面板确认实际调用。公开只读接口无账号或配额保障，正式商用前应加入密钥、全局限流与监控。资源对外推荐时请让用户到来源网站确认最新信息。
+
+---
+
 ## 🔥 下一步优化
 
 - 持续优化真实用户体验

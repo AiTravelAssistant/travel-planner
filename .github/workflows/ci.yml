@@ -23,6 +23,8 @@ jobs:
         run: |
           node --check api/deepseek.js
           node --check api/feedback.js
+          node --check api/resources.js
+          node --test tests/resources.test.mjs
 
       - name: Check for exposed DeepSeek API key
         run: |
