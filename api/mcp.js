@@ -1,4 +1,5 @@
 import resourceHandler from './resources.js';
+import rakutenHotelsHandler from './rakuten-hotels.js';
 
 const tool = {
   name: 'searchJapanLocalResources',
@@ -17,6 +18,22 @@ const tool = {
     additionalProperties: false
   },
   annotations: { readOnlyHint: true, openWorldHint: false, destructiveHint: false }
+};
+
+const rakutenHotelTool = {
+  name: 'searchRakutenHotels',
+  title: 'Search Rakuten Travel hotels',
+  description: 'Search live hotel information from Rakuten Travel by Japanese keyword. Returns current provider data such as hotel name, location, minimum listed price, rating, image, access information, and booking URL. Availability and prices can change and should be verified on Rakuten Travel.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      keyword: { type: 'string', description: 'Japanese hotel/location keyword, for example 金沢' },
+      limit: { type: 'integer', minimum: 1, maximum: 20, default: 5 }
+    },
+    required: ['keyword'],
+    additionalProperties: false
+  },
+  annotations: { readOnlyHint: true, openWorldHint: true, destructiveHint: false }
 };
 
 const reply = (id, result) => ({ jsonrpc: '2.0', id, result });
@@ -46,12 +63,33 @@ export default function handler(req, res) {
       protocolVersion: version,
       capabilities: { tools: {} },
       serverInfo: { name: 'mengtrip-japan-local-resource', version: '0.1.0' },
-      instructions: 'Use searchJapanLocalResources for Japan local experiences and places. This demo catalog is static; never present results as live availability, current prices, or confirmed bookings. Preserve source and booking URLs so users can verify details.'
+      instructions: 'Use searchJapanLocalResources for MengTrip static local experiences and places. Use searchRakutenHotels for live hotel information from Rakuten Travel. Never present provider results as guaranteed availability or a confirmed booking; preserve source and booking URLs so users can verify current details.'
     }));
   }
   if (method === 'ping') return res.status(200).json(reply(id, {}));
-  if (method === 'tools/list') return res.status(200).json(reply(id, { tools: [tool] }));
+  if (method === 'tools/list') return res.status(200).json(reply(id, { tools: [tool, rakutenHotelTool] }));
   if (method !== 'tools/call') return res.status(200).json(error(id, -32601, 'Method not found'));
+  if (params.name === rakutenHotelTool.name) {
+    const args = params.arguments ?? {};
+    if (!args || typeof args !== 'object' || Array.isArray(args) ||
+        typeof args.keyword !== 'string' || !args.keyword.trim() || args.keyword.length > 80 ||
+        (args.limit !== undefined && (!Number.isInteger(args.limit) || args.limit < 1 || args.limit > 20)) ||
+        Object.keys(args).some(key => !Object.hasOwn(rakutenHotelTool.inputSchema.properties, key))) {
+      return res.status(200).json(error(id, -32602, 'Invalid tool arguments'));
+    }
+    const query = new URLSearchParams({ keyword: args.keyword, ...(args.limit ? { limit: String(args.limit) } : {}) }).toString();
+    let status = 200;
+    let data;
+    await rakutenHotelsHandler({ method: 'GET', url: `/api/rakuten-hotels?${query}` }, {
+      setHeader() {}, status(code) { status = code; return this; }, end() { return this; },
+      json(value) { data = value; return this; }
+    });
+    if (status !== 200) return res.status(200).json(error(id, -32603, data?.error ?? 'Rakuten Travel search failed'));
+    return res.status(200).json(reply(id, {
+      content: [{ type: 'text', text: JSON.stringify(data) }],
+      structuredContent: data
+    }));
+  }
   if (params.name !== tool.name) return res.status(200).json(error(id, -32602, 'Unknown tool'));
   const args = params.arguments ?? {};
   if (!args || typeof args !== 'object' || Array.isArray(args) ||
