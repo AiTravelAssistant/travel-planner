@@ -49,7 +49,13 @@ export default async function handler(req, res) {
   try {
     const response = await fetch(
       `https://openapi.rakuten.co.jp/engine/api/Travel/KeywordHotelSearch/20260731?${params.toString()}`,
-      { headers: { Accept: 'application/json' } }
+      {
+        headers: {
+          Accept: 'application/json',
+          Referer: 'https://www.mengtrip.com/',
+          Origin: 'https://www.mengtrip.com'
+        }
+      }
     );
 
     const body = await response.json().catch(() => null);
