@@ -1,4 +1,6 @@
-# ✈️ AI Travel Planner (MVP)
+# ✈️ MengTrip — AI Travel Planner & Japan Travel Resource Layer
+
+连接中文旅行用户、AI Agent 与日本旅行资源（Japan Travel Resource Layer for AI Agents）。
 
 一个基于 AI 的旅行行程生成工具（MVP版本），当前支持：
 - 自动生成旅行行程
@@ -9,6 +11,8 @@
 - 页面刷新后恢复当前行程
 - 百度统计事件埋点
 - 页面内轻量用户反馈（无需登录）
+- Rakuten Travel 真实酒店搜索（REST API + MCP）
+- 日本当地资源示例库搜索（20 条静态资源）
 
 ---
 
@@ -24,7 +28,7 @@
 
 ---
 
-## ✅ Current MVP Status（2026-09）
+## ✅ Current MVP Status（2026-10-01）
 
 当前核心用户链路已经完成 PC + Mobile 人工验收：
 
@@ -185,14 +189,14 @@
 - 更换浏览器 / 设备后历史记录不会同步
 - 最多保留最近 20 条旅行历史
 - 微信扫码付款后需用户自行确认；网站不自动验单，已确认状态仅保存在本机
-- 无酒店 / OTA 实时价格与库存
+- 已提供独立的 Rakuten 酒店信息搜索；尚未接入行程生成流程，也不提供指定入住日期的空房确认或站内预约
 - AI 推荐结果仍需用户自行核实
 
 ---
 
 ## 🧪 Japan Local Resource API Demo
 
-这是现有网站旁边的独立只读试验接口，原有行程生成、PDF 和支付页面不受影响。数据来自已整理的 20 条日本本地资源，以静态 JSON 文件保存；未接入楽天或其他实时库存 API。
+这是现有网站旁边的独立只读试验接口，原有行程生成、PDF 和支付页面不受影响。数据来自已整理的 20 条日本本地资源，以静态 JSON 文件保存；此当地资源接口不提供实时库存。独立的 Rakuten 酒店接口见下方 v0.2 说明。
 
 - 数据：`data/japan-local-resources.demo.json`
 - 查询：`GET https://www.mengtrip.com/api/resources?prefecture=千叶县&limit=3`
@@ -217,7 +221,60 @@ MengTrip 已在现有 Japan Local Resource API 之上增加最小 MCP Server，�
 
 验收用例：“用 MengTrip 查找金泽的传统工艺体验。”成功返回 4 项静态 Demo 资源，包括金泽 Katani 金箔贴饰、今井金箔工坊、加贺友禅手帕染色和九谷光仙窑陶轮制陶，并返回来源/商家链接。
 
-当前 MCP Demo 仍使用 20 条静态样本数据（`data_type: static_demo`），不代表实时价格、库存、营业时间或预约结果。下一阶段重点是扩充真实日本本地资源数据，并逐步接入实时 API、库存/价格和预约能力。
+`searchJapanLocalResources` 使用 20 条静态样本数据（`data_type: static_demo`），不代表实时价格、库存、营业时间或预约结果。v0.2 新增的 `searchRakutenHotels` 返回外部 API 酒店信息，两类数据需要明确区分。
+
+### 🏨 MengTrip v0.2 — Real Travel API Demo（2026-10-01）
+
+这一里程碑验证了同一套 MengTrip 酒店能力可同时服务 Web 用户和 AI Agent；v0.2 是功能里程碑，不表示已创建 GitHub Release 或 tag。
+
+| 能力 | 数据来源 / 状态 |
+|------|----------------|
+| 当地体验与地点搜索 | MengTrip 20 条静态示例资源，`data_type: static_demo` |
+| 酒店搜索 | Rakuten Travel 外部 API，`data_type: live_api` |
+| 原生 MCP Tools | `searchJapanLocalResources`、`searchRakutenHotels` |
+| 酒店展示 | 图片、原始名称、地址、最低价格、评分、评论数、预订链接 |
+| 预订 | 跳转 Rakuten 住宿方案页面；MengTrip 不直接完成预约 |
+
+**已验证的入口**
+
+- [MengTrip Japan Local Resource Site](https://mengtrip-japan-local-resource.king-meng.chatgpt.site/)：酒店搜索放在顶部，下方为「MengTrip · 示例资源库」。中文界面保留酒店的日文官方名称和地址。
+- REST：`GET https://www.mengtrip.com/api/rakuten-hotels?keyword=東京&limit=5`
+- MCP Endpoint：`https://www.mengtrip.com/mcp`
+- MCP 调用：`searchRakutenHotels({"keyword":"東京","limit":5})`
+
+**共用后端**
+
+```mermaid
+flowchart TD
+  W["用户 / MengTrip Site"] --> H["MengTrip 酒店接口"]
+  A["AI 用户 / ChatGPT Work"] --> M["MengTrip MCP"]
+  M --> H
+  H --> R["Rakuten Travel API"]
+```
+
+MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源工具复用 `api/resources.js`。Site 是独立前端入口，并不表示本站行程生成已自动调用酒店搜索。
+
+**2026-10-01 人工验收记录（用户实测）**
+
+- Site 搜索「金沢」「東京」均返回 5 家真实酒店，预订链接可跳转 Rakuten。
+- ChatGPT 网页版 Work 实际调用 `searchRakutenHotels`，参数为 `{"keyword":"東京","limit":5}`，返回 5 家酒店及 `data_type: live_api`。
+- 已验证明确指定工具的调用；未在此记录中确认 AI 在不指定工具名称时自动选择工具，也未确认本次酒店功能的桌面版验收。
+
+**接口与部署**
+
+- 参数：`keyword` 必填，最多 80 字符；`limit` 默认 5，MCP 支持 1–20，Site 最多展示 5 家。
+- 返回字段：`name`、`area`、`price_from_jpy`、`rating`、`review_count`、`image`、`booking_url` 等；缺失字段可能为 `null`。
+- 服务端环境变量：`RAKUTEN_APPLICATION_ID`、`RAKUTEN_ACCESS_KEY`。密钥只配置在部署环境，不能写入前端或提交到仓库。
+- 上游失败返回错误，不回退到模拟酒店数据。
+- 源码：`api/rakuten-hotels.js`（酒店查询及标准化）、`api/mcp.js`（两个 MCP Tools）、`api/resources.js`（静态资源搜索）、`data/japan-local-resources.demo.json`（示例数据）。
+
+**当前限制与下一步**
+
+- 酒店查询是关键词匹配，不是严格城市过滤：「東京」可能匹配千叶县舞滨的酒店。
+- 最低展示价格不等于指定日期、房型或人数的报价；没有入住日期查询、空房保证或预约确认。酒店接口有短时缓存，最终价格与空房以 Rakuten 页面为准。
+- 当前酒店名称、地址等保留 API 原文；尚未建立中文翻译数据层。
+- MCP 客户端需连接并启用 MengTrip；公开端点不意味着所有 AI 会自动发现它。
+- 下一步先验证自然语言请求「帮我找 5 家东京的酒店」是否能自动选择酒店工具，再改善地区筛选；更多真实旅行 API 留作后续扩展。
 
 ---
 
@@ -227,7 +284,7 @@ MengTrip 已在现有 Japan Local Resource API 之上增加最小 MCP Server，�
 - 根据百度统计和页面内用户反馈迭代产品
 - 增加用户系统与云端旅行历史
 - 若要可靠限制访问，接入正式订单、微信支付回调与服务端验单
-- 接入酒店 / OTA API
+- 完善已接入的 Rakuten 酒店查询，优先验证工具自动选择及地区筛选
 - 扩展已验证的 MCP / AI Agent 调用能力，逐步接入更多日本本地资源与实时 API
 - 探索可保存、可分享、可共创的公共旅行行程库
 
@@ -235,8 +292,8 @@ MengTrip 已在现有 Japan Local Resource API 之上增加最小 MCP Server，�
 
 ## 🧠 项目定位
 
-当前：**AI 旅行规划工具 MVP + Japan Local Resource API / MCP Demo**  
-中期：**扩充日本本地资源库，并接入实时 API / 库存 / 价格能力**  
+当前：**AI 旅行规划工具 MVP + 日本当地资源示例库 + Rakuten 真实酒店 API / MCP Demo**  
+中期：**完善日本旅行资源连接层，扩充真实资源、地区筛选与多语言能力**  
 未来：**AI 旅行基础设施 / Agent 平台（预约与佣金闭环）**
 
 ---
