@@ -75,7 +75,10 @@ export default async function handler(req, res) {
       description: info.hotelSpecial ?? null,
       access: info.access ?? null,
       image: info.hotelImageUrl ?? info.hotelThumbnailUrl ?? null,
-      booking_url: info.hotelInformationUrl ?? null,
+      // Rakuten distinguishes the hotel information page from the lodging-plan page.
+      // Prefer the plan list for a booking-oriented link, and keep the information page separately.
+      booking_url: info.planListUrl ?? null,
+      hotel_information_url: info.hotelInformationUrl ?? null,
       source: 'Rakuten Travel'
     }));
 
@@ -86,7 +89,7 @@ export default async function handler(req, res) {
       total: body?.pagingInfo?.recordCount ?? results.length,
       returned: results.length,
       results,
-      notice: 'Hotel information is provided by Rakuten Travel. Prices and availability can change; verify current details on the booking page.'
+      notice: 'Hotel information is provided by Rakuten Travel. booking_url is the Rakuten lodging-plan page when the API supplies one; prices and availability can change and should be verified there.'
     });
   } catch (err) {
     console.error('Rakuten Travel API request failed', err?.message || err);
