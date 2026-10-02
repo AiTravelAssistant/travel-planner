@@ -28,7 +28,24 @@
 
 ---
 
-## ✅ Current MVP Status（2026-10-01）
+## ✅ Current MVP Status（2026-10-02）
+
+当前项目目前有两个相互关联但用途不同的用户入口：
+
+### MengTrip Unified Travel Demo V1（2026-10-02 冻结版）
+- Site：MengTrip Japan Local Resource Site
+- AI 自动生成日本旅行行程，并以 Trip Card 展示，可打开查看完整行程
+- Rakuten Travel 真实酒店搜索：桌面端按 3 列 × 2 行展示，最多 6 条
+- Viator 真实日本当地体验搜索：桌面端按 3 列 × 2 行展示，最多 6 条
+- MengTrip Japan Local Resource 当地资源搜索
+- 当前 Site 的 AI 行程详情不提供 PDF 下载、支付按钮或导出触发逻辑
+- 已完成 PC 端人工验收；现阶段作为统一旅行 Demo 冻结，后续优先考虑让 AI 行程与酒店 / 体验资源进一步联动
+
+统一 Site 当前产品链路：
+
+**输入旅行需求 → AI 生成行程 → Trip Card → 查看完整行程 → 搜索真实酒店 / 体验 / 当地资源 → 跳转供应商 booking URL**
+
+### 原 MengTrip AI Travel Planner MVP
 
 当前核心用户链路已经完成 PC + Mobile 人工验收：
 
@@ -237,6 +254,7 @@ MengTrip 已在现有 Japan Local Resource API 之上增加最小 MCP Server，�
 - 价格和可用性可能变化；MengTrip 当前不把搜索结果表述为确认预订。
 - 2026-10-02 已完成 Production 端到端 REST 验收：`searchTerm=Tokyo food tour&limit=5` 成功返回 5 条 Viator `live_api` 体验数据，包含 JPY 起价、评分、评论数、时长、图片、免费取消标识和带 MengTrip Partner ID 的 Viator booking URL。Sandbox Key 仍可单独等待激活用于后续开发测试。
 - 2026-10-02 已在 ChatGPT Desktop App 的 Work 模式完成 MCP 端到端人工验收：**ChatGPT → MengTrip Plugin → MCP `searchExperiences` → Viator Production API → 5 条真实体验结果**。测试参数为 `searchTerm="Tokyo food tour"`、`limit=5`，未使用网页搜索；返回价格、评分及带联盟归因参数的 booking URL。
+- 2026-10-02 Unified Travel Demo V1 已将 Viator 体验搜索整合到统一 Site；Site 当前最多展示 6 条体验结果，并保留供应商 booking URL。
 
 架构：
 
@@ -293,7 +311,7 @@ MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源�
 
 **接口与部署**
 
-- 参数：`keyword` 必填，最多 80 字符；`limit` 默认 5，MCP 支持 1–20，Site 最多展示 5 家。
+- 参数：`keyword` 必填，最多 80 字符；`limit` 默认 5，MCP 支持 1–20，Site 最多展示 6 家。
 - 返回字段：`name`、`area`、`price_from_jpy`、`rating`、`review_count`、`image`、`booking_url` 等；缺失字段可能为 `null`。
 - 服务端环境变量：`RAKUTEN_APPLICATION_ID`、`RAKUTEN_ACCESS_KEY`。密钥只配置在部署环境，不能写入前端或提交到仓库。
 - 上游失败返回错误，不回退到模拟酒店数据。
@@ -315,6 +333,7 @@ MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源�
 - 根据百度统计和页面内用户反馈迭代产品
 - 增加用户系统与云端旅行历史
 - 若要可靠限制访问，接入正式订单、微信支付回调与服务端验单
+- 推进 AI 行程与 Rakuten 酒店 / Viator 体验的联动，让生成的行程进一步连接真实可预订资源
 - 完善已接入的 Rakuten 酒店查询，优先验证工具自动选择及地区筛选
 - 扩展已验证的 MCP / AI Agent 调用能力，逐步接入更多日本本地资源与实时 API
 - 探索可保存、可分享、可共创的公共旅行行程库
@@ -323,7 +342,7 @@ MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源�
 
 ## 🧠 项目定位
 
-当前：**AI 旅行规划工具 MVP + 日本当地资源示例库 + Rakuten 真实酒店 API + Viator 体验 Provider / MCP Demo**  
+当前：**MengTrip Unified Travel Demo V1（AI 行程 + Rakuten 酒店 + Viator 体验 + MengTrip 当地资源）+ MCP / AI Agent 旅行资源连接层 Demo**  
 中期：**完善日本旅行资源连接层，扩充真实资源、地区筛选与多语言能力**  
 未来：**AI 旅行基础设施 / Agent 平台（预约与佣金闭环）**
 
