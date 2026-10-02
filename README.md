@@ -12,6 +12,7 @@
 - 百度统计事件埋点
 - 页面内轻量用户反馈（无需登录）
 - Rakuten Travel 真实酒店搜索（REST API + MCP）
+- Viator 真实日本当地体验搜索（REST API + MCP）
 - Rakuten Ichiba 真实日本商品搜索（REST API + MCP）
 - 日本当地资源示例库搜索（20 条静态资源）
 
@@ -38,13 +39,14 @@
 - AI 自动生成日本旅行行程，并以 Trip Card 展示，可打开查看完整行程
 - Rakuten Travel 真实酒店搜索：桌面端按 3 列 × 2 行展示，最多 6 条
 - Viator 真实日本当地体验搜索：桌面端按 3 列 × 2 行展示，最多 6 条
+- Rakuten Ichiba 真实日本商品搜索：默认展示 6 条，并保留供应商 Affiliate URL（如返回）
 - MengTrip Japan Local Resource 当地资源搜索
 - 当前 Site 的 AI 行程详情不提供 PDF 下载、支付按钮或导出触发逻辑
-- 已完成 PC 端人工验收；现阶段作为统一旅行 Demo 冻结，后续优先考虑让 AI 行程与酒店 / 体验资源进一步联动
+- 已完成 PC 端人工验收；现阶段作为统一旅行 Demo 冻结，后续优先考虑让 AI 行程与酒店 / 体验 / 商品资源进一步联动
 
 统一 Site 当前产品链路：
 
-**输入旅行需求 → AI 生成行程 → Trip Card → 查看完整行程 → 搜索真实酒店 / 体验 / 当地资源 → 跳转供应商 booking URL**
+**输入旅行需求 → AI 生成行程 → Trip Card → 查看完整行程 → 搜索真实酒店 / 体验 / 商品 / 当地资源 → 跳转供应商 booking / purchase URL**
 
 ### 原 MengTrip AI Travel Planner MVP
 
@@ -227,13 +229,15 @@
 
 ### 🤖 MCP / AI Agent Demo（v0.1，2026-09-29）
 
-MengTrip 已在现有 Japan Local Resource API 之上增加最小 MCP Server，使支持 MCP 的 AI 客户端可以把 MengTrip 日本本地旅行资源作为原生工具调用，而不只是让用户直接访问网站。
+MengTrip 已在现有 Japan Local Resource API 之上增加 MCP Server，使支持 MCP 的 AI 客户端可以把 MengTrip 旅行资源作为原生工具调用，而不只是让用户直接访问网站。
+
+**当前 MCP 共暴露 4 个只读搜索工具：** `searchJapanLocalResources`、`searchRakutenHotels`、`searchExperiences`、`searchRakutenProducts`。它们负责资源发现和返回供应商链接；当前不直接执行预约、支付或购买。
 
 - MCP Endpoint：`https://www.mengtrip.com/mcp`
 - MCP Tool：`searchJapanLocalResources`
 - 支持参数：`q`、`prefecture`、`municipality`、`category`、`type`、`limit`
 - Tool 底层复用现有 `/api/resources` 查询逻辑，不改变原有行程生成、PDF 与支付流程
-- ChatGPT Plugin：`MengTrip Japan Local Resource` v0.2.0
+- ChatGPT Plugin：`MengTrip Japan Local Resource` v0.5.0（2026-10-02 已同步酒店、体验、商品与当地资源说明）
 - MCP `tools/list` 已成功识别 `searchJapanLocalResources`，实际 Tool Call 已成功返回 MengTrip 资源
 - 2026-09-29 已在 ChatGPT Desktop App 的 Work 模式完成端到端人工验收：**ChatGPT → MengTrip Plugin → MCP → `searchJapanLocalResources` → MengTrip Japan Local Resource → AI 回答**
 
@@ -316,7 +320,7 @@ MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源�
 - 返回字段：`name`、`area`、`price_from_jpy`、`rating`、`review_count`、`image`、`booking_url` 等；缺失字段可能为 `null`。
 - 服务端环境变量：`RAKUTEN_APPLICATION_ID`、`RAKUTEN_ACCESS_KEY`；可选联盟配置 `RAKUTEN_AFFILIATE_ID`。配置联盟 ID 后，酒店接口将其作为 `affiliateId` 传入 Rakuten，由供应商生成链接；MengTrip 原样保留 `planListUrl` / `hotelInformationUrl`。未配置时仍可搜索，但不能据此声称链接已包含 MengTrip 联盟归因。密钥只配置在部署环境，不能写入前端或提交到仓库。
 - 上游失败返回错误，不回退到模拟酒店数据。
-- 源码：`api/rakuten-hotels.js`（酒店查询及标准化）、`api/mcp.js`（两个 MCP Tools）、`api/resources.js`（静态资源搜索）、`data/japan-local-resources.demo.json`（示例数据）。
+- 源码：`api/rakuten-hotels.js`（酒店）、`api/viator-experiences.js`（体验）、`api/rakuten-products.js`（商品）、`api/mcp.js`（4 个 MCP Tools）、`api/resources.js`（静态资源）、`data/japan-local-resources.demo.json`（示例数据）。
 
 **当前限制与下一步**
 
@@ -334,7 +338,7 @@ MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源�
 - 根据百度统计和页面内用户反馈迭代产品
 - 增加用户系统与云端旅行历史
 - 若要可靠限制访问，接入正式订单、微信支付回调与服务端验单
-- 推进 AI 行程与 Rakuten 酒店 / Viator 体验的联动，让生成的行程进一步连接真实可预订资源
+- 推进 AI 行程与 Rakuten 酒店 / Viator 体验 / Rakuten 商品的联动，让生成的行程进一步连接真实可预订、可购买资源
 - 完善已接入的 Rakuten 酒店查询，优先验证工具自动选择及地区筛选
 - 扩展已验证的 MCP / AI Agent 调用能力，逐步接入更多日本本地资源与实时 API
 - 探索可保存、可分享、可共创的公共旅行行程库
@@ -343,7 +347,7 @@ MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源�
 
 ## 🧠 项目定位
 
-当前：**MengTrip Unified Travel Demo V1（AI 行程 + Rakuten 酒店 + Viator 体验 + MengTrip 当地资源）+ MCP / AI Agent 旅行资源连接层 Demo**  
+当前：**MengTrip Unified Travel Demo V1（AI 行程 + Rakuten 酒店 + Viator 体验 + Rakuten 商品 + MengTrip 当地资源）+ MCP / AI Agent 旅行资源连接层 Demo**  
 中期：**完善日本旅行资源连接层，扩充真实资源、地区筛选与多语言能力**  
 未来：**AI 旅行基础设施 / Agent 平台（预约与佣金闭环）**
 
@@ -391,8 +395,8 @@ MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源�
 
 - 已检查 REST 后端及 MCP 复用路径；Site 与 MCP 共用供应商返回的 `booking_url`。
 - Viator Production 实测返回 `pid=P00323288`、`mcid=42383`、`medium=api`、`campaign=mengtrip`。代码已请求 `campaign-value=mengtrip`，并原样保留 API 的 `productUrl`，不手工替换 PID / MCID。
-- Rakuten 检查时未传入 `affiliateId`，线上返回普通住宿方案链接。已增加可选 `RAKUTEN_AFFILIATE_ID` 转发支持；需在后端生产部署环境配置本人联盟 ID 并重新部署，再验证实际返回链接。
-- 本次本地模拟验证：已配置 / 未配置联盟 ID 两种情况下的请求参数正确，供应商 booking URL 原样保留，`limit=6` 不受影响。
+- Rakuten 后端已支持可选 `RAKUTEN_AFFILIATE_ID` 转发。2026-10-02 商品 MCP 实测已返回 `hb.afl.rakuten.co.jp` Affiliate URL；酒店 Affiliate 归因仍应以实际返回链接及 Rakuten Affiliate 后台记录为准。
+- 已验证 Site / MCP 均保留供应商返回的 booking / purchase / affiliate URL；`limit=6` 展示调整不改变归因链接。
 - 链接含归因参数不等于已产生收入。实际收益闭环仍需在供应商后台核对合规真实预订的归因、成果确认及佣金；本次未执行预订或支付。
 
 ### 🛍️ MengTrip v0.4 — Rakuten 商品搜索（2026-10-02）
