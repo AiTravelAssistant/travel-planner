@@ -1,10 +1,11 @@
 import resourceHandler from './resources.js';
 import rakutenHotelsHandler from './rakuten-hotels.js';
+import viatorExperiencesHandler from './viator-experiences.js';
 
-const SERVER_INFO = { name: 'mengtrip-japan-local-resource', version: '0.2.0' };
+const SERVER_INFO = { name: 'mengtrip-japan-local-resource', version: '0.3.0' };
 const MODERN_VERSION = '2026-07-28';
 const LEGACY_VERSIONS = ['2025-11-25', '2025-06-18', '2025-03-26'];
-const INSTRUCTIONS = 'Use searchJapanLocalResources for MengTrip static local experiences and places. Use searchRakutenHotels for live hotel information from Rakuten Travel. Never present provider results as guaranteed availability or a confirmed booking; preserve source and booking URLs so users can verify current details.';
+const INSTRUCTIONS = 'Use searchJapanLocalResources for MengTrip static local experiences and places. Use searchRakutenHotels for live hotel information from Rakuten Travel. Use searchExperiences for live tours and activities through MengTrip experience providers; Viator is the first provider. Never present provider results as guaranteed availability or a confirmed booking; preserve source and booking URLs so users can verify current details.';
 
 const tool = {
   name: 'searchJapanLocalResources',
@@ -36,6 +37,26 @@ const rakutenHotelTool = {
       limit: { type: 'integer', minimum: 1, maximum: 20, default: 5 }
     },
     required: ['keyword'],
+    additionalProperties: false
+  },
+  annotations: { readOnlyHint: true, openWorldHint: true, destructiveHint: false }
+};
+
+const experienceTool = {
+  name: 'searchExperiences',
+  title: 'Search travel experiences',
+  description: 'Search live tours and activities through the MengTrip experience provider layer. The current provider is Viator. Returns provider data such as title, starting price, rating, review count, image, and affiliate booking URL when supplied. Prices and availability can change.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      searchTerm: { type: 'string', description: 'Full experience search query, including destination and preferences, for example Tokyo food tour' },
+      startDate: { type: 'string', description: 'Optional travel date in YYYY-MM-DD format' },
+      endDate: { type: 'string', description: 'Optional end date in YYYY-MM-DD format' },
+      currency: { type: 'string', description: 'ISO currency code, default JPY' },
+      locale: { type: 'string', description: 'Response language, default en' },
+      limit: { type: 'integer', minimum: 1, maximum: 10, default: 5 }
+    },
+    required: ['searchTerm'],
     additionalProperties: false
   },
   annotations: { readOnlyHint: true, openWorldHint: true, destructiveHint: false }
@@ -89,11 +110,41 @@ export default async function handler(req, res) {
   }
   if (method === 'ping') return res.status(200).json(reply(id, modern ? modernResult({}) : {}));
   if (method === 'tools/list') {
-    const result = { tools: [tool, rakutenHotelTool] };
+    const result = { tools: [tool, rakutenHotelTool, experienceTool] };
     if (modern) Object.assign(result, { resultType: 'complete', ttlMs: 0, cacheScope: 'public', _meta: serverMeta() });
     return res.status(200).json(reply(id, result));
   }
   if (method !== 'tools/call') return res.status(200).json(error(id, -32601, 'Method not found'));
+  if (params.name === experienceTool.name) {
+    const args = params.arguments ?? {};
+    const allowed = experienceTool.inputSchema.properties;
+    const validDate = value => /^\\d{4}-\\d{2}-\\d{2}$/.test(value);
+    if (!args || typeof args !== 'object' || Array.isArray(args) ||
+        typeof args.searchTerm !== 'string' || !args.searchTerm.trim() || args.searchTerm.length > 200 ||
+        (args.startDate !== undefined && (typeof args.startDate !== 'string' || !validDate(args.startDate))) ||
+        (args.endDate !== undefined && (typeof args.endDate !== 'string' || !validDate(args.endDate))) ||
+        (args.currency !== undefined && (typeof args.currency !== 'string' || !/^[A-Za-z]{3}$/.test(args.currency))) ||
+        (args.locale !== undefined && (typeof args.locale !== 'string' || args.locale.length > 20)) ||
+        (args.limit !== undefined && (!Number.isInteger(args.limit) || args.limit < 1 || args.limit > 10)) ||
+        Object.keys(args).some(key => !Object.hasOwn(allowed, key))) {
+      return res.status(200).json(error(id, -32602, 'Invalid tool arguments'));
+    }
+    const query = new URLSearchParams(Object.fromEntries(
+      Object.entries(args).map(([key, value]) => [key, String(value)])
+    )).toString();
+    let status = 200;
+    let data;
+    await viatorExperiencesHandler({ method: 'GET', url: `/api/viator-experiences?${query}` }, {
+      setHeader() {}, status(code) { status = code; return this; }, end() { return this; },
+      json(value) { data = value; return this; }
+    });
+    if (status !== 200) return res.status(200).json(error(id, -32603, data?.error ?? 'Experience search failed', { providerStatus: data?.status ?? null, providerCode: data?.provider_code ?? null }));
+    const result = {
+      content: [{ type: 'text', text: JSON.stringify(data) }],
+      structuredContent: data
+    };
+    return res.status(200).json(reply(id, modern ? modernResult(result) : result));
+  }
   if (params.name === rakutenHotelTool.name) {
     const args = params.arguments ?? {};
     if (!args || typeof args !== 'object' || Array.isArray(args) ||
