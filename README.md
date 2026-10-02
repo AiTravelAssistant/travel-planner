@@ -223,6 +223,36 @@ MengTrip 已在现有 Japan Local Resource API 之上增加最小 MCP Server，�
 
 `searchJapanLocalResources` 使用 20 条静态样本数据（`data_type: static_demo`），不代表实时价格、库存、营业时间或预约结果。v0.2 新增的 `searchRakutenHotels` 返回外部 API 酒店信息，两类数据需要明确区分。
 
+
+### 🎟️ MengTrip v0.3 — Experience Provider Demo（2026-10-02）
+
+在 v0.2 的 Rakuten 酒店能力之外，MengTrip 新增统一体验搜索入口 `searchExperiences`。对 AI / Agent 暴露的是 MengTrip 的通用体验工具名，Viator 作为首个底层 Provider；未来增加其他体验供应商时，不需要改变 AI 侧调用名称。
+
+- REST：`GET https://www.mengtrip.com/api/viator-experiences?searchTerm=Tokyo%20food%20tour&limit=5`
+- MCP Endpoint：`https://www.mengtrip.com/mcp`
+- MCP Tool：`searchExperiences`
+- 当前 Provider：Viator Partner API（Basic Access）
+- 服务端环境变量：`VIATOR_API_KEY`；密钥不得写入前端或提交 GitHub。
+- 返回统一字段包括体验 ID、名称、简介、起价/币种、评分/评论数、图片和供应商 booking URL（以 Viator 实际返回字段为准）。
+- 价格和可用性可能变化；MengTrip 当前不把搜索结果表述为确认预订。
+- Viator Sandbox Key 新申请后可能需要最长 24 小时激活，因此 v0.3 代码和 MCP Tool 已部署，但供应商端到端数据验收需在 Key 可用后完成。
+
+架构：
+
+```text
+ChatGPT / Gemini / AI Agent
+          ↓
+       MengTrip MCP
+          ↓
+    searchExperiences
+          ↓
+ Experience Provider Layer
+          ↓
+     Viator Provider
+          ↓
+      Viator API
+```
+
 ### 🏨 MengTrip v0.2 — Real Travel API Demo（2026-10-01）
 
 这一里程碑验证了同一套 MengTrip 酒店能力可同时服务 Web 用户和 AI Agent；v0.2 是功能里程碑，不表示已创建 GitHub Release 或 tag。
@@ -292,7 +322,7 @@ MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源�
 
 ## 🧠 项目定位
 
-当前：**AI 旅行规划工具 MVP + 日本当地资源示例库 + Rakuten 真实酒店 API / MCP Demo**  
+当前：**AI 旅行规划工具 MVP + 日本当地资源示例库 + Rakuten 真实酒店 API + Viator 体验 Provider / MCP Demo**  
 中期：**完善日本旅行资源连接层，扩充真实资源、地区筛选与多语言能力**  
 未来：**AI 旅行基础设施 / Agent 平台（预约与佣金闭环）**
 
