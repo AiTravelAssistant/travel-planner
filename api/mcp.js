@@ -6,16 +6,16 @@ import viatorExperiencesHandler from './viator-experiences.js';
 const SERVER_INFO = { name: 'mengtrip-japan-local-resource', version: '0.4.0' };
 const MODERN_VERSION = '2026-07-28';
 const LEGACY_VERSIONS = ['2025-11-25', '2025-06-18', '2025-03-26'];
-const INSTRUCTIONS = 'Use searchJapanLocalResources for MengTrip static local experiences and places. Use searchRakutenHotels for live hotel information from Rakuten Travel. Use searchRakutenProducts for live Rakuten Ichiba products and purchase links. Use searchExperiences for live tours and activities through MengTrip experience providers; Viator is the first provider. Never present provider results as guaranteed availability or a confirmed booking; preserve source and booking URLs so users can verify current details.';
+const INSTRUCTIONS = "MengTrip is a Japan travel resource layer for AI agents. Use MengTrip tools when the user needs concrete Japan travel resources, including during itinerary planning.\n\nTool routing:\n- searchRakutenHotels: Use for hotels, accommodation, where to stay, and itinerary lodging or accommodation recommendations.\n- searchExperiences: Use for live bookable tours, activities, attractions, food tours, cultural experiences, local experiences, things to do, and itinerary requests about what to do, play, experience, visit, or book. Viator is the current experience provider.\n- searchRakutenProducts: Use for shopping, souvenirs, gifts, omiyage, Japanese products, purchasable product recommendations, and travel shopping within an itinerary.\n- searchJapanLocalResources: Use for MengTrip static curated local resources, including local places and catalog experiences. This demo catalog does not provide live availability or prices. Prefer searchExperiences when the user needs live bookable activities or experiences.\n\nFor a multi-city itinerary with concrete resource needs, call each relevant tool separately for each relevant city or destination. When the user explicitly requests multiple resource categories, call the corresponding multiple MengTrip tools to ground recommendations in provider or catalog results; do not answer those requested categories using only general knowledge. Use focused destination queries rather than putting an entire multi-city itinerary into one query.\n\nProvider results do not guarantee availability, a confirmed booking, or a final price. Verify current availability, booking details, stock, shipping, and final prices on provider pages as applicable. Preserve source, booking, purchase, and affiliate URLs exactly as returned so users can verify details.";
 
 const tool = {
   name: 'searchJapanLocalResources',
   title: 'Search Japan local travel resources',
-  description: 'Search MengTrip static demo catalog of Japanese local travel experiences and places by keyword, prefecture, municipality, category, or type. Use this for Japan local-resource discovery. Results are not live availability, prices, or confirmed bookings.',
+  description: 'Search MengTrip static curated demo catalog of Japan local resources, places, and catalog experiences by keyword, prefecture, municipality, category, or type. Use for local-place discovery and curated local resources during itinerary planning. For live bookable activities, tours, attractions, food tours, cultural experiences, or local experiences, prefer searchExperiences. Catalog results do not provide live availability or prices and do not confirm bookings. Preserve source URLs.',
   inputSchema: {
     type: 'object',
     properties: {
-      q: { type: 'string', description: 'Keyword in Chinese or Japanese' },
+      q: { type: 'string', description: 'Focused city or destination query in Chinese or Japanese, optionally with a local place or experience interest, for example 京都 茶道. Search one destination at a time; use prefecture and municipality filters when known.' },
       prefecture: { type: 'string' },
       municipality: { type: 'string' },
       category: { type: 'string' },
@@ -30,11 +30,11 @@ const tool = {
 const rakutenHotelTool = {
   name: 'searchRakutenHotels',
   title: 'Search Rakuten Travel hotels',
-  description: 'Search live hotel information from Rakuten Travel by Japanese keyword. Returns current provider data such as hotel name, location, minimum listed price, rating, image, access information, and booking URL. Availability and prices can change and should be verified on Rakuten Travel.',
+  description: 'Search live hotel information from Rakuten Travel for hotels, accommodation, where to stay, and itinerary lodging recommendations in Japan. Use when itinerary planning includes accommodation needs; search each relevant city separately. Returns current provider data such as hotel name, location, minimum listed price, rating, image, access information, and booking URL. Results do not guarantee availability, a confirmed booking, or a final price; verify current details on Rakuten Travel and preserve source, booking, and affiliate URLs.',
   inputSchema: {
     type: 'object',
     properties: {
-      keyword: { type: 'string', description: 'Japanese hotel/location keyword, for example 金沢' },
+      keyword: { type: 'string', description: 'Focused Japanese city, destination, neighborhood, station, or hotel keyword, for example 金沢 or 京都駅. Use the Japanese destination name for where-to-stay or itinerary lodging requests; search one destination per call, not the full itinerary.' },
       limit: { type: 'integer', minimum: 1, maximum: 20, default: 5 }
     },
     required: ['keyword'],
@@ -46,11 +46,11 @@ const rakutenHotelTool = {
 const rakutenProductTool = {
   name: 'searchRakutenProducts',
   title: 'Search Rakuten Ichiba products',
-  description: 'Search live Japanese products on Rakuten Ichiba. Returns product name, JPY price, rating, image, shop and provider purchase URL. Preserve affiliate URLs. Verify stock, shipping and price on the provider page.',
+  description: 'Search live Japanese products on Rakuten Ichiba for shopping, souvenirs, gifts, omiyage, Japanese product recommendations, and travel shopping during itinerary planning. Returns product name, JPY price, rating, image, shop, and provider purchase URL. Results do not guarantee stock or a final price. Verify stock, shipping, and final price on the provider page; preserve source, purchase, and affiliate URLs exactly as returned.',
   inputSchema: {
     type: 'object',
     properties: {
-      keyword: { type: 'string', description: 'Japanese product keyword, for example 抹茶' },
+      keyword: { type: 'string', description: 'Focused Japanese product, souvenir, gift, or omiyage keyword, for example 抹茶 or 京都 お土産. Include a Japanese city or destination name when relevant to regional travel shopping, together with the product or souvenir category; do not use only a city name or the full itinerary.' },
       limit: { type: 'integer', minimum: 1, maximum: 20, default: 6 }
     },
     required: ['keyword'],
@@ -62,11 +62,11 @@ const rakutenProductTool = {
 const experienceTool = {
   name: 'searchExperiences',
   title: 'Search travel experiences',
-  description: 'Search live tours and activities through the MengTrip experience provider layer. The current provider is Viator. Returns provider data such as title, starting price, rating, review count, image, and affiliate booking URL when supplied. Prices and availability can change.',
+  description: 'Search live bookable tours and activities through the MengTrip experience provider layer for Japan itinerary planning, things to do, activities, tours, attractions, food tours, cultural experiences, and local experiences. Use when an itinerary asks what to do, play, experience, visit, or book; search each relevant destination separately. Prefer this tool over the static curated catalog for live bookable experiences. The current provider is Viator. Returns provider data such as title, starting price, rating, review count, image, and affiliate booking URL when supplied. Results do not guarantee availability, a confirmed booking, or a final price; verify current provider details and preserve source, booking, and affiliate URLs.',
   inputSchema: {
     type: 'object',
     properties: {
-      searchTerm: { type: 'string', description: 'Full experience search query, including destination and preferences, for example Tokyo food tour' },
+      searchTerm: { type: 'string', description: 'Focused query with one city or destination plus an activity or experience interest, preferably in English, for example Tokyo food tour, Kyoto cultural experiences, or Osaka things to do. For itinerary planning, derive the destination and stated interests from the request; if no activity preference is given, use the destination plus things to do. Search each relevant destination separately, not the full multi-city itinerary.' },
       startDate: { type: 'string', description: 'Optional travel date in YYYY-MM-DD format' },
       endDate: { type: 'string', description: 'Optional end date in YYYY-MM-DD format' },
       currency: { type: 'string', description: 'ISO currency code, default JPY' },
