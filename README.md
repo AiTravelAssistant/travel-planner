@@ -12,6 +12,7 @@
 - 百度统计事件埋点
 - 页面内轻量用户反馈（无需登录）
 - Rakuten Travel 真实酒店搜索（REST API + MCP）
+- Rakuten Ichiba 真实日本商品搜索（REST API + MCP）
 - 日本当地资源示例库搜索（20 条静态资源）
 
 ---
@@ -393,3 +394,12 @@ MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源�
 - Rakuten 检查时未传入 `affiliateId`，线上返回普通住宿方案链接。已增加可选 `RAKUTEN_AFFILIATE_ID` 转发支持；需在后端生产部署环境配置本人联盟 ID 并重新部署，再验证实际返回链接。
 - 本次本地模拟验证：已配置 / 未配置联盟 ID 两种情况下的请求参数正确，供应商 booking URL 原样保留，`limit=6` 不受影响。
 - 链接含归因参数不等于已产生收入。实际收益闭环仍需在供应商后台核对合规真实预订的归因、成果确认及佣金；本次未执行预订或支付。
+
+### 🛍️ MengTrip v0.4 — Rakuten 商品搜索（2026-10-02）
+
+- REST：`GET https://www.mengtrip.com/api/rakuten-products?keyword=抹茶&limit=6`
+- MCP：`searchRakutenProducts({"keyword":"抹茶","limit":6})`；现有三个工具保持不变。
+- 复用服务端 `RAKUTEN_APPLICATION_ID`、`RAKUTEN_ACCESS_KEY`、可选 `RAKUTEN_AFFILIATE_ID`；乐天应用需启用楽天市場API访问范围。
+- 返回商品名称、JPY价格、评分、评论数、图片、店铺、`purchase_url`、`affiliate_url`。优先原样保留供应商 `affiliateUrl`；未配置联盟或供应商未返回联盟链接时，普通商品链接不能视为佣金归因。
+- 线上 MCP 实际调用「抹茶」limit=6 成功返回6件真实商品，6条联盟链接。商品可能含ふるさと納税返礼品，需按商品名称确认；价格、库存及配送范围以供应商页面为准。
+- 本地验证参数校验、联盟参数传递、原样链接、无联盟配置和上游失败。当前未执行购买或证明佣金到账。
