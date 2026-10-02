@@ -235,7 +235,7 @@ MengTrip 已在现有 Japan Local Resource API 之上增加最小 MCP Server，�
 - 服务端环境变量：`VIATOR_API_KEY`；密钥不得写入前端或提交 GitHub。
 - 返回统一字段包括体验 ID、名称、简介、起价/币种、评分/评论数、图片和供应商 booking URL（以 Viator 实际返回字段为准）。
 - 价格和可用性可能变化；MengTrip 当前不把搜索结果表述为确认预订。
-- Viator Sandbox Key 新申请后可能需要最长 24 小时激活，因此 v0.3 代码和 MCP Tool 已部署，但供应商端到端数据验收需在 Key 可用后完成。
+- 2026-10-02 已完成 Production 端到端 REST 验收：`searchTerm=Tokyo food tour&limit=5` 成功返回 5 条 Viator `live_api` 体验数据，包含 JPY 起价、评分、评论数、时长、图片、免费取消标识和带 MengTrip Partner ID 的 Viator booking URL。Sandbox Key 仍可单独等待激活用于后续开发测试。
 
 架构：
 
