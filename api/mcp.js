@@ -1,11 +1,12 @@
 import resourceHandler from './resources.js';
 import rakutenHotelsHandler from './rakuten-hotels.js';
+import rakutenProductsHandler from './rakuten-products.js';
 import viatorExperiencesHandler from './viator-experiences.js';
 
-const SERVER_INFO = { name: 'mengtrip-japan-local-resource', version: '0.3.0' };
+const SERVER_INFO = { name: 'mengtrip-japan-local-resource', version: '0.4.0' };
 const MODERN_VERSION = '2026-07-28';
 const LEGACY_VERSIONS = ['2025-11-25', '2025-06-18', '2025-03-26'];
-const INSTRUCTIONS = 'Use searchJapanLocalResources for MengTrip static local experiences and places. Use searchRakutenHotels for live hotel information from Rakuten Travel. Use searchExperiences for live tours and activities through MengTrip experience providers; Viator is the first provider. Never present provider results as guaranteed availability or a confirmed booking; preserve source and booking URLs so users can verify current details.';
+const INSTRUCTIONS = 'Use searchJapanLocalResources for MengTrip static local experiences and places. Use searchRakutenHotels for live hotel information from Rakuten Travel. Use searchRakutenProducts for live Rakuten Ichiba products and purchase links. Use searchExperiences for live tours and activities through MengTrip experience providers; Viator is the first provider. Never present provider results as guaranteed availability or a confirmed booking; preserve source and booking URLs so users can verify current details.';
 
 const tool = {
   name: 'searchJapanLocalResources',
@@ -35,6 +36,22 @@ const rakutenHotelTool = {
     properties: {
       keyword: { type: 'string', description: 'Japanese hotel/location keyword, for example 金沢' },
       limit: { type: 'integer', minimum: 1, maximum: 20, default: 5 }
+    },
+    required: ['keyword'],
+    additionalProperties: false
+  },
+  annotations: { readOnlyHint: true, openWorldHint: true, destructiveHint: false }
+};
+
+const rakutenProductTool = {
+  name: 'searchRakutenProducts',
+  title: 'Search Rakuten Ichiba products',
+  description: 'Search live Japanese products on Rakuten Ichiba. Returns product name, JPY price, rating, image, shop and provider purchase URL. Preserve affiliate URLs. Verify stock, shipping and price on the provider page.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      keyword: { type: 'string', description: 'Japanese product keyword, for example 抹茶' },
+      limit: { type: 'integer', minimum: 1, maximum: 20, default: 6 }
     },
     required: ['keyword'],
     additionalProperties: false
@@ -110,7 +127,7 @@ export default async function handler(req, res) {
   }
   if (method === 'ping') return res.status(200).json(reply(id, modern ? modernResult({}) : {}));
   if (method === 'tools/list') {
-    const result = { tools: [tool, rakutenHotelTool, experienceTool] };
+    const result = { tools: [tool, rakutenHotelTool, experienceTool, rakutenProductTool] };
     if (modern) Object.assign(result, { resultType: 'complete', ttlMs: 0, cacheScope: 'public', _meta: serverMeta() });
     return res.status(200).json(reply(id, result));
   }
@@ -161,6 +178,28 @@ export default async function handler(req, res) {
       json(value) { data = value; return this; }
     });
     if (status !== 200) return res.status(200).json(error(id, -32603, data?.error ?? 'Rakuten Travel search failed'));
+    const result = {
+      content: [{ type: 'text', text: JSON.stringify(data) }],
+      structuredContent: data
+    };
+    return res.status(200).json(reply(id, modern ? modernResult(result) : result));
+  }
+  if (params.name === rakutenProductTool.name) {
+    const args = params.arguments ?? {};
+    if (!args || typeof args !== 'object' || Array.isArray(args) ||
+        typeof args.keyword !== 'string' || !args.keyword.trim() || args.keyword.length > 80 ||
+        (args.limit !== undefined && (!Number.isInteger(args.limit) || args.limit < 1 || args.limit > 20)) ||
+        Object.keys(args).some(key => !Object.hasOwn(rakutenProductTool.inputSchema.properties, key))) {
+      return res.status(200).json(error(id, -32602, 'Invalid tool arguments'));
+    }
+    const query = new URLSearchParams({ keyword: args.keyword, ...(args.limit ? { limit: String(args.limit) } : {}) }).toString();
+    let status = 200;
+    let data;
+    await rakutenProductsHandler({ method: 'GET', url: `/api/rakuten-products?${query}` }, {
+      setHeader() {}, status(code) { status = code; return this; }, end() { return this; },
+      json(value) { data = value; return this; }
+    });
+    if (status !== 200) return res.status(200).json(error(id, -32603, data?.error ?? 'Rakuten Ichiba search failed'));
     const result = {
       content: [{ type: 'text', text: JSON.stringify(data) }],
       structuredContent: data
