@@ -46,6 +46,10 @@ export default async function handler(req, res) {
     hits: String(limit)
   });
 
+  // Let Rakuten generate the affiliate URLs; preserve its returned URLs verbatim.
+  const affiliateId = (process.env.RAKUTEN_AFFILIATE_ID || '').trim();
+  if (affiliateId) params.set('affiliateId', affiliateId);
+
   try {
     const response = await fetch(
       `https://openapi.rakuten.co.jp/engine/api/Travel/KeywordHotelSearch/20260731?${params.toString()}`,
