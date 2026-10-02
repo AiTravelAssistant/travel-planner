@@ -3,6 +3,7 @@
 const ALLOWED_ORIGINS = new Set([
   'https://aitravelassistant.github.io',
   'https://www.mengtrip.com',
+  'https://mengtrip-japan-local-resource.king-meng.chatgpt.site',
   'https://mengtrip.com',
   'http://localhost:3000',
   'http://localhost:5173'
