@@ -313,7 +313,7 @@ MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源�
 
 - 参数：`keyword` 必填，最多 80 字符；`limit` 默认 5，MCP 支持 1–20，Site 最多展示 6 家。
 - 返回字段：`name`、`area`、`price_from_jpy`、`rating`、`review_count`、`image`、`booking_url` 等；缺失字段可能为 `null`。
-- 服务端环境变量：`RAKUTEN_APPLICATION_ID`、`RAKUTEN_ACCESS_KEY`。密钥只配置在部署环境，不能写入前端或提交到仓库。
+- 服务端环境变量：`RAKUTEN_APPLICATION_ID`、`RAKUTEN_ACCESS_KEY`；可选联盟配置 `RAKUTEN_AFFILIATE_ID`。配置联盟 ID 后，酒店接口将其作为 `affiliateId` 传入 Rakuten，由供应商生成链接；MengTrip 原样保留 `planListUrl` / `hotelInformationUrl`。未配置时仍可搜索，但不能据此声称链接已包含 MengTrip 联盟归因。密钥只配置在部署环境，不能写入前端或提交到仓库。
 - 上游失败返回错误，不回退到模拟酒店数据。
 - 源码：`api/rakuten-hotels.js`（酒店查询及标准化）、`api/mcp.js`（两个 MCP Tools）、`api/resources.js`（静态资源搜索）、`data/japan-local-resources.demo.json`（示例数据）。
 
@@ -385,3 +385,11 @@ MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源�
 - 代理要求 POST 携带允许的 Origin，允许 GitHub Pages、mengtrip.com（含 www）和 localhost:3000 / localhost:5173；无 Origin 的脚本调用会返回 403。Origin/CORS 不是身份认证，非浏览器客户端仍能伪造该请求头。
 - 保留请求大小、消息、token 和每 IP 频率限制。内存 rate limit 仅作用于当前 serverless 实例，不跨实例共享，冷启动会重置，不能保证全局限流。
 - 客户端请求约 90 秒超时，并对 429 / 5xx 显示简短提示；客户端取消不保证上游模型停止计算。
+
+### Affiliate link audit（2026-10-02）
+
+- 已检查 REST 后端及 MCP 复用路径；Site 与 MCP 共用供应商返回的 `booking_url`。
+- Viator Production 实测返回 `pid=P00323288`、`mcid=42383`、`medium=api`、`campaign=mengtrip`。代码已请求 `campaign-value=mengtrip`，并原样保留 API 的 `productUrl`，不手工替换 PID / MCID。
+- Rakuten 检查时未传入 `affiliateId`，线上返回普通住宿方案链接。已增加可选 `RAKUTEN_AFFILIATE_ID` 转发支持；需在后端生产部署环境配置本人联盟 ID 并重新部署，再验证实际返回链接。
+- 本次本地模拟验证：已配置 / 未配置联盟 ID 两种情况下的请求参数正确，供应商 booking URL 原样保留，`limit=6` 不受影响。
+- 链接含归因参数不等于已产生收入。实际收益闭环仍需在供应商后台核对合规真实预订的归因、成果确认及佣金；本次未执行预订或支付。
