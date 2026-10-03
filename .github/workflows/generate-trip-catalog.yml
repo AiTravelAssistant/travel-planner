@@ -1,0 +1,31 @@
+name: Generate travel catalog
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/trips.json'
+      - 'scripts/generate-trip-catalog.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate homepage cards and sitemap
+        run: node scripts/generate-trip-catalog.mjs
+      - name: Commit generated files
+        run: |
+          if git diff --quiet -- index.html sitemap.xml; then
+            echo "Generated files are already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html sitemap.xml
+          git commit -m "Update generated travel catalog"
+          git push
