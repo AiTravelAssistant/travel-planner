@@ -22,5 +22,14 @@
     "description": "大阪美食街区搭配京都文化散步，按区域游览，减少搬运行李。",
     "lastmod": "2026-10-03"
   }
+,
+  {
+    "title": "京都经典5日自由行",
+    "url": "/kyoto-classic-5-day-itinerary.html",
+    "label": "5天｜首次京都｜文化古都",
+    "highlight": "清水寺・祇园・伏见稻荷・岚山・锦市场",
+    "description": "从东山传统街区到伏见稻荷与岚山，结合寺社文化、自然、美食和购物，适合第一次到京都的中文自由行游客。",
+    "lastmod": "2026-10-03",
+    "anchors": {"hotels":"#hotels","experiences":"#experiences","products":"#products"}
+  }
 ]
-
