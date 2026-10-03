@@ -111,12 +111,7 @@
 <p>先用 AI 规划行程，再挑选酒店、当地体验和日本商品。</p>
 </section>
 <section id="planner" class="planner-panel" aria-label="AI 行程规划">
-<div class="quick-input-hint">
-  <p>🧳 1分钟一键搞定行程安排！</p>
-  <p>📝 输出行程PDF文件，可保存可分享</p>
-  <p>💡 节省做攻略的时间，出行前轻松搞定</p>
-  <p>🎁 免费生成行程，下载PDF文件（¥9.90）</p>
-</div>
+<div class="quick-input-hint"><p>告诉我去哪、几天、和谁去，AI 帮你生成日本自由行。</p><p>免费生成行程；需要时可下载 PDF（¥9.90）。</p></div>
 <div class="input-assist" aria-label="快速填写旅行需求">
   <div class="input-assist-header">
     <p class="input-assist-title">不知道怎么写？可以从这里开始</p>
@@ -149,25 +144,10 @@
 <article class="resource-card"><p class="resource-label">5天｜首次京都｜文化古都</p><h3><a href="/kyoto-classic-5-day-itinerary.html">京都经典5日自由行</a></h3><p><strong>清水寺・祇园・伏见稻荷・岚山・锦市场</strong></p><p>从东山传统街区到伏见稻荷与岚山，结合寺社文化、自然、美食和购物，适合第一次到京都的中文自由行游客。</p><a class="resource-demo" href="/kyoto-classic-5-day-itinerary.html">查看完整行程</a></article>
 <!-- FEATURED_TRIPS_END --></div></section>
 <section id="japan-resources" class="resource-section" aria-labelledby="resourcesTitle">
-<h2 id="resourcesTitle">住哪里、玩什么、买什么</h2>
-<p class="resource-intro">MengTrip 为赴日自由行用户和 AI Agent 提供日本旅行规划与资源查询。除了中文 AI 行程，你还可以通过旅行资源站 探索日本酒店、当地体验和旅行购物，为东京、大阪、京都等目的地的旅程寻找灵感。</p>
-<p class="resource-intro" lang="en">MengTrip connects Japan travel resources including hotels, local experiences and Japanese products, for travelers and AI agents.</p>
-<div class="resource-grid">
-<article class="resource-card"><p class="resource-label" lang="en">HOTELS IN JAPAN</p><h3><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/#hotel-section">日本酒店</a></h3><p>通过 Rakuten Travel 查询酒店名称、地区、最低标示价格与评分，进入供应商页面查看住宿方案。具体日期的价格与空房以预订页面为准。</p></article>
-<article class="resource-card"><p class="resource-label" lang="en">THINGS TO DO IN JAPAN</p><h3><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/#experience-section">当地体验</a></h3><p>通过 Viator 探索东京美食导览、文化体验与日本观光活动，查看体验介绍、价格与评分，再前往供应商页面预约。</p></article>
-<article class="resource-card"><p class="resource-label" lang="en">JAPANESE PRODUCTS</p><h3><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/#product-section">日本商品</a></h3><p>通过 Rakuten 市场寻找抹茶、伴手礼与日本商品，让旅行购物延续到旅程之后。配送地区、库存与费用请在商品页面确认。</p></article>
-</div>
-<a class="resource-demo" href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/">探索酒店、体验与商品 →</a>
-<details class="agent-details">
-<summary>AI Agent 与开发者接入 <span lang="en">/ For AI Agents &amp; Developers</span></summary>
-<p lang="en">MengTrip provides Japan travel resources through REST APIs and MCP: Rakuten hotels, Viator experiences, Rakuten products, and a curated local resource demo dataset.</p>
-<ul>
-<li>REST API：<code>/api/rakuten-hotels</code>、<code>/api/viator-experiences</code>、<code>/api/rakuten-products</code>、<code>/api/resources</code>。参数与返回字段参见<a href="https://github.com/AiTravelAssistant/travel-planner#readme">接入文档</a>。</li>
-<li><a href="/openapi.json">OpenAPI 描述文件</a>：当前描述当地静态资源接口。</li>
-<li>MCP endpoint：<code>https://www.mengtrip.com/mcp</code>，需在支持 MCP 的客户端中配置连接。</li>
-</ul>
-<p>资源查询后可前往供应商页面预订或购买；当前接口不提供自动预订和支付。公开页面与端点有助于发现，但不代表所有 AI 都会自动调用。</p>
-</details>
+<h2 id="resourcesTitle">探索日本旅行资源</h2>
+<p class="resource-intro">需要继续安排旅行？从 MengTrip 旅行资源站查询酒店、当地体验和日本商品。</p>
+<div class="resource-actions"><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/#hotel-section">🏨 酒店</a><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/#experience-section">🎫 当地体验</a><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/#product-section">🎁 日本商品</a></div>
+<details class="agent-details"><summary>AI Agent 与开发者接入</summary><p>支持 REST API 与 MCP。<a href="https://github.com/AiTravelAssistant/travel-planner#readme">查看接入文档</a> · <a href="/openapi.json">OpenAPI</a> · MCP：<code>https://www.mengtrip.com/mcp</code></p></details>
 </section>
 <section class="resource-section faq-section" aria-labelledby="faqTitle"><h2 id="faqTitle">常见问题</h2><details class="agent-details"><summary>MengTrip是什么？</summary><p>MengTrip为中文用户提供日本自由行规划与当地旅行资源入口，包括AI行程生成、日本酒店、当地体验和日本商品查询。</p></details>
 <details class="agent-details"><summary>可以生成日本自由行吗？</summary><p>可以。输入目的地、出行日期、人数、预算和偏好，即可免费生成行程。生成后进入独立结果页查看，PDF下载为人民币¥9.90，微信扫码后自行确认。</p></details>
