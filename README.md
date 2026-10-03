@@ -30,23 +30,20 @@
 
 ---
 
-## ✅ Current MVP Status（2026-10-02）
+## ✅ Current MVP Status（2026-10-03）
 
-当前项目目前有两个相互关联但用途不同的用户入口：
+两个入口按用户任务分工：
 
-### MengTrip Unified Travel Demo V1（2026-10-02 冻结版）
-- Site：MengTrip Japan Local Resource Site
-- AI 自动生成日本旅行行程，并以 Trip Card 展示，可打开查看完整行程
-- Rakuten Travel 真实酒店搜索：桌面端按 3 列 × 2 行展示，最多 6 条
-- Viator 真实日本当地体验搜索：桌面端按 3 列 × 2 行展示，最多 6 条
-- Rakuten Ichiba 真实日本商品搜索：默认展示 6 条，并保留供应商 Affiliate URL（如返回）
-- MengTrip Japan Local Resource 当地资源搜索
-- 当前 Site 的 AI 行程详情不提供 PDF 下载、支付按钮或导出触发逻辑
-- 已完成 PC 端人工验收；现阶段作为统一旅行 Demo 冻结，后续优先考虑让 AI 行程与酒店 / 体验 / 商品资源进一步联动
+### MengTrip 日本旅行资源站
+- Site 只保留酒店、Viator 当地体验、Rakuten 商品与精选当地资源搜索。
+- 酒店、体验、商品最多显示 6 条，桌面三列、手机单列。
+- 官网旅行卡片通过查询参数带入搜索条件，链接定位相应区域。
+- 卡片保留供应商 Affiliate URL（如返回），点击进入供应商预订或购买页面。
+- AI 行程生成集中在 www.mengtrip.com；Site 不再生成或展示 AI Trip Card。
 
-统一 Site 当前产品链路：
+当前链路：
 
-**输入旅行需求 → AI 生成行程 → Trip Card → 查看完整行程 → 搜索真实酒店 / 体验 / 商品 / 当地资源 → 跳转供应商 booking / purchase URL**
+**官网 AI 行程 / 精选旅行 → 酒店、体验、商品入口 → Site 搜索结果 → 供应商预订 / 购买链接**
 
 ### 原 MengTrip AI Travel Planner MVP
 
@@ -435,3 +432,10 @@ MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源�
 - 公开路线扩展为东京5日、东京→大阪5日、大阪京都5日；新增页沿用东京示例版式，提供静态正文、独立元数据与官方参考链接，已列入sitemap。
 - 增加面向旅行者与AI Agent的英文旅行资源说明，以及4项可展开FAQ；FAQ结构化数据与页面正文一致，不保证搜索展示。
 - 本轮仅修改公开内容、入口和发现元数据；AI生成、结果页、微信二维码、PDF、REST/MCP与ChatGPT Site未修改。
+
+
+## 官网与旅行资源站分工（2026-10-03）
+- `www.mengtrip.com`：AI 行程生成、独立行程结果/PDF、精选旅行产品和 SEO 内容。
+- ChatGPT Site：酒店、Viator 体验、Rakuten 商品与当地资源搜索；AI 行程生成区已移除。
+- 官网旅行卡片和三个静态行程页通过 `hotel` / `experience` / `product` 查询参数带入资源站搜索条件，并通过 `#hotel-section` / `#experience-section` / `#product-section` 定位对应区域。
+- 暂时使用现有 ChatGPT Site 地址；未切换 `app.mengtrip.com`。API、MCP、Affiliate 链接和 SEO 基础文件保持原有功能。
