@@ -409,6 +409,13 @@ function updateRoadTrack() {
 }
 const observer = new MutationObserver(() => {
   const car = document.getElementById("roadTrack");
-  if (car && !intervalId) intervalId = setInterval(updateRoadTrack, 200);
+  if (car && !intervalId) {
+    carPosition = 0;
+    direction = 1;
+    intervalId = setInterval(updateRoadTrack, 200);
+  } else if (!car && intervalId) {
+    clearInterval(intervalId);
+    intervalId = undefined;
+  }
 });
 observer.observe(document.body, { childList: true, subtree: true });
