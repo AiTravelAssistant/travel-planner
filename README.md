@@ -408,7 +408,7 @@ MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源�
 ### 首页发现与展示（2026-10-03）
 
 - `index.html` 增加中文标题、description、canonical、Open Graph 和 Organization / WebSite JSON-LD。
-- 首页加入静态日本酒店、当地体验、商品介绍及资源 Demo 链接；开发者说明包含 REST / MCP 接入和 OpenAPI 当前仅覆盖静态资源的范围。
+- 首页加入静态日本酒店、当地体验、商品介绍及资源 Demo 链接；开发者说明包含 REST / MCP 接入和 OpenAPI 覆盖静态资源、酒店、体验及商品查询的范围。
 - 新增 `robots.txt` 与 `sitemap.xml`（目前仅列首页）；不保证搜索引擎收录、排名或 AI 自动调用。
 - 统一绿色主色、留白、卡片与手机排版；保留原有 DeepSeek 请求、行程历史、微信二维码与人民币 ¥9.90 PDF 下载逻辑。ChatGPT Site 未修改。
 
@@ -439,3 +439,11 @@ MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源�
 - ChatGPT Site：酒店、Viator 体验、Rakuten 商品与当地资源搜索；AI 行程生成区已移除。
 - 官网旅行卡片和三个静态行程页通过 `hotel` / `experience` / `product` 查询参数带入资源站搜索条件，并通过 `#hotel-section` / `#experience-section` / `#product-section` 定位对应区域。
 - 暂时使用现有 ChatGPT Site 地址；未切换 `app.mengtrip.com`。API、MCP、Affiliate 链接和 SEO 基础文件保持原有功能。
+
+
+### API 稳定性修正（2026-10-03）
+
+- 修正 MCP 体验查询的 YYYY-MM-DD 日期正则；非法 `params` 返回 JSON-RPC `-32602`，避免未捕获异常。
+- DeepSeek 上游请求超时为 60 秒；Rakuten 酒店、商品及 Viator 为 15 秒，超时 REST 返回 HTTP 504。MCP 保留现有 JSON-RPC 工具错误返回格式。
+- `openapi.json` 同步四个公开资源查询接口，包含参数、默认条数、返回字段及错误响应；未将 AI 生成或反馈接口公开为 Agent 工具。
+- CI 检查所有后端 JavaScript 文件并运行全部测试，包括日期透传、异常参数、上游超时与 OpenAPI 接口契约。

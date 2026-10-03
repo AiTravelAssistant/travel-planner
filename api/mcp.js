@@ -101,6 +101,9 @@ export default async function handler(req, res) {
   }
   if (body.id === undefined) return res.status(202).end(); // notifications
   const { id, method, params = {} } = body;
+  if (!params || typeof params !== 'object' || Array.isArray(params)) {
+    return res.status(200).json(error(id, -32602, 'Invalid params: expected an object'));
+  }
   const modern = isModern(req, params);
 
   // MCP 2026-07-28 is stateless and starts with server/discover rather than initialize.
@@ -135,7 +138,7 @@ export default async function handler(req, res) {
   if (params.name === experienceTool.name) {
     const args = params.arguments ?? {};
     const allowed = experienceTool.inputSchema.properties;
-    const validDate = value => /^\\d{4}-\\d{2}-\\d{2}$/.test(value);
+    const validDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value);
     if (!args || typeof args !== 'object' || Array.isArray(args) ||
         typeof args.searchTerm !== 'string' || !args.searchTerm.trim() || args.searchTerm.length > 200 ||
         (args.startDate !== undefined && (typeof args.startDate !== 'string' || !validDate(args.startDate))) ||

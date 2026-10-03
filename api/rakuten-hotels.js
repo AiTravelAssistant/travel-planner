@@ -54,6 +54,7 @@ export default async function handler(req, res) {
     const response = await fetch(
       `https://openapi.rakuten.co.jp/engine/api/Travel/KeywordHotelSearch/20260731?${params.toString()}`,
       {
+        signal: AbortSignal.timeout(15000),
         headers: {
           Accept: 'application/json',
           Referer: 'https://www.mengtrip.com/',
@@ -62,7 +63,10 @@ export default async function handler(req, res) {
       }
     );
 
-    const body = await response.json().catch(() => null);
+    const body = await response.json().catch(err => {
+      if (err?.name === 'TimeoutError' || err?.name === 'AbortError') throw err;
+      return null;
+    });
     if (!response.ok) {
       console.error('Rakuten Travel API error', response.status, body?.error || body?.error_description || 'unknown');
       return res.status(502).json({ error: 'Rakuten Travel API request failed', status: response.status });
@@ -96,6 +100,9 @@ export default async function handler(req, res) {
       notice: 'Hotel information is provided by Rakuten Travel. booking_url is the Rakuten lodging-plan page when the API supplies one; prices and availability can change and should be verified there.'
     });
   } catch (err) {
+    if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
+      return res.status(504).json({ error: 'Upstream service timed out; please retry later' });
+    }
     console.error('Rakuten Travel API request failed', err?.message || err);
     return res.status(502).json({ error: 'Unable to reach Rakuten Travel API' });
   }

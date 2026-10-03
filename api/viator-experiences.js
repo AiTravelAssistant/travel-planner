@@ -83,6 +83,7 @@ export default async function handler(req, res) {
   try {
     const response = await fetch(`${baseUrl}/search/freetext?campaign-value=mengtrip`, {
       method: 'POST',
+      signal: AbortSignal.timeout(15000),
       headers: {
         'exp-api-key': apiKey,
         'Accept': 'application/json;version=2.0',
@@ -92,7 +93,10 @@ export default async function handler(req, res) {
       body: JSON.stringify(requestBody)
     });
 
-    const body = await response.json().catch(() => null);
+    const body = await response.json().catch(err => {
+      if (err?.name === 'TimeoutError' || err?.name === 'AbortError') throw err;
+      return null;
+    });
     if (!response.ok) {
       console.error('Viator API error', response.status, body?.code || body?.message || 'unknown');
       return res.status(502).json({
@@ -122,6 +126,9 @@ export default async function handler(req, res) {
       notice: 'Experience information is provided by Viator. Prices and availability can change. booking_url is the provider affiliate link when supplied by Viator.'
     });
   } catch (err) {
+    if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
+      return res.status(504).json({ error: 'Upstream service timed out; please retry later' });
+    }
     console.error('Viator API request failed', err?.message || err);
     return res.status(502).json({ error: 'Unable to reach Viator API' });
   }
