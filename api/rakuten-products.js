@@ -55,7 +55,10 @@ export default async function handler(req, res) {
       }
     );
 
-    const body = await response.json().catch(() => null);
+    const body = await response.json().catch(err => {
+      if (err?.name === 'TimeoutError' || err?.name === 'AbortError') throw err;
+      return null;
+    });
     if (!response.ok) {
       console.error('Rakuten Ichiba API error', response.status);
       return res.status(502).json({ error: 'Rakuten Ichiba API request failed', status: response.status });
@@ -84,7 +87,10 @@ export default async function handler(req, res) {
       total: body.count ?? results.length, returned: results.length, results,
       notice: 'Prices and stock can change. Verify product details and shipping on Rakuten Ichiba. Affiliate links do not guarantee commission.'
     });
-  } catch {
+  } catch (err) {
+    if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
+      return res.status(504).json({ error: 'Upstream service timed out; please retry later' });
+    }
     return res.status(502).json({ error: 'Unable to reach Rakuten Ichiba API' });
   }
 }

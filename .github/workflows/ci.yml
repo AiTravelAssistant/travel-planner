@@ -21,12 +21,8 @@ jobs:
 
       - name: Validate JavaScript syntax
         run: |
-          node --check api/deepseek.js
-          node --check api/feedback.js
-          node --check api/resources.js
-          node --check api/mcp.js
-          node --test tests/resources.test.mjs
-          node --test tests/mcp.test.mjs
+          for file in api/*.js; do node --check "$file"; done
+          node --test tests/*.mjs
 
       - name: Check for exposed DeepSeek API key
         run: |

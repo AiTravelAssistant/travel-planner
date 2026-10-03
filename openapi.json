@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "MengTrip Japan Local Resource Demo",
-    "version": "0.1.0",
-    "description": "从静态样例文件检索日本本地体验和场所。无实时库存、价格或自动预订。"
+    "title": "MengTrip Japan Travel Resource API",
+    "version": "0.4.0",
+    "description": "日本旅行资源查询：Rakuten Travel 酒店、Viator 体验、Rakuten Ichiba 商品及静态精选资源。查询不确认预订、库存或最终价格；供应商及联盟链接须原样保留。"
   },
   "servers": [
     {
@@ -126,6 +126,320 @@
           }
         }
       }
+    },
+    "/api/rakuten-hotels": {
+      "get": {
+        "operationId": "searchRakutenHotels",
+        "summary": "查询乐天日本酒店（参考起价，不是指定日期空房报价）",
+        "description": "查询结果仅为参考，请在供应商页面确认价格、空房、库存、语言与配送条件。原样保留 booking_url / purchase_url 和联盟参数。",
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "description": "日文城市、车站或酒店名称，例如 京都駅"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "default": 5
+            },
+            "description": "最多返回条数"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "provider": {
+                      "type": "string"
+                    },
+                    "data_type": {
+                      "type": "string",
+                      "enum": [
+                        "live_api"
+                      ]
+                    },
+                    "returned": {
+                      "type": "integer"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Hotel"
+                      }
+                    },
+                    "notice": {
+                      "type": "string"
+                    },
+                    "keyword": {
+                      "type": "string"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "405": {
+            "description": "仅支持 GET"
+          },
+          "500": {
+            "description": "供应商配置缺失"
+          },
+          "502": {
+            "description": "供应商请求失败"
+          },
+          "504": {
+            "description": "供应商请求超时"
+          }
+        }
+      }
+    },
+    "/api/rakuten-products": {
+      "get": {
+        "operationId": "searchRakutenProducts",
+        "summary": "查询乐天日本商品，优先返回供应商联盟购买链接",
+        "description": "查询结果仅为参考，请在供应商页面确认价格、空房、库存、语言与配送条件。原样保留 booking_url / purchase_url 和联盟参数。",
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "description": "日文商品关键词，例如 京都 お土産"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "default": 6
+            },
+            "description": "最多返回条数"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "provider": {
+                      "type": "string"
+                    },
+                    "data_type": {
+                      "type": "string",
+                      "enum": [
+                        "live_api"
+                      ]
+                    },
+                    "returned": {
+                      "type": "integer"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Product"
+                      }
+                    },
+                    "notice": {
+                      "type": "string"
+                    },
+                    "keyword": {
+                      "type": "string"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "405": {
+            "description": "仅支持 GET"
+          },
+          "500": {
+            "description": "供应商配置缺失"
+          },
+          "502": {
+            "description": "供应商请求失败"
+          },
+          "504": {
+            "description": "供应商请求超时"
+          }
+        }
+      }
+    },
+    "/api/viator-experiences": {
+      "get": {
+        "operationId": "searchExperiences",
+        "summary": "查询 Viator 当地体验，保留供应商预订链接",
+        "description": "查询结果仅为参考，请在供应商页面确认价格、空房、库存、语言与配送条件。原样保留 booking_url / purchase_url 和联盟参数。",
+        "parameters": [
+          {
+            "name": "searchTerm",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "description": "城市与活动关键词，推荐英文，例如 Kyoto tea ceremony"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "可选开始日期 YYYY-MM-DD"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "可选结束日期；startDate 未提供时不会应用日期筛选"
+          },
+          {
+            "name": "currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "JPY"
+            },
+            "description": "供应商支持的币种代码"
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "en"
+            },
+            "description": "供应商支持的响应语言"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10,
+              "default": 5
+            },
+            "description": "最多返回条数"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "provider": {
+                      "type": "string"
+                    },
+                    "data_type": {
+                      "type": "string",
+                      "enum": [
+                        "live_api"
+                      ]
+                    },
+                    "returned": {
+                      "type": "integer"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Experience"
+                      }
+                    },
+                    "notice": {
+                      "type": "string"
+                    },
+                    "search_term": {
+                      "type": "string"
+                    },
+                    "start_date": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "date"
+                    },
+                    "end_date": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "date"
+                    },
+                    "currency": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误"
+          },
+          "405": {
+            "description": "仅支持 GET"
+          },
+          "500": {
+            "description": "供应商配置缺失"
+          },
+          "502": {
+            "description": "供应商请求失败"
+          },
+          "504": {
+            "description": "供应商请求超时"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -173,6 +487,191 @@
           "verified_on": {
             "type": "string",
             "format": "date"
+          }
+        }
+      },
+      "Hotel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "rating": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "review_count": {
+            "type": "integer",
+            "nullable": true
+          },
+          "image": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri"
+          },
+          "source": {
+            "type": "string"
+          },
+          "area": {
+            "type": "string"
+          },
+          "price_from_jpy": {
+            "type": "number",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "access": {
+            "type": "string",
+            "nullable": true
+          },
+          "booking_url": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri"
+          },
+          "hotel_information_url": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri"
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "rating": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "review_count": {
+            "type": "integer",
+            "nullable": true
+          },
+          "image": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri"
+          },
+          "source": {
+            "type": "string"
+          },
+          "price_jpy": {
+            "type": "number",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "JPY"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "shop_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "purchase_url": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri"
+          },
+          "affiliate_url": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri"
+          },
+          "item_url": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri"
+          }
+        }
+      },
+      "Experience": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "rating": {
+            "type": "number",
+            "nullable": true
+          },
+          "review_count": {
+            "type": "integer",
+            "nullable": true
+          },
+          "image": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri"
+          },
+          "source": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "price_from": {
+            "type": "number",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true
+          },
+          "duration": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          },
+          "free_cancellation": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "booking_url": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri"
           }
         }
       }

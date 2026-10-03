@@ -205,6 +205,7 @@ export default async function handler(req, res) {
   try {
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
       method: 'POST',
+      signal: AbortSignal.timeout(60000),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${API_KEY}`
@@ -212,7 +213,10 @@ export default async function handler(req, res) {
       body: JSON.stringify(upstreamBody)
     });
 
-    const data = await response.json().catch(() => null);
+    const data = await response.json().catch(err => {
+      if (err?.name === 'TimeoutError' || err?.name === 'AbortError') throw err;
+      return null;
+    });
 
     if (!response.ok) {
       logTravelRequest(requestId, 'failed', '', { upstreamStatus: response.status });
@@ -225,6 +229,10 @@ export default async function handler(req, res) {
     logTravelRequest(requestId, 'success', '');
     return res.status(200).json(data);
   } catch (err) {
+    if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
+      logTravelRequest(requestId, 'failed', '', { error: 'timeout' });
+      return res.status(504).json({ error: 'Upstream service timed out; please retry later' });
+    }
     logTravelRequest(requestId, 'failed', '', { error: err?.name || 'unknown' });
     console.error('代理出错:', err);
     return res.status(502).json({ error: 'AI service unavailable' });
