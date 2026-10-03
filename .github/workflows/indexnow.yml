@@ -1,0 +1,30 @@
+name: Notify IndexNow
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "*-itinerary.html"
+      - "sitemap.xml"
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify IndexNow of public pages
+        run: |
+          curl --fail-with-body --retry 3 -X POST "https://api.indexnow.org/IndexNow" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d '{
+              "host": "www.mengtrip.com",
+              "key": "8f4c2d9a7b1e6f305c8d4a2b9e7f1c63",
+              "keyLocation": "https://www.mengtrip.com/8f4c2d9a7b1e6f305c8d4a2b9e7f1c63.txt",
+              "urlList": [
+                "https://www.mengtrip.com/",
+                "https://www.mengtrip.com/tokyo-5-day-itinerary.html",
+                "https://www.mengtrip.com/tokyo-osaka-5-day-itinerary.html",
+                "https://www.mengtrip.com/osaka-kyoto-5-day-itinerary.html"
+              ]
+            }'
