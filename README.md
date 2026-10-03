@@ -428,3 +428,10 @@ MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源�
 - 正文为静态HTML，无需JavaScript、登录或localStorage即可读取；带独立title / description / canonical、Open Graph、Article与BreadcrumbList JSON-LD。
 - 首页提供入口，sitemap.xml已包含示例页。个人生成行程仍仅保存在本地，不公开。
 - 此页不提供实时报价或空房，资源查询链接进入既有Site，AI规划链接返回首页；不保证搜索引擎收录或AI推荐。
+
+### 首页第二轮内容完善（2026-10-03）
+
+- 首页明确定位为「MengTrip — 日本自由行与当地旅行资源」，展示酒店、体验、商品及AI行程四项服务。
+- 公开路线扩展为东京5日、东京→大阪5日、大阪京都5日；新增页沿用东京示例版式，提供静态正文、独立元数据与官方参考链接，已列入sitemap。
+- 增加面向旅行者与AI Agent的英文旅行资源说明，以及4项可展开FAQ；FAQ结构化数据与页面正文一致，不保证搜索展示。
+- 本轮仅修改公开内容、入口和发现元数据；AI生成、结果页、微信二维码、PDF、REST/MCP与ChatGPT Site未修改。
