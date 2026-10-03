@@ -22,7 +22,7 @@ const FEEDBACK_API_URL = 'https://deepseek-proxy-three.vercel.app/api/feedback';
 const ITINERARY_STORAGE_KEY = "currentItinerary";
 const ITINERARY_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const MY_TRIPS_STORAGE_KEY = "myTrips";
-const MY_TRIPS_MAX_COUNT = 20;
+const MY_TRIPS_MAX_COUNT = 1;
 const IS_TRIP_PAGE = /\/trip\.html$/.test(location.pathname);
 
 function fillExampleInput() {
@@ -373,8 +373,9 @@ window.onload = function () {
         document.querySelector('.feedback-wrap').hidden = true;
       }
     } else {
-      const itinerary = getStoredItinerary();
-      if (itinerary) document.getElementById('inputText').value = itinerary.input || '';
+      // Keep the planner ready for a new request on every homepage visit.
+      const input = document.getElementById('inputText');
+      if (input) input.value = '';
     }
     renderMyTrips();
   } catch (e) {
