@@ -3,7 +3,40 @@
 <head>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <meta charset="utf-8"/>
-<title>AI旅行助手</title>
+<title>MengTrip 日本AI旅行助手｜东京、大阪自由行与旅行资源</title>
+<meta name="description" content="MengTrip 为赴日自由行用户提供中文 AI 行程规划，免费生成东京、大阪、京都等日本旅行行程，支持付费下载 PDF；通过旅行资源 Demo 和 API 连接 Rakuten 酒店、日本当地体验与日本商品。"/>
+<link rel="canonical" href="https://www.mengtrip.com/"/>
+<meta property="og:type" content="website"/>
+<meta property="og:locale" content="zh_CN"/>
+<meta property="og:site_name" content="MengTrip"/>
+<meta property="og:title" content="MengTrip 日本AI旅行助手｜东京、大阪自由行与旅行资源"/>
+<meta property="og:description" content="MengTrip 为赴日自由行用户提供中文 AI 行程规划，免费生成东京、大阪、京都等日本旅行行程，支持付费下载 PDF；通过旅行资源 Demo 和 API 连接 Rakuten 酒店、日本当地体验与日本商品。"/>
+<meta property="og:url" content="https://www.mengtrip.com/"/>
+<meta name="twitter:card" content="summary"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.mengtrip.com/#organization",
+      "name": "MengTrip",
+      "url": "https://www.mengtrip.com/"
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.mengtrip.com/#website",
+      "name": "MengTrip 日本AI旅行助手",
+      "url": "https://www.mengtrip.com/",
+      "inLanguage": "zh-CN",
+      "description": "MengTrip 为赴日自由行用户提供中文 AI 行程规划，免费生成东京、大阪、京都等日本旅行行程，支持付费下载 PDF；通过旅行资源 Demo 和 API 连接 Rakuten 酒店、日本当地体验与日本商品。",
+      "publisher": {
+        "@id": "https://www.mengtrip.com/#organization"
+      }
+    }
+  ]
+}
+</script>
 
 <!-- 百度统计 -->
 <script>
@@ -489,6 +522,59 @@ th, td {
   .feedback-comment { font-size: 16px; }
 }
 
+
+/* Homepage presentation: keep itinerary/PDF styles and application logic intact. */
+body { color:#243d35; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif; background:#f6f8f7; }
+.container { max-width:880px; padding:24px 20px; }
+.site-header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:0 0 24px; }
+.brand { font-size:23px; font-weight:800; color:#20704e; text-decoration:none; letter-spacing:-.5px; }
+.site-nav { display:flex; gap:18px; font-size:14px; }
+.site-nav a,.resource-section a { color:#20704e; text-underline-offset:4px; }
+.site-nav a { text-decoration:none; }
+.hero { text-align:center; padding:20px 0 24px; }
+.eyebrow { color:#598171; font-size:12px; letter-spacing:2px; margin:0 0 12px; }
+.hero h1 { font-size:clamp(28px,5vw,40px); line-height:1.3; letter-spacing:-1px; margin:0 0 14px; color:#203b31; }
+.hero p:last-child { color:#687a72; line-height:1.8; margin:0; font-size:16px; }
+.planner-panel { background:#fff; border:1px solid #e0e8e3; border-radius:20px; padding:26px; box-shadow:0 8px 30px rgba(30,70,50,.035); }
+.quick-input-hint { background:#eff7f2; color:#476555; padding:14px 18px; font-size:14px; }
+.quick-input-hint p { margin-bottom:4px; }
+#inputText { font-size:16px; height:160px; min-height:140px; line-height:1.7; border-color:#d8e3dc; box-shadow:none; resize:vertical; }
+#inputText:focus { outline:2px solid #74b294; outline-offset:2px; }
+button { border-radius:10px; box-shadow:none; }
+#generateBtn { background:#23734f; font-size:17px; width:100%; padding:16px; margin-bottom:0; }
+#generateBtn:hover { background:#195d3f; }
+#generateBtn:disabled { opacity:.65; cursor:wait; }
+button:focus-visible,a:focus-visible,summary:focus-visible { outline:2px solid #23734f; outline-offset:4px; }
+.my-trips { border:1px solid #e0e8e3; box-shadow:none; }
+.resource-section { margin-top:44px; }
+.resource-section h2 { font-size:25px; text-align:left; letter-spacing:0; margin:0 0 12px; color:#203b31; }
+.resource-intro { color:#687a72; font-size:15px; line-height:1.9; margin:0 0 20px; }
+.resource-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+.resource-card { background:#fff; border:1px solid #e0e8e3; border-radius:14px; padding:20px; }
+.resource-card .resource-label { color:#698376; font-size:12px; margin:0 0 10px; }
+.resource-card h3 { font-size:18px; margin:0 0 10px; }
+.resource-card p { color:#687a72; font-size:14px; line-height:1.8; margin:0; }
+.resource-demo { display:inline-block; margin-top:18px; font-size:14px; font-weight:600; }
+.agent-details { margin-top:22px; border-top:1px solid #dfe7e2; padding-top:20px; }
+.agent-details summary { cursor:pointer; font-weight:600; font-size:15px; }
+.agent-details p,.agent-details li { color:#687a72; font-size:14px; line-height:1.8; }
+.agent-details ul { padding-left:20px; }
+.agent-details code { overflow-wrap:anywhere; }
+.page-footer { font-size:13px; border-top:1px solid #e0e8e3; padding-top:22px; }
+@media (max-width:600px) {
+ .container { padding:18px 16px; }
+ .site-header { padding-bottom:16px; }
+ .site-nav { gap:12px; font-size:13px; }
+ .hero { padding:16px 0 22px; }
+ .planner-panel { padding:18px; border-radius:16px; }
+ .input-assist-header { flex-wrap:wrap; }
+ .resource-grid { grid-template-columns:1fr; gap:10px; }
+ .resource-card { padding:18px; }
+ .resource-section { margin-top:32px; }
+ .loading-road { white-space:normal; flex-wrap:wrap; }
+ #roadTrack { min-width:0; }
+}
+
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
@@ -891,7 +977,17 @@ function updateButtonDisplayAfterGenerate() {
 </head>
 <body>
 <div class="container">
-<h2 style="margin-top: 10px;">✈️ AI旅行助手</h2>
+<header class="site-header">
+<a class="brand" href="/" aria-label="MengTrip 首页">MengTrip<span aria-hidden="true">.</span></a>
+<nav class="site-nav" aria-label="页面导航"><a href="#planner">规划行程</a><a href="#japan-resources">旅行资源</a></nav>
+</header>
+<main>
+<section class="hero" aria-labelledby="pageTitle">
+<p class="eyebrow">JAPAN TRAVEL, MADE SIMPLE</p>
+<h1 id="pageTitle">日本AI旅行助手</h1>
+<p>东京、大阪、京都自由行，从一个想法开始。<br>告诉 MengTrip 你的需求，轻松规划下一段旅程。</p>
+</section>
+<section id="planner" class="planner-panel" aria-label="AI 行程规划">
 <div class="quick-input-hint">
   <p>🧳 1分钟一键搞定行程安排！</p>
   <p>📝 输出行程PDF文件，可保存可分享</p>
@@ -917,6 +1013,7 @@ function updateButtonDisplayAfterGenerate() {
 </div>
 <textarea id="inputText" aria-label="旅行需求" placeholder="例如：东京到大阪6天自由行，3人，8月1日到6日，预算每人1万元人民币" rows="5"></textarea>
 <button id="generateBtn" onclick="generate()">🗺️ AI生成旅游行程</button>
+</section>
 <div class="output" id="pdf-content"><div id="output"><p><strong> 这里将显示生成的行程内容... </strong></p></div></div>
 <div style="text-align: center;">
   <button id="pdfButton" onclick="doDownloadPDF()" style="display: none;"><img src="./pdf_icon.png" alt="" style="height:38px; vertical-align:middle; margin-right:8px;"/>下载PDF</button>
@@ -928,6 +1025,27 @@ function updateButtonDisplayAfterGenerate() {
   <button type="button" class="payment-cancel" onclick="closePaymentPanel()">稍后再说</button>
 </section>
 <section class="my-trips" aria-labelledby="myTripsTitle"><h3 id="myTripsTitle">🧳 我的旅行</h3><div id="myTripsContent"></div></section>
+<section id="japan-resources" class="resource-section" aria-labelledby="resourcesTitle">
+<h2 id="resourcesTitle">MengTrip 日本旅行资源</h2>
+<p class="resource-intro">MengTrip 为赴日自由行用户和 AI Agent 提供日本旅行规划与资源查询。除了中文 AI 行程，你还可以通过旅行资源 Demo 探索日本酒店、当地体验和旅行购物，为东京、大阪、京都等目的地的旅程寻找灵感。</p>
+<div class="resource-grid">
+<article class="resource-card"><p class="resource-label" lang="en">HOTELS IN JAPAN</p><h3>日本酒店</h3><p>通过 Rakuten Travel 查询酒店名称、地区、最低标示价格与评分，进入供应商页面查看住宿方案。具体日期的价格与空房以预订页面为准。</p></article>
+<article class="resource-card"><p class="resource-label" lang="en">THINGS TO DO IN JAPAN</p><h3>当地体验</h3><p>通过 Viator 探索东京美食导览、文化体验与日本观光活动，查看体验介绍、价格与评分，再前往供应商页面预约。</p></article>
+<article class="resource-card"><p class="resource-label" lang="en">JAPANESE PRODUCTS</p><h3>日本商品</h3><p>通过 Rakuten 市场寻找抹茶、伴手礼与日本商品，让旅行购物延续到旅程之后。配送地区、库存与费用请在商品页面确认。</p></article>
+</div>
+<a class="resource-demo" href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/">探索酒店、体验与商品 →</a>
+<details class="agent-details">
+<summary>AI Agent 与开发者接入 <span lang="en">/ For AI Agents &amp; Developers</span></summary>
+<p lang="en">MengTrip provides Japan travel resources through REST APIs and MCP: Rakuten hotels, Viator experiences, Rakuten products, and a curated local resource demo dataset.</p>
+<ul>
+<li>REST API：<code>/api/rakuten-hotels</code>、<code>/api/viator-experiences</code>、<code>/api/rakuten-products</code>、<code>/api/resources</code>。参数与返回字段参见<a href="https://github.com/AiTravelAssistant/travel-planner#readme">接入文档</a>。</li>
+<li><a href="/openapi.json">OpenAPI 描述文件</a>：当前描述当地静态资源接口。</li>
+<li>MCP endpoint：<code>https://www.mengtrip.com/mcp</code>，需在支持 MCP 的客户端中配置连接。</li>
+</ul>
+<p>资源查询后可前往供应商页面预订或购买；当前接口不提供自动预订和支付。公开页面与端点有助于发现，但不代表所有 AI 都会自动调用。</p>
+</details>
+</section>
+</main>
 <div class="feedback-wrap">
   <button id="feedbackToggle" class="feedback-toggle" type="button" onclick="toggleFeedback()" aria-expanded="false" aria-controls="feedbackPanel">用户反馈</button>
   <p style="font-size:13px; color:#888; margin-top:-8px;">欢迎提出建议，帮助我们继续改进 AI旅行助手</p>

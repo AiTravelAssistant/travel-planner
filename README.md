@@ -407,3 +407,10 @@ MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源�
 - 返回商品名称、JPY价格、评分、评论数、图片、店铺、`purchase_url`、`affiliate_url`。优先原样保留供应商 `affiliateUrl`；未配置联盟或供应商未返回联盟链接时，普通商品链接不能视为佣金归因。
 - 线上 MCP 实际调用「抹茶」limit=6 成功返回6件真实商品，6条联盟链接。商品可能含ふるさと納税返礼品，需按商品名称确认；价格、库存及配送范围以供应商页面为准。
 - 本地验证参数校验、联盟参数传递、原样链接、无联盟配置和上游失败。当前未执行购买或证明佣金到账。
+
+### 首页发现与展示（2026-10-03）
+
+- `index.html` 增加中文标题、description、canonical、Open Graph 和 Organization / WebSite JSON-LD。
+- 首页加入静态日本酒店、当地体验、商品介绍及资源 Demo 链接；开发者说明包含 REST / MCP 接入和 OpenAPI 当前仅覆盖静态资源的范围。
+- 新增 `robots.txt` 与 `sitemap.xml`（目前仅列首页）；不保证搜索引擎收录、排名或 AI 自动调用。
+- 统一绿色主色、留白、卡片与手机排版；保留原有 DeepSeek 请求、行程历史、微信二维码与人民币 ¥9.90 PDF 下载逻辑。ChatGPT Site 未修改。
