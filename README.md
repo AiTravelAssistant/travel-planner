@@ -421,3 +421,10 @@ MCP 的酒店工具直接复用 `api/rakuten-hotels.js` handler；当地资源�
 - 结果页保留完整行程、微信二维码、PDF 导出和用户反馈，提供返回首页 / 规划新行程链接。
 - 首页“我的旅行”进入对应结果页；结果页支持刷新恢复。链接依赖当前浏览器本地历史，不能跨设备分享行程。
 - 现有 AI 请求、资源 API / MCP 与 ChatGPT Site 不变。
+
+### 公开东京行程示例（2026-10-03）
+
+- `/tokyo-5-day-itinerary.html`：公开的东京5天4晚编辑路线示例，包含每日安排、住宿选区、交通思路、预算拆分、行前清单与官方参考链接。
+- 正文为静态HTML，无需JavaScript、登录或localStorage即可读取；带独立title / description / canonical、Open Graph、Article与BreadcrumbList JSON-LD。
+- 首页提供入口，sitemap.xml已包含示例页。个人生成行程仍仅保存在本地，不公开。
+- 此页不提供实时报价或空房，资源查询链接进入既有Site，AI规划链接返回首页；不保证搜索引擎收录或AI推荐。
