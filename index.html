@@ -4,13 +4,13 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <meta charset="utf-8"/>
 <title>MengTrip 日本AI旅行助手｜东京、大阪自由行与旅行资源</title>
-<meta name="description" content="MengTrip 为赴日自由行用户提供中文 AI 行程规划，免费生成东京、大阪、京都等日本旅行行程，支持付费下载 PDF；通过旅行资源 Demo 和 API 连接 Rakuten 酒店、日本当地体验与日本商品。"/>
+<meta name="description" content="MengTrip 为赴日自由行用户提供中文 AI 行程规划，免费生成东京、大阪、京都等日本旅行行程，支持付费下载 PDF；通过旅行资源站 和 API 连接 Rakuten 酒店、日本当地体验与日本商品。"/>
 <link rel="canonical" href="https://www.mengtrip.com/"/>
 <meta property="og:type" content="website"/>
 <meta property="og:locale" content="zh_CN"/>
 <meta property="og:site_name" content="MengTrip"/>
 <meta property="og:title" content="MengTrip 日本AI旅行助手｜东京、大阪自由行与旅行资源"/>
-<meta property="og:description" content="MengTrip 为赴日自由行用户提供中文 AI 行程规划，免费生成东京、大阪、京都等日本旅行行程，支持付费下载 PDF；通过旅行资源 Demo 和 API 连接 Rakuten 酒店、日本当地体验与日本商品。"/>
+<meta property="og:description" content="MengTrip 为赴日自由行用户提供中文 AI 行程规划，免费生成东京、大阪、京都等日本旅行行程，支持付费下载 PDF；通过旅行资源站 和 API 连接 Rakuten 酒店、日本当地体验与日本商品。"/>
 <meta property="og:url" content="https://www.mengtrip.com/"/>
 <meta name="twitter:card" content="summary"/>
 <script type="application/ld+json">
@@ -29,7 +29,7 @@
       "name": "MengTrip 日本AI旅行助手",
       "url": "https://www.mengtrip.com/",
       "inLanguage": "zh-CN",
-      "description": "MengTrip 为赴日自由行用户提供中文 AI 行程规划，免费生成东京、大阪、京都等日本旅行行程，支持付费下载 PDF；通过旅行资源 Demo 和 API 连接 Rakuten 酒店、日本当地体验与日本商品。",
+      "description": "MengTrip 为赴日自由行用户提供中文 AI 行程规划，免费生成东京、大阪、京都等日本旅行行程，支持付费下载 PDF；通过旅行资源站 和 API 连接 Rakuten 酒店、日本当地体验与日本商品。",
       "publisher": {
         "@id": "https://www.mengtrip.com/#organization"
       }
@@ -58,7 +58,7 @@
           "name": "可以搜索日本酒店和当地体验吗？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "可以。点击“探索酒店、体验与商品”进入资源Demo，查询Rakuten Travel酒店、Viator体验及Rakuten商品，再前往供应商页面确认价格、空房和预约条件。"
+            "text": "可以。点击“探索酒店、体验与商品”进入旅行资源站，查询Rakuten Travel酒店、Viator体验及Rakuten商品，再前往供应商页面确认价格、空房和预约条件。"
           }
         },
         {
@@ -102,13 +102,13 @@
 <div class="container">
 <header class="site-header">
 <a class="brand" href="/" aria-label="MengTrip 首页">MengTrip<span aria-hidden="true">.</span></a>
-<nav class="site-nav" aria-label="页面导航"><a href="#planner">规划行程</a><a href="#japan-resources">旅行资源</a></nav>
+<nav class="site-nav" aria-label="页面导航"><a href="#planner">规划行程</a><a href="#featured-trips">精选旅行</a><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/">酒店与体验</a></nav>
 </header>
 <main>
 <section class="hero" aria-labelledby="pageTitle">
 <p class="eyebrow">JAPAN TRAVEL, MADE SIMPLE</p>
-<h1 id="pageTitle">MengTrip — 日本自由行<br>与当地旅行资源</h1>
-<p>酒店 · 日本当地体验 · 日本商品 · AI自由行生成<br>告诉 MengTrip 你的日期、人数和偏好，开始规划日本之旅。</p>
+<h1 id="pageTitle">发现适合你的日本旅行</h1>
+<p>先用 AI 规划行程，再挑选酒店、当地体验和日本商品。</p>
 </section>
 <section id="planner" class="planner-panel" aria-label="AI 行程规划">
 <div class="quick-input-hint">
@@ -139,21 +139,21 @@
 <p id="generationStatus" role="status" aria-live="polite"></p>
 </section>
 <section class="my-trips" aria-labelledby="myTripsTitle"><h3 id="myTripsTitle">🧳 我的旅行</h3><div id="myTripsContent"></div></section>
-<section class="resource-section" aria-labelledby="guideTitle">
-<h2 id="guideTitle">日本自由行示例</h2>
-<p class="resource-intro">先看看一份完整路线，再按你的日期、人数和偏好生成自己的行程。</p>
-<div class="resource-grid"><article class="resource-card"><p class="resource-label" lang="en">TOKYO · 5 DAYS / 4 NIGHTS</p><h3><a href="/tokyo-5-day-itinerary.html">东京5日自由行：第一次去东京的轻松路线</a></h3><p>浅草、上野、原宿、涩谷与台场，按区域安排，附住宿选区、交通思路和行前清单。</p><a class="resource-demo" href="/tokyo-5-day-itinerary.html">查看完整示例 →</a></article>
-<article class="resource-card"><p class="resource-label" lang="en">TOKYO → OSAKA · 5 DAYS</p><h3><a href="/tokyo-osaka-5-day-itinerary.html">东京→大阪5日自由行</a></h3><p>东京两晚、大阪两晚，第三天乘新干线换城市，兼顾街区、美食与休息。</p><a class="resource-demo" href="/tokyo-osaka-5-day-itinerary.html">查看完整示例 →</a></article>
-<article class="resource-card"><p class="resource-label" lang="en">OSAKA &amp; KYOTO · 5 DAYS</p><h3><a href="/osaka-kyoto-5-day-itinerary.html">大阪京都5日自由行</a></h3><p>大阪美食街区搭配京都文化散步，按区域游览，减少搬运行李。</p><a class="resource-demo" href="/osaka-kyoto-5-day-itinerary.html">查看完整示例 →</a></article>
+<section id="featured-trips" class="resource-section" aria-labelledby="guideTitle">
+<h2 id="guideTitle">精选日本旅行产品</h2>
+<p class="resource-intro">东京、大阪、京都：从一条路线开始，找到适合你的住处、体验与伴手礼。</p>
+<div class="resource-grid"><article class="resource-card"><p class="resource-label" lang="en">TOKYO · 5 DAYS / 4 NIGHTS</p><h3><a href="/tokyo-5-day-itinerary.html">东京5日自由行：第一次去东京的轻松路线</a></h3><p>浅草、上野、原宿、涩谷与台场，按区域安排，附住宿选区、交通思路和行前清单。</p><a class="resource-demo" href="/tokyo-5-day-itinerary.html">查看行程</a><div class="resource-actions"><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/?hotel=%E6%9D%B1%E4%BA%AC#hotel-section">酒店</a><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/?experience=Tokyo+food+tour#experience-section">当地体验</a><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/?product=%E6%8A%B9%E8%8C%B6#product-section">日本商品</a></div></article>
+<article class="resource-card"><p class="resource-label" lang="en">TOKYO → OSAKA · 5 DAYS</p><h3><a href="/tokyo-osaka-5-day-itinerary.html">东京→大阪5日自由行</a></h3><p>东京两晚、大阪两晚，第三天乘新干线换城市，兼顾街区、美食与休息。</p><a class="resource-demo" href="/tokyo-osaka-5-day-itinerary.html">查看行程</a><div class="resource-actions"><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/?hotel=%E5%A4%A7%E9%98%AA#hotel-section">酒店</a><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/?experience=Osaka+food+tour#experience-section">当地体验</a><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/?product=%E6%8A%B9%E8%8C%B6#product-section">日本商品</a></div></article>
+<article class="resource-card"><p class="resource-label" lang="en">OSAKA &amp; KYOTO · 5 DAYS</p><h3><a href="/osaka-kyoto-5-day-itinerary.html">大阪京都5日自由行</a></h3><p>大阪美食街区搭配京都文化散步，按区域游览，减少搬运行李。</p><a class="resource-demo" href="/osaka-kyoto-5-day-itinerary.html">查看行程</a><div class="resource-actions"><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/?hotel=%E4%BA%AC%E9%83%BD#hotel-section">酒店</a><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/?experience=Kyoto+cultural+experience#experience-section">当地体验</a><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/?product=%E6%8A%B9%E8%8C%B6#product-section">日本商品</a></div></article>
 </div></section>
 <section id="japan-resources" class="resource-section" aria-labelledby="resourcesTitle">
-<h2 id="resourcesTitle">MengTrip 日本旅行资源</h2>
-<p class="resource-intro">MengTrip 为赴日自由行用户和 AI Agent 提供日本旅行规划与资源查询。除了中文 AI 行程，你还可以通过旅行资源 Demo 探索日本酒店、当地体验和旅行购物，为东京、大阪、京都等目的地的旅程寻找灵感。</p>
+<h2 id="resourcesTitle">住哪里、玩什么、买什么</h2>
+<p class="resource-intro">MengTrip 为赴日自由行用户和 AI Agent 提供日本旅行规划与资源查询。除了中文 AI 行程，你还可以通过旅行资源站 探索日本酒店、当地体验和旅行购物，为东京、大阪、京都等目的地的旅程寻找灵感。</p>
 <p class="resource-intro" lang="en">MengTrip connects Japan travel resources including hotels, local experiences and Japanese products, for travelers and AI agents.</p>
 <div class="resource-grid">
-<article class="resource-card"><p class="resource-label" lang="en">HOTELS IN JAPAN</p><h3>日本酒店</h3><p>通过 Rakuten Travel 查询酒店名称、地区、最低标示价格与评分，进入供应商页面查看住宿方案。具体日期的价格与空房以预订页面为准。</p></article>
-<article class="resource-card"><p class="resource-label" lang="en">THINGS TO DO IN JAPAN</p><h3>当地体验</h3><p>通过 Viator 探索东京美食导览、文化体验与日本观光活动，查看体验介绍、价格与评分，再前往供应商页面预约。</p></article>
-<article class="resource-card"><p class="resource-label" lang="en">JAPANESE PRODUCTS</p><h3>日本商品</h3><p>通过 Rakuten 市场寻找抹茶、伴手礼与日本商品，让旅行购物延续到旅程之后。配送地区、库存与费用请在商品页面确认。</p></article>
+<article class="resource-card"><p class="resource-label" lang="en">HOTELS IN JAPAN</p><h3><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/?hotel=%E6%9D%B1%E4%BA%AC#hotel-section">日本酒店</a></h3><p>通过 Rakuten Travel 查询酒店名称、地区、最低标示价格与评分，进入供应商页面查看住宿方案。具体日期的价格与空房以预订页面为准。</p></article>
+<article class="resource-card"><p class="resource-label" lang="en">THINGS TO DO IN JAPAN</p><h3><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/?experience=Tokyo+food+tour#experience-section">当地体验</a></h3><p>通过 Viator 探索东京美食导览、文化体验与日本观光活动，查看体验介绍、价格与评分，再前往供应商页面预约。</p></article>
+<article class="resource-card"><p class="resource-label" lang="en">JAPANESE PRODUCTS</p><h3><a href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/?product=%E6%8A%B9%E8%8C%B6#product-section">日本商品</a></h3><p>通过 Rakuten 市场寻找抹茶、伴手礼与日本商品，让旅行购物延续到旅程之后。配送地区、库存与费用请在商品页面确认。</p></article>
 </div>
 <a class="resource-demo" href="https://mengtrip-japan-local-resource.king-meng.chatgpt.site/">探索酒店、体验与商品 →</a>
 <details class="agent-details">
@@ -169,10 +169,10 @@
 </section>
 <section class="resource-section faq-section" aria-labelledby="faqTitle"><h2 id="faqTitle">常见问题</h2><details class="agent-details"><summary>MengTrip是什么？</summary><p>MengTrip为中文用户提供日本自由行规划与当地旅行资源入口，包括AI行程生成、日本酒店、当地体验和日本商品查询。</p></details>
 <details class="agent-details"><summary>可以生成日本自由行吗？</summary><p>可以。输入目的地、出行日期、人数、预算和偏好，即可免费生成行程。生成后进入独立结果页查看，PDF下载为人民币¥9.90，微信扫码后自行确认。</p></details>
-<details class="agent-details"><summary>可以搜索日本酒店和当地体验吗？</summary><p>可以。点击“探索酒店、体验与商品”进入资源Demo，查询Rakuten Travel酒店、Viator体验及Rakuten商品，再前往供应商页面确认价格、空房和预约条件。</p></details>
+<details class="agent-details"><summary>可以搜索日本酒店和当地体验吗？</summary><p>可以。点击“探索酒店、体验与商品”进入旅行资源站，查询Rakuten Travel酒店、Viator体验及Rakuten商品，再前往供应商页面确认价格、空房和预约条件。</p></details>
 <details class="agent-details"><summary>AI Agent可以使用MengTrip旅行资源吗？</summary><p>支持MCP的客户端可配置连接https://www.mengtrip.com/mcp；开发者也可接入REST API。当前支持资源搜索和供应商链接，不直接完成预订或支付；公开接口不代表所有AI会自动发现或调用。</p></details></section>
 </main>
-<footer class="page-footer">© 2026 MYG. All rights reserved.</footer>
+<footer class="page-footer">© 2026 MengTrip. 日本自由行与当地旅行资源</footer>
 
 <script src="/trip-app.js"></script>
 </body>
