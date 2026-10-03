@@ -528,3 +528,21 @@ button:focus-visible,a:focus-visible,summary:focus-visible { outline:2px solid #
 [hidden] { display:none !important; }
 #tripTitle { overflow-wrap:anywhere; font-size:26px; text-align:left; }
 #output:empty { display:none; }
+
+/* MengTrip shared navy and teal brand */
+body { color:#142d41;background:#f1f5f9; }
+.container { max-width:1100px; }
+.brand,.site-nav a,.resource-section a,.hero h1,.resource-section h2 { color:#102d43; }
+.hero { text-align:left;padding:18px 0 22px; }
+.hero h1 { font-size:clamp(28px,5vw,42px); }
+.eyebrow { color:#116e78;font-size:14px; }
+#generateBtn { background:#116e78; }
+#generateBtn:hover { background:#0b5962; }
+.planner-panel,.my-trips,.resource-card { border-color:#dce7ee; }
+.quick-input-hint,.quick-option { background:#e4f5f1;color:#11685f; }
+.resource-card { border-top:3px solid #2dd4bf; }
+.resource-card p,.resource-intro { font-size:16px; }
+.resource-actions { display:flex;flex-wrap:wrap;gap:8px;margin-top:18px; }
+.resource-actions a { padding:9px 12px;background:#e4f5f1;border-radius:8px;color:#11685f;text-decoration:none;font-size:14px;font-weight:650; }
+.resource-actions a:hover { background:#ccebe5; }
+@media(max-width:700px) { .site-header{flex-wrap:wrap}.site-nav{flex-wrap:wrap}.resource-grid{grid-template-columns:1fr}.hero{padding-top:8px}.container{padding:18px 16px} }
