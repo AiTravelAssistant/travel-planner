@@ -1,0 +1,25 @@
+[
+  {
+    "title": "东京经典5日自由行",
+    "url": "/tokyo-5-day-itinerary.html",
+    "label": "5天｜首次访日｜经典东京",
+    "highlight": "浅草・上野・涩谷・银座・东京塔",
+    "description": "从传统浅草到现代涩谷，结合经典景点、美食、购物与东京夜景，适合第一次来东京的中文自由行游客。",
+    "lastmod": "2026-10-03",
+    "anchors": {"hotels":"#hotels","experiences":"#experiences","products":"#products"}
+  },
+  {
+    "title": "东京→大阪5日自由行",
+    "url": "/tokyo-osaka-5-day-itinerary.html",
+    "label": "TOKYO → OSAKA · 5 DAYS",
+    "description": "东京两晚、大阪两晚，第三天乘新干线换城市，兼顾街区、美食与休息。",
+    "lastmod": "2026-10-03"
+  },
+  {
+    "title": "大阪京都5日自由行",
+    "url": "/osaka-kyoto-5-day-itinerary.html",
+    "label": "OSAKA & KYOTO · 5 DAYS",
+    "description": "大阪美食街区搭配京都文化散步，按区域游览，减少搬运行李。",
+    "lastmod": "2026-10-03"
+  }
+]
