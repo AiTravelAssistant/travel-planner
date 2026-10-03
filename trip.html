@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>我的旅行行程｜MengTrip</title><meta name="robots" content="noindex, nofollow"/>
+<link rel="stylesheet" href="/trip-app.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.4.12/dist/purify.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head><body><div class="container"><header class="site-header"><a class="brand" href="/">MengTrip.</a><nav class="site-nav"><a href="/">← 返回首页</a><a href="/#planner">规划新行程</a></nav></header>
+<main><h1 id="tripTitle">我的旅行行程</h1><p class="resource-intro">行程保存在当前浏览器，可从首页“我的旅行”再次查看。</p><div class="output" id="pdf-content"><div id="output"><p><strong> 这里将显示生成的行程内容... </strong></p></div></div>
+<div style="text-align: center;">
+  <button id="pdfButton" onclick="doDownloadPDF()" style="display: none;"><img src="./pdf_icon.png" alt="" style="height:38px; vertical-align:middle; margin-right:8px;"/>下载PDF</button>
+</div>
+<section id="paymentPanel" class="payment-panel" hidden aria-label="微信支付二维码">
+  <img class="payment-qr" src="./wechat-payment-9.90.jpeg" alt="AI旅行助手微信收款二维码，金额 ¥9.90" width="320" height="434"/>
+  <p class="payment-note">手机长按保存二维码，再用微信扫一扫识别</p>
+  <button id="paidDownloadButton" type="button" onclick="confirmPaymentAndDownload()">已支付，下载PDF</button>
+  <button type="button" class="payment-cancel" onclick="closePaymentPanel()">稍后再说</button>
+</section>
+<div class="feedback-wrap">
+  <button id="feedbackToggle" class="feedback-toggle" type="button" onclick="toggleFeedback()" aria-expanded="false" aria-controls="feedbackPanel">用户反馈</button>
+  <p style="font-size:13px; color:#888; margin-top:-8px;">欢迎提出建议，帮助我们继续改进 AI旅行助手</p>
+  <section id="feedbackPanel" class="feedback-panel" hidden aria-label="用户反馈表单">
+    <form id="feedbackForm" onsubmit="submitFeedback(event)">
+      <fieldset>
+        <legend>这次行程对您有帮助吗？</legend>
+        <div class="feedback-options">
+          <label><input type="radio" name="helpfulness" value="very_helpful">很有帮助</label>
+          <label><input type="radio" name="helpfulness" value="average">一般</label>
+          <label><input type="radio" name="helpfulness" value="not_helpful">没什么帮助</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>您愿意为这样的服务付费吗？</legend>
+        <div class="feedback-options">
+          <label><input type="radio" name="payment" value="free_only">免费才会用</label>
+          <label><input type="radio" name="payment" value="cny_3_5">¥3～5 / 次</label>
+          <label><input type="radio" name="payment" value="cny_6_10">¥6～10 / 次</label>
+          <label><input type="radio" name="payment" value="cny_10_20">¥10～20 / 次</label>
+          <label><input type="radio" name="payment" value="subscription">功能更完善后考虑订阅</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>您最希望增加什么？（可多选）</legend>
+        <div class="feedback-options">
+          <label><input type="checkbox" name="features" value="transport">交通路线</label>
+          <label><input type="checkbox" name="features" value="restaurant">餐厅推荐</label>
+          <label><input type="checkbox" name="features" value="hotel">酒店推荐</label>
+          <label><input type="checkbox" name="features" value="map">地图 / 导航</label>
+          <label><input type="checkbox" name="features" value="budget">预算估算</label>
+          <label><input type="checkbox" name="features" value="other">其他</label>
+        </div>
+      </fieldset>
+      <label for="feedbackComment" style="display:block; font-weight:bold; margin-bottom:10px;">还有什么想告诉我们？（可不填）</label>
+      <textarea id="feedbackComment" class="feedback-comment" name="comment" maxlength="500" placeholder="请写下一句话意见"></textarea>
+      <button id="feedbackSubmit" class="feedback-submit" type="submit">确认送信</button>
+      <p id="feedbackMessage" class="feedback-message" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+</div>
+</main><footer class="page-footer">© 2026 MYG. All rights reserved.</footer></div><script src="/trip-app.js"></script></body></html>
